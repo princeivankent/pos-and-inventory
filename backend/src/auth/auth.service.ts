@@ -10,7 +10,8 @@ import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { SupabaseService } from './supabase.service';
 import { User } from '../database/entities/user.entity';
-import { UserStore } from '../database/entities/user-store.entity';
+import { UserStore, UserRole } from '../database/entities/user-store.entity';
+import { Store } from '../database/entities/store.entity';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 
@@ -23,10 +24,12 @@ export class AuthService {
     private userRepository: Repository<User>,
     @InjectRepository(UserStore)
     private userStoreRepository: Repository<UserStore>,
+    @InjectRepository(Store)
+    private storeRepository: Repository<Store>,
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const { email, password, full_name } = registerDto;
+    const { email, password, full_name, store_name } = registerDto;
 
     // Check if user already exists
     const existingUser = await this.userRepository.findOne({
@@ -37,11 +40,12 @@ export class AuthService {
       throw new ConflictException('User already exists');
     }
 
-    // Register with Supabase
-    const supabase = this.supabaseService.getClient();
-    const { data, error } = await supabase.auth.signUp({
+    // Register with Supabase using admin client to auto-confirm email
+    const supabase = this.supabaseService.getAdminClient();
+    const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
+      email_confirm: true,
     });
 
     if (error) {
@@ -58,12 +62,35 @@ export class AuthService {
 
     await this.userRepository.save(user);
 
+    // Create a default store for the user
+    const store = this.storeRepository.create({
+      name: store_name || 'My Store',
+      settings: {},
+    });
+
+    await this.storeRepository.save(store);
+
+    // Assign user to the store as ADMIN
+    const userStore = this.userStoreRepository.create({
+      user_id: user.id,
+      store_id: store.id,
+      role: UserRole.ADMIN,
+      is_default: true,
+    });
+
+    await this.userStoreRepository.save(userStore);
+
     return {
       message: 'User registered successfully',
       user: {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
+      },
+      store: {
+        id: store.id,
+        name: store.name,
+        role: UserRole.ADMIN,
       },
     };
   }

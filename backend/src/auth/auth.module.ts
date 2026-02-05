@@ -9,10 +9,11 @@ import { SupabaseService } from './supabase.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { User } from '../database/entities/user.entity';
 import { UserStore } from '../database/entities/user-store.entity';
+import { Store } from '../database/entities/store.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserStore]),
+    TypeOrmModule.forFeature([User, UserStore, Store]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
