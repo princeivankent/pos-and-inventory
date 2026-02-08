@@ -31,6 +31,15 @@ export class Product extends TenantBaseEntity {
   @Column({ type: 'boolean', default: false })
   has_expiry: boolean;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  retail_price: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  cost_price: number;
+
+  @Column({ type: 'integer', default: 0 })
+  current_stock: number;
+
   @Column({ type: 'boolean', default: true })
   is_active: boolean;
 

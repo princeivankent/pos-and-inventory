@@ -5,364 +5,193 @@ Track your progress as you implement the POS system.
 ## Phase 1: Backend Foundation ✅
 
 - [x] Project structure setup
-- [x] Database schema design
-- [x] All entities created (14 tables)
+- [x] Database schema design (14 entities)
 - [x] Initial migration file
-- [x] Multi-tenant architecture
-- [x] Authentication module
-- [x] Guards and decorators
-- [x] Configuration modules
-- [x] Sample module (Stores)
-- [x] Documentation files
+- [x] Multi-tenant architecture (TenantGuard, store_id isolation)
+- [x] Authentication module (Supabase + JWT)
+- [x] Guards and decorators (Auth, Tenant, Roles)
+- [x] Configuration modules (DB, Supabase, env)
+- [x] Stores module (CRUD + user-store access)
 
-## Phase 2: Core Backend Modules
+## Phase 2: Categories & Products ✅
 
-### Products & Categories
-- [ ] Create Products module
-  - [ ] products.module.ts
-  - [ ] products.service.ts
-  - [ ] products.controller.ts
-  - [ ] DTOs (create, update)
-  - [ ] Barcode search endpoint
-  - [ ] SKU validation
-  - [ ] Add to app.module.ts
-  - [ ] Test CRUD operations
+### Categories ✅
+- [x] categories.module.ts
+- [x] categories.service.ts (CRUD with store_id filtering)
+- [x] categories.controller.ts (TenantGuard + RolesGuard)
+- [x] DTOs (create-category, update-category)
+- [x] Hierarchical category support (parent_id)
 
-- [ ] Create Categories module
-  - [ ] categories.module.ts
-  - [ ] categories.service.ts
-  - [ ] categories.controller.ts
-  - [ ] DTOs (create, update)
-  - [ ] Hierarchical category support
-  - [ ] Category tree endpoint
-  - [ ] Add to app.module.ts
-  - [ ] Test operations
+### Products ✅
+- [x] Migration: Added `retail_price`, `cost_price`, `current_stock` to Product entity
+- [x] products.module.ts
+- [x] products.service.ts (CRUD + search by name/SKU/barcode)
+- [x] products.controller.ts (TenantGuard + RolesGuard)
+- [x] DTOs (create-product, update-product)
+- [x] Search endpoint (`GET /api/products/search?q=`)
+- [x] Category filter (`GET /api/products?category_id=`)
+- [x] Soft delete (sets `is_active = false`)
 
-### Suppliers
-- [ ] Create Suppliers module
-  - [ ] suppliers.module.ts
-  - [ ] suppliers.service.ts
-  - [ ] suppliers.controller.ts
-  - [ ] DTOs (create, update)
-  - [ ] Search functionality
-  - [ ] Add to app.module.ts
-  - [ ] Test operations
+## Phase 3: Inventory Management ✅
 
-### Inventory Management
-- [ ] Create Inventory module
-  - [ ] inventory.module.ts
-  - [ ] inventory.service.ts
-  - [ ] inventory.controller.ts
-  - [ ] DTOs (create batch, adjust stock)
-  - [ ] FIFO batch selection logic
-  - [ ] Stock deduction method
-  - [ ] Stock restock method (for returns)
-  - [ ] Current stock calculation
-  - [ ] Expiry tracking
-  - [ ] Add to app.module.ts
-  - [ ] Test FIFO logic
-  - [ ] Test stock movements
+- [x] inventory.module.ts
+- [x] inventory.service.ts (stock in/out with FIFO batch tracking)
+- [x] inventory.controller.ts (TenantGuard + RolesGuard)
+- [x] DTOs (stock-adjustment with AdjustmentType enum)
+- [x] Stock in: creates InventoryBatch + StockMovement, updates product.current_stock
+- [x] Stock out: FIFO batch deduction, validates sufficient stock
+- [x] Low stock endpoint (`GET /api/inventory/low-stock`)
+- [x] Movement history endpoint (`GET /api/inventory/movements`)
 
-### Customer Management
-- [ ] Create Customers module
-  - [ ] customers.module.ts
-  - [ ] customers.service.ts
-  - [ ] customers.controller.ts
-  - [ ] DTOs (create, update)
-  - [ ] Credit validation method
-  - [ ] Balance update method
-  - [ ] Customer statement generation
-  - [ ] Add to app.module.ts
-  - [ ] Test credit limits
+## Phase 4: Sales / POS ✅
 
-## Phase 3: Sales & Transactions
+- [x] sales.module.ts
+- [x] sales.service.ts (atomic transactions via DataSource.transaction())
+- [x] sales.controller.ts (TenantGuard + RolesGuard)
+- [x] DTOs (create-sale with nested SaleItemDto array)
+- [x] Sale number generation (`SALE-YYYYMMDD-NNNN`)
+- [x] VAT calculation from store.settings (12% default)
+- [x] Discount support (percentage or fixed amount)
+- [x] FIFO batch deduction per sale item
+- [x] Stock movement recording (type: sale)
+- [x] Daily sales endpoint (`GET /api/sales/daily?date=`)
+- [x] Void sale with stock restoration (`POST /api/sales/:id/void`, Admin only)
+- [x] SaleItem.batch_id made nullable (for products without batches)
 
-### Sales Module
-- [ ] Create Sales module
-  - [ ] sales.module.ts
-  - [ ] sales.service.ts
-  - [ ] sales.controller.ts
-  - [ ] DTOs (create sale, return sale)
-  - [ ] Sale number generation
-  - [ ] VAT calculation (12%)
-  - [ ] Payment processing
-  - [ ] FIFO batch selection integration
-  - [ ] Stock deduction on sale
-  - [ ] Stock movement recording
-  - [ ] Customer balance updates
-  - [ ] Returns/refunds processing
-  - [ ] Add to app.module.ts
-  - [ ] Test complete sale flow
-  - [ ] Test returns flow
-  - [ ] Test credit sales
+## Phase 5: Receipts ✅
 
-### Credit Payments
-- [ ] Create Credit Payments module
-  - [ ] credit-payments.module.ts
-  - [ ] credit-payments.service.ts
-  - [ ] credit-payments.controller.ts
-  - [ ] DTOs (record payment)
-  - [ ] Payment recording
-  - [ ] Balance updates
-  - [ ] Payment history
-  - [ ] Add to app.module.ts
-  - [ ] Test payment processing
+- [x] receipts.module.ts
+- [x] receipts.service.ts (receipt data + PDF generation with pdfkit)
+- [x] receipts.controller.ts (TenantGuard + RolesGuard)
+- [x] Receipt data endpoint (`GET /api/receipts/:saleId`)
+- [x] PDF receipt endpoint (`GET /api/receipts/:saleId/pdf`)
+- [x] Thermal-printer-friendly format (80mm width)
+- [x] Includes: store info, TIN, items, totals, cashier, payment info
+- [x] Custom receipt header/footer from store.settings
 
-## Phase 4: Reports & Alerts
+## Phase 6: Reports ✅
 
-### Reports Module
-- [ ] Create Reports module
-  - [ ] reports.module.ts
-  - [ ] reports.service.ts
-  - [ ] reports.controller.ts
-  - [ ] DTOs (query parameters)
-  - [ ] Daily sales report
-  - [ ] Monthly sales report
-  - [ ] Inventory report
-  - [ ] Customer balance report
-  - [ ] Product sales analysis
-  - [ ] Expiring batch report
-  - [ ] Low stock report
-  - [ ] Add to app.module.ts
-  - [ ] Test all reports
+- [x] reports.module.ts
+- [x] reports.service.ts (sales, inventory, best-selling, profit)
+- [x] reports.controller.ts (Admin only)
+- [x] Sales summary (`GET /api/reports/sales?period=daily|weekly|monthly`)
+- [x] Inventory report (`GET /api/reports/inventory`)
+- [x] Best-selling products (`GET /api/reports/best-selling?period=&limit=`)
+- [x] Profit report (`GET /api/reports/profit?period=`)
 
-### Alerts Module
-- [ ] Create Alerts module
-  - [ ] alerts.module.ts
-  - [ ] alerts.service.ts
-  - [ ] alerts.cron.ts
-  - [ ] alerts.controller.ts
-  - [ ] Low stock detection
-  - [ ] Out of stock alerts
-  - [ ] Near expiry warnings (30 days)
-  - [ ] Expired batch alerts
-  - [ ] Cron job setup (daily at 6 AM)
-  - [ ] Alert resolution
-  - [ ] Add @nestjs/schedule
-  - [ ] Add to app.module.ts
-  - [ ] Test alert generation
-  - [ ] Test cron job
+## Phase 7: Users Management ✅
 
-### Receipts Module
-- [ ] Create Receipts module
-  - [ ] receipts.module.ts
-  - [ ] receipts.service.ts
-  - [ ] pdf-receipt.service.ts
-  - [ ] thermal-receipt.service.ts
-  - [ ] Receipt template HTML
-  - [ ] PDF generation with pdfkit
-  - [ ] Thermal printer ESC/POS commands
-  - [ ] Store branding support
-  - [ ] Add to app.module.ts
-  - [ ] Test PDF generation
-  - [ ] Test thermal printing
+- [x] users.module.ts
+- [x] users.service.ts (Supabase account creation + store assignment)
+- [x] users.controller.ts (Admin only)
+- [x] DTOs (create-user, update-user-role)
+- [x] List users by store (`GET /api/users`)
+- [x] Create user with Supabase account (`POST /api/users`)
+- [x] Update role (`PATCH /api/users/:id/role`)
+- [x] Deactivate user (`DELETE /api/users/:id`)
 
-### Users Management
-- [ ] Create Users module
-  - [ ] users.module.ts
-  - [ ] users.service.ts
-  - [ ] users.controller.ts
-  - [ ] DTOs (assign store, update role)
-  - [ ] User-store assignment
-  - [ ] Role management
-  - [ ] Default store configuration
-  - [ ] Add to app.module.ts
-  - [ ] Test user management
+## Phase 8: Settings ✅
 
-## Phase 5: Testing & Optimization
+- [x] Settings endpoint on Stores controller (`PATCH /api/stores/:id/settings`)
+- [x] updateSettings() merges into store.settings JSONB
+- [x] Settings schema: `receipt_header`, `receipt_footer`, `tax_enabled`, `tax_rate`
 
-### Backend Testing
-- [ ] Unit tests for services
-  - [ ] Products service tests
-  - [ ] Inventory service tests (FIFO)
-  - [ ] Sales service tests
-  - [ ] Customers service tests
-  - [ ] Reports service tests
+## Build Verification ✅
 
-- [ ] Integration tests
-  - [ ] Authentication flow
-  - [ ] Multi-tenant isolation
-  - [ ] Store switching
-  - [ ] Complete sale transaction
-  - [ ] Returns processing
-  - [ ] Credit payment
-
-- [ ] E2E tests
-  - [ ] User registration to first sale
-  - [ ] Multi-store access
-  - [ ] Inventory depletion
-  - [ ] Low stock alerts
-
-### Performance Optimization
-- [ ] Add database indexes
-- [ ] Query optimization
-- [ ] Caching strategy
-- [ ] API response time testing
-- [ ] Load testing
-
-## Phase 6: Frontend Development
-
-### Project Setup
-- [ ] Initialize Angular project
-- [ ] Install dependencies
-  - [ ] @supabase/supabase-js
-  - [ ] PrimeNG or Angular Material
-  - [ ] Other UI libraries
-
-- [ ] Project structure
-  - [ ] Core module (services, guards, interceptors)
-  - [ ] Shared module (components, pipes, directives)
-  - [ ] Feature modules
-
-### Core Frontend Setup
-- [ ] Supabase service
-- [ ] Auth service
-- [ ] API service
-- [ ] HTTP interceptors
-  - [ ] Auth token interceptor
-  - [ ] Tenant context interceptor (X-Store-Id)
-  - [ ] Error interceptor
-- [ ] Auth guard
-- [ ] Role guard
-- [ ] Store context service
-
-### Authentication UI
-- [ ] Login page
-- [ ] Register page
-- [ ] Store selection component
-- [ ] Store switcher component
-
-### Dashboard
-- [ ] Dashboard layout
-- [ ] Sales overview widgets
-- [ ] Low stock alerts widget
-- [ ] Expiry alerts widget
-- [ ] Quick stats
-
-### POS Interface
-- [ ] POS main layout
-- [ ] Product search component
-  - [ ] Text search
-  - [ ] Barcode scanner integration
-- [ ] Shopping cart component
-- [ ] Customer selection
-- [ ] Payment component
-  - [ ] Cash payment
-  - [ ] Credit payment
-  - [ ] Partial payment
-- [ ] Receipt preview
-- [ ] Receipt print
-
-### Management Interfaces
-- [ ] Products management
-  - [ ] Product list
-  - [ ] Product form (create/edit)
-  - [ ] Product search/filter
-
-- [ ] Inventory management
-  - [ ] Batch list
-  - [ ] Batch form
-  - [ ] Stock adjustment
-  - [ ] Expiry tracking
-
-- [ ] Customers management
-  - [ ] Customer list
-  - [ ] Customer form
-  - [ ] Credit management
-  - [ ] Payment recording
-  - [ ] Customer statement
-
-- [ ] Sales history
-  - [ ] Sales list
-  - [ ] Sales detail
-  - [ ] Returns interface
-
-- [ ] Reports
-  - [ ] Sales reports
-  - [ ] Inventory reports
-  - [ ] Customer reports
-  - [ ] Date range picker
-  - [ ] Export functionality
-
-- [ ] Settings
-  - [ ] Store settings
-  - [ ] User management
-  - [ ] Receipt configuration
-
-## Phase 7: Deployment
-
-### Backend Deployment
-- [ ] Set up Railway account
-- [ ] Create new project
-- [ ] Connect GitHub repository
-- [ ] Set environment variables
-- [ ] Configure build settings
-- [ ] Deploy backend
-- [ ] Test production API
-
-### Frontend Deployment
-- [ ] Set up Vercel account
-- [ ] Connect GitHub repository
-- [ ] Set environment variables
-- [ ] Configure build settings
-- [ ] Deploy frontend
-- [ ] Test production app
-
-### Database Setup
-- [ ] Supabase production project
-- [ ] Run migrations
-- [ ] Configure RLS policies (optional)
-- [ ] Set up backups
-- [ ] Monitor performance
-
-### CI/CD Pipeline
-- [ ] GitHub Actions workflow
-- [ ] Automated testing
-- [ ] Automated deployment
-- [ ] Environment management
-
-## Phase 8: Documentation & Launch
-
-### Documentation
-- [ ] API documentation (Swagger/OpenAPI)
-- [ ] User manual
-- [ ] Admin guide
-- [ ] Deployment guide
-- [ ] Troubleshooting guide
-
-### Launch Preparation
-- [ ] Security audit
-- [ ] Performance testing
-- [ ] User acceptance testing
-- [ ] Training materials
-- [ ] Support system setup
-
-### Go Live
-- [ ] Final testing
-- [ ] Data migration (if applicable)
-- [ ] Production deployment
-- [ ] Monitor for issues
-- [ ] Collect user feedback
-
-## Future Enhancements
-
-### Features to Consider
-- [ ] Mobile app (React Native/Flutter)
-- [ ] Offline mode support
-- [ ] Multiple payment methods (GCash, PayMaya)
-- [ ] Loyalty program
-- [ ] Email receipts
-- [ ] SMS notifications
-- [ ] Advanced analytics
-- [ ] Multi-currency support
-- [ ] Multi-language support
-- [ ] Inventory forecasting
-- [ ] Supplier management portal
-- [ ] API for third-party integrations
+- [x] All 7 new modules registered in app.module.ts
+- [x] `npm run build` compiles with zero errors
 
 ---
 
-**Remember**: Test each component thoroughly before moving to the next. Multi-tenant isolation is critical - always verify that store data is properly isolated.
+## Phase 9: Frontend (Angular 21 + PrimeNG) ✅
 
-**Current Status**: Phase 1 Complete ✅
-**Next Up**: Phase 2 - Core Backend Modules
+### Project Setup ✅
+- [x] Initialize Angular 21 project with standalone components
+- [x] Install PrimeNG + PrimeIcons + Chart.js
+- [x] Proxy config for backend API (`proxy.conf.json`)
+
+### Core Layer ✅
+- [x] Auth service (login, register, token management)
+- [x] Store context service (active store, store switching)
+- [x] Toast service (notifications)
+- [x] Auth interceptor (JWT `Authorization` header)
+- [x] Tenant interceptor (`X-Store-Id` header)
+- [x] Error interceptor (global error handling)
+- [x] Auth guard (route protection)
+- [x] Role guard (admin-only routes)
+
+### Models ✅
+- [x] User, Store, Category, Product, Inventory, Sale, Receipt, Report models
+- [x] Enums (UserRole, PaymentMethod, etc.)
+
+### Layout ✅
+- [x] Main layout component (sidebar + header + content area)
+- [x] Header component (store switcher, user menu)
+- [x] Sidebar component (navigation)
+
+### Routing ✅
+- [x] Lazy-loaded routes for all feature pages
+- [x] Auth guard on protected routes
+- [x] Admin guard on reports, users, categories, settings
+
+### Feature Pages ✅
+- [x] Login page
+- [x] Register page
+- [x] Dashboard (sales summary, low stock alerts)
+- [x] POS screen (product search, category tabs, product grid, cart, payment dialog, receipt preview)
+- [x] Products list (add/edit/deactivate)
+- [x] Categories list (add/edit with hierarchy)
+- [x] Inventory overview (stock in/out)
+- [x] Movement history
+- [x] Low stock alerts
+- [x] Sales list
+- [x] Sale detail (with receipt view)
+- [x] Reports page (sales, inventory, best-selling, profit)
+- [x] Users management (Admin)
+- [x] Store settings (Admin - tax, receipt config)
+
+### POS Components ✅
+- [x] Product search component
+- [x] Category tabs component
+- [x] Product grid component
+- [x] Cart item component
+- [x] Cart panel component
+- [x] Payment dialog component
+- [x] Receipt preview component
+- [x] Cart service (state management)
+
+---
+
+## Phase 10: Testing & Deployment ⏳
+
+### Testing
+- [ ] Unit tests for backend services
+- [ ] Integration tests (multi-tenant isolation, sale transactions)
+- [ ] E2E tests (registration to first sale)
+- [ ] Frontend component tests
+
+### Deployment
+- [ ] Backend deployment (Railway or similar)
+- [ ] Frontend deployment (Vercel or Firebase Hosting)
+- [ ] Run migrations on production DB
+- [ ] Production environment variables
+- [ ] CI/CD pipeline setup
+
+---
+
+## Phase 11: Future Enhancements ⏳
+
+- [ ] Customer management (credit/utang system)
+- [ ] Credit payments tracking
+- [ ] Supplier management
+- [ ] Barcode scanning integration
+- [ ] Offline mode / PWA support
+- [ ] Low stock alert cron jobs
+- [ ] Expiry date warnings
+- [ ] Data export (CSV/Excel)
+- [ ] Multi-device sync
+- [ ] BIR compliance reports
+
+---
+
+**Current Status**: Backend Complete ✅ | Frontend Complete ✅ | Testing & Deployment Pending ⏳

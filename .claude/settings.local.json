@@ -7,7 +7,24 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(tree:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(where:*)",
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(ng version:*)",
+      "Bash(ng new:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(node -e:*)",
+      "Bash(npx ng build:*)",
+      "Bash(npx typeorm migration:run:*)",
+      "Bash(cmd:*)",
+      "Bash(timeout 5 tail:*)",
+      "Bash(npm run migration:run:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(powershell:*)"
     ]
   }
 }

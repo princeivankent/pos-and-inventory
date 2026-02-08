@@ -13,7 +13,7 @@ export class SaleItem extends BaseEntity {
   @Column({ type: 'uuid' })
   product_id: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', nullable: true })
   batch_id: string;
 
   @Column({ type: 'integer' })
@@ -33,7 +33,7 @@ export class SaleItem extends BaseEntity {
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
-  @ManyToOne(() => InventoryBatch)
+  @ManyToOne(() => InventoryBatch, { nullable: true })
   @JoinColumn({ name: 'batch_id' })
   batch: InventoryBatch;
 }

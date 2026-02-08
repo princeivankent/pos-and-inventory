@@ -4,6 +4,13 @@ import { ConfigModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { StoresModule } from './stores/stores.module';
+import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './products/products.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { SalesModule } from './sales/sales.module';
+import { ReceiptsModule } from './receipts/receipts.module';
+import { ReportsModule } from './reports/reports.module';
+import { UsersModule } from './users/users.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { ValidationPipe } from './common/pipes/validation.pipe';
 
@@ -13,16 +20,13 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     DatabaseModule,
     AuthModule,
     StoresModule,
-    // TODO: Add remaining modules as they are implemented
-    // ProductsModule,
-    // CategoriesModule,
-    // SuppliersModule,
-    // InventoryModule,
-    // CustomersModule,
-    // SalesModule,
-    // ReportsModule,
-    // AlertsModule,
-    // ReceiptsModule,
+    CategoriesModule,
+    ProductsModule,
+    InventoryModule,
+    SalesModule,
+    ReceiptsModule,
+    ReportsModule,
+    UsersModule,
   ],
   providers: [
     {

@@ -64,4 +64,13 @@ export class StoresService {
     });
     return !!userStore;
   }
+
+  async updateSettings(
+    id: string,
+    settings: Record<string, any>,
+  ): Promise<Store> {
+    const store = await this.findOne(id);
+    store.settings = { ...store.settings, ...settings };
+    return await this.storeRepository.save(store);
+  }
 }

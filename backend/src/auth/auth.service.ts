@@ -80,18 +80,39 @@ export class AuthService {
 
     await this.userStoreRepository.save(userStore);
 
+    // Sign in the newly created user to get session tokens
+    const { data: signInData, error: signInError } =
+      await this.supabaseService
+        .getClient()
+        .auth.signInWithPassword({ email, password });
+
+    if (signInError || !signInData.session) {
+      throw new BadRequestException('Account created but auto-login failed. Please sign in manually.');
+    }
+
+    // Sign our own JWT
+    const payload = { sub: user.id, email: user.email };
+    const access_token = this.jwtService.sign(payload);
+
+    const stores = [
+      {
+        id: store.id,
+        name: store.name,
+        role: UserRole.ADMIN,
+        is_default: true,
+      },
+    ];
+
     return {
-      message: 'User registered successfully',
+      access_token,
+      refresh_token: signInData.session.refresh_token,
       user: {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
       },
-      store: {
-        id: store.id,
-        name: store.name,
-        role: UserRole.ADMIN,
-      },
+      stores,
+      default_store: stores[0],
     };
   }
 
@@ -132,8 +153,12 @@ export class AuthService {
     const defaultStore =
       userStores.find((us) => us.is_default) || userStores[0];
 
+    // Sign our own JWT so passport-jwt can verify it with JWT_SECRET
+    const payload = { sub: user.id, email: user.email };
+    const access_token = this.jwtService.sign(payload);
+
     return {
-      access_token: data.session.access_token,
+      access_token,
       refresh_token: data.session.refresh_token,
       user: {
         id: user.id,

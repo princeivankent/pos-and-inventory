@@ -15,15 +15,17 @@ import { UpdateStoreDto } from './dto/update-store.dto';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { TenantGuard } from '../common/guards/tenant.guard';
 import { UserRole } from '../database/entities/user-store.entity';
 import { RequestUser } from '../common/interfaces/request-with-user.interface';
 
 @Controller('stores')
-@UseGuards(AuthGuard('jwt'), RolesGuard)
+@UseGuards(AuthGuard('jwt'))
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
   @Post()
+  @UseGuards(TenantGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   create(@Body() createStoreDto: CreateStoreDto) {
     return this.storesService.create(createStoreDto);
@@ -41,12 +43,24 @@ export class StoresController {
   }
 
   @Patch(':id')
+  @UseGuards(TenantGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto) {
     return this.storesService.update(id, updateStoreDto);
   }
 
+  @Patch(':id/settings')
+  @UseGuards(TenantGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updateSettings(
+    @Param('id') id: string,
+    @Body() settings: Record<string, any>,
+  ) {
+    return this.storesService.updateSettings(id, settings);
+  }
+
   @Delete(':id')
+  @UseGuards(TenantGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string) {
     return this.storesService.remove(id);

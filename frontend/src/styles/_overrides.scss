@@ -1,0 +1,77 @@
+// PrimeNG Customizations
+
+// Buttons
+.p-button {
+  border-radius: var(--border-radius-sm);
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all var(--transition-fast);
+}
+
+// Tables
+.p-datatable {
+  .p-datatable-header {
+    background: transparent;
+    border: none;
+    padding: 0 0 var(--space-4);
+  }
+
+  .p-datatable-thead > tr > th {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    border-color: var(--border-color);
+  }
+
+  .p-datatable-tbody > tr > td {
+    border-color: var(--border-color);
+    font-size: 0.875rem;
+  }
+
+  .p-datatable-tbody > tr:hover {
+    background: var(--bg-secondary);
+  }
+}
+
+// Inputs
+.p-inputtext {
+  border-radius: var(--border-radius-sm);
+  border-color: var(--border-color);
+  font-size: 0.875rem;
+
+  &:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary-light);
+  }
+}
+
+// Dialogs
+.p-dialog {
+  border-radius: var(--border-radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+
+  .p-dialog-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: var(--space-4) var(--space-6);
+  }
+
+  .p-dialog-content {
+    padding: var(--space-6);
+  }
+
+  .p-dialog-footer {
+    border-top: 1px solid var(--border-color);
+    padding: var(--space-4) var(--space-6);
+  }
+}
+
+// Toast
+.p-toast {
+  .p-toast-message {
+    border-radius: var(--border-radius);
+  }
+}
