@@ -14,6 +14,7 @@ import { UserStore, UserRole } from '../database/entities/user-store.entity';
 import { Store } from '../database/entities/store.entity';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ALL_PERMISSIONS } from '../common/permissions/permission.enum';
 
 @Injectable()
 export class AuthService {
@@ -100,6 +101,7 @@ export class AuthService {
         name: store.name,
         role: UserRole.ADMIN,
         is_default: true,
+        permissions: ALL_PERMISSIONS,
       },
     ];
 
@@ -170,11 +172,19 @@ export class AuthService {
         name: us.store.name,
         role: us.role,
         is_default: us.is_default,
+        permissions:
+          us.role === UserRole.ADMIN
+            ? ALL_PERMISSIONS
+            : (us.permissions ?? []),
       })),
       default_store: {
         id: defaultStore.store_id,
         name: defaultStore.store.name,
         role: defaultStore.role,
+        permissions:
+          defaultStore.role === UserRole.ADMIN
+            ? ALL_PERMISSIONS
+            : (defaultStore.permissions ?? []),
       },
     };
   }
@@ -198,6 +208,10 @@ export class AuthService {
         id: userStore.store_id,
         name: userStore.store.name,
         role: userStore.role,
+        permissions:
+          userStore.role === UserRole.ADMIN
+            ? ALL_PERMISSIONS
+            : (userStore.permissions ?? []),
       },
     };
   }
@@ -213,6 +227,10 @@ export class AuthService {
       name: us.store.name,
       role: us.role,
       is_default: us.is_default,
+      permissions:
+        us.role === UserRole.ADMIN
+          ? ALL_PERMISSIONS
+          : (us.permissions ?? []),
     }));
   }
 }

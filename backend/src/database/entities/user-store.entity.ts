@@ -26,6 +26,9 @@ export class UserStore extends BaseEntity {
   })
   role: UserRole;
 
+  @Column({ type: 'simple-array', nullable: true })
+  permissions: string[];
+
   @Column({ type: 'boolean', default: false })
   is_default: boolean;
 

@@ -5,6 +5,7 @@ export interface RequestUser {
   email: string;
   storeId?: string;
   role?: string;
+  permissions?: string[];
 }
 
 export interface RequestWithUser extends Request {

@@ -12,15 +12,20 @@ import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UpdatePermissionsDto } from './dto/update-permissions.dto';
 import { CurrentStore } from '../common/decorators/current-store.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
+import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { PermissionsGuard } from '../common/guards/permissions.guard';
 import { UserRole } from '../database/entities/user-store.entity';
+import { Permission } from '../common/permissions/permission.enum';
 
 @Controller('users')
-@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard)
+@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard, PermissionsGuard)
 @Roles(UserRole.ADMIN)
+@RequirePermissions(Permission.USERS_MANAGE)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -29,9 +34,31 @@ export class UsersController {
     return this.usersService.findAllByStore(storeId);
   }
 
+  @Get('permissions/available')
+  getAvailablePermissions() {
+    return this.usersService.getAvailablePermissions();
+  }
+
   @Post()
   create(@Body() createUserDto: CreateUserDto, @CurrentStore() storeId: string) {
     return this.usersService.create(createUserDto, storeId);
+  }
+
+  @Get(':id/permissions')
+  getUserPermissions(
+    @Param('id') id: string,
+    @CurrentStore() storeId: string,
+  ) {
+    return this.usersService.getUserPermissions(id, storeId);
+  }
+
+  @Patch(':id/permissions')
+  updatePermissions(
+    @Param('id') id: string,
+    @Body() updatePermissionsDto: UpdatePermissionsDto,
+    @CurrentStore() storeId: string,
+  ) {
+    return this.usersService.updatePermissions(id, updatePermissionsDto, storeId);
   }
 
   @Patch(':id/role')
