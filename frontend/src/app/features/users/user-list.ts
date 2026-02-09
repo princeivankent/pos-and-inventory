@@ -96,6 +96,7 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
             optionLabel="label"
             optionValue="value"
             styleClass="w-full"
+            appendTo="body"
           />
         </div>
       </div>
@@ -130,6 +131,7 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
               optionLabel="label"
               optionValue="value"
               styleClass="w-full"
+              appendTo="body"
             />
           </div>
         </div>

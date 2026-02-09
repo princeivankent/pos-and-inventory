@@ -24,6 +24,7 @@ import { StoreAccess } from '../../core/models/user.model';
           placeholder="Select store"
           (onChange)="onStoreChange($event.value)"
           styleClass="store-select"
+          appendTo="body"
         />
       </div>
 

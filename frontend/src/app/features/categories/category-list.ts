@@ -88,6 +88,7 @@ import { PageHeader } from '../../shared/components/page-header/page-header';
             placeholder="None (top-level)"
             [showClear]="true"
             styleClass="w-full"
+            appendTo="body"
           />
         </div>
       </div>

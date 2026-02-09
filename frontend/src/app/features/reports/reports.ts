@@ -31,6 +31,7 @@ import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
             optionLabel="label"
             optionValue="value"
             (onChange)="onSalesPeriodChange()"
+            appendTo="body"
           />
           <div class="date-nav">
             <p-button icon="pi pi-chevron-left" [text]="true" [rounded]="true" severity="secondary" (onClick)="navigateDate('sales', -1)" />
@@ -157,6 +158,7 @@ import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
             optionLabel="label"
             optionValue="value"
             (onChange)="onBestSellingPeriodChange()"
+            appendTo="body"
           />
           <div class="date-nav">
             <p-button icon="pi pi-chevron-left" [text]="true" [rounded]="true" severity="secondary" (onClick)="navigateDate('bestSelling', -1)" />
@@ -209,6 +211,7 @@ import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
             optionLabel="label"
             optionValue="value"
             (onChange)="onProfitPeriodChange()"
+            appendTo="body"
           />
           <div class="date-nav">
             <p-button icon="pi pi-chevron-left" [text]="true" [rounded]="true" severity="secondary" (onClick)="navigateDate('profit', -1)" />
