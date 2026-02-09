@@ -132,6 +132,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!data.session) {
+      throw new UnauthorizedException('Authentication failed: no session returned. Please verify your email.');
+    }
+
     // Get user from database
     const user = await this.userRepository.findOne({
       where: { id: data.user.id },
@@ -147,13 +151,16 @@ export class AuthService {
       relations: ['store'],
     });
 
-    if (userStores.length === 0) {
+    // Filter out any user_stores with missing store relations
+    const validUserStores = userStores.filter((us) => us.store);
+
+    if (validUserStores.length === 0) {
       throw new ForbiddenException('User is not assigned to any store');
     }
 
     // Find default store or use first available
     const defaultStore =
-      userStores.find((us) => us.is_default) || userStores[0];
+      validUserStores.find((us) => us.is_default) || validUserStores[0];
 
     // Sign our own JWT so passport-jwt can verify it with JWT_SECRET
     const payload = { sub: user.id, email: user.email };
@@ -167,7 +174,7 @@ export class AuthService {
         email: user.email,
         full_name: user.full_name,
       },
-      stores: userStores.map((us) => ({
+      stores: validUserStores.map((us) => ({
         id: us.store_id,
         name: us.store.name,
         role: us.role,
