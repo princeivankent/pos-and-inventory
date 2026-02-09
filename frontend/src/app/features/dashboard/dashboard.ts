@@ -194,18 +194,18 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.http.get<SalesReport>(`${environment.apiUrl}/reports/sales`, {
       params: { period: 'daily' },
-    }).subscribe((r) => this.salesReport.set(r));
+    }).subscribe({ next: (r) => this.salesReport.set(r), error: () => {} });
 
-    this.http.get<Sale[]>(`${environment.apiUrl}/sales/daily`).subscribe(
-      (s) => this.recentSales.set(s.slice(0, 5))
-    );
+    this.http.get<Sale[]>(`${environment.apiUrl}/sales/daily`).subscribe({
+      next: (s) => this.recentSales.set(s.slice(0, 5)), error: () => {},
+    });
 
-    this.http.get<Product[]>(`${environment.apiUrl}/inventory/low-stock`).subscribe(
-      (p) => this.lowStockProducts.set(p)
-    );
+    this.http.get<Product[]>(`${environment.apiUrl}/inventory/low-stock`).subscribe({
+      next: (p) => this.lowStockProducts.set(p), error: () => {},
+    });
 
-    this.http.get<Product[]>(`${environment.apiUrl}/products`).subscribe(
-      (p) => this.totalProducts.set(p.length)
-    );
+    this.http.get<Product[]>(`${environment.apiUrl}/products`).subscribe({
+      next: (p) => this.totalProducts.set(p.length), error: () => {},
+    });
   }
 }
