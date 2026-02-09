@@ -45,6 +45,7 @@ export class TenantGuard implements CanActivate {
     // Inject store context into request
     request.user.storeId = storeId;
     request.user.role = userStore.role;
+    request.user.permissions = userStore.permissions ?? [];
 
     return true;
   }

@@ -11,6 +11,13 @@ import { UserStore, UserRole } from '../database/entities/user-store.entity';
 import { SupabaseService } from '../auth/supabase.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserRoleDto } from './dto/update-user-role.dto';
+import { UpdatePermissionsDto } from './dto/update-permissions.dto';
+import {
+  Permission,
+  ALL_PERMISSIONS,
+  DEFAULT_CASHIER_PERMISSIONS,
+  PERMISSION_DESCRIPTIONS,
+} from '../common/permissions/permission.enum';
 
 @Injectable()
 export class UsersService {
@@ -36,6 +43,7 @@ export class UsersService {
       full_name: us.user.full_name,
       is_active: us.user.is_active,
       role: us.role,
+      permissions: us.role === UserRole.ADMIN ? ALL_PERMISSIONS : (us.permissions ?? []),
     })) as any;
   }
 
@@ -78,11 +86,18 @@ export class UsersService {
       await this.userRepository.save(user);
     }
 
-    // Assign user to store with role
+    // Auto-assign default permissions based on role
+    const permissions =
+      dto.role === UserRole.CASHIER
+        ? [...DEFAULT_CASHIER_PERMISSIONS]
+        : [...ALL_PERMISSIONS];
+
+    // Assign user to store with role and default permissions
     const userStore = this.userStoreRepository.create({
       user_id: user.id,
       store_id: storeId,
       role: dto.role,
+      permissions,
       is_default: false,
     });
     await this.userStoreRepository.save(userStore);
@@ -92,7 +107,77 @@ export class UsersService {
       email: user.email,
       full_name: user.full_name,
       role: dto.role,
+      permissions,
     };
+  }
+
+  async getUserPermissions(
+    userId: string,
+    storeId: string,
+  ): Promise<any> {
+    const userStore = await this.userStoreRepository.findOne({
+      where: { user_id: userId, store_id: storeId },
+      relations: ['user'],
+    });
+
+    if (!userStore) {
+      throw new NotFoundException(
+        `User with ID ${userId} not found in this store`,
+      );
+    }
+
+    return {
+      id: userStore.user.id,
+      email: userStore.user.email,
+      full_name: userStore.user.full_name,
+      role: userStore.role,
+      permissions:
+        userStore.role === UserRole.ADMIN
+          ? ALL_PERMISSIONS
+          : (userStore.permissions ?? []),
+    };
+  }
+
+  async updatePermissions(
+    userId: string,
+    dto: UpdatePermissionsDto,
+    storeId: string,
+  ): Promise<any> {
+    const userStore = await this.userStoreRepository.findOne({
+      where: { user_id: userId, store_id: storeId },
+      relations: ['user'],
+    });
+
+    if (!userStore) {
+      throw new NotFoundException(
+        `User with ID ${userId} not found in this store`,
+      );
+    }
+
+    if (userStore.role === UserRole.ADMIN) {
+      throw new BadRequestException(
+        'Cannot modify permissions for ADMIN users. Admins always have full access.',
+      );
+    }
+
+    userStore.permissions = dto.permissions;
+    await this.userStoreRepository.save(userStore);
+
+    return {
+      id: userStore.user.id,
+      email: userStore.user.email,
+      full_name: userStore.user.full_name,
+      role: userStore.role,
+      permissions: userStore.permissions,
+    };
+  }
+
+  getAvailablePermissions(): any {
+    return ALL_PERMISSIONS.map((permission) => ({
+      value: permission,
+      description: PERMISSION_DESCRIPTIONS[permission],
+      default_for_cashier: DEFAULT_CASHIER_PERMISSIONS.includes(permission),
+    }));
   }
 
   async updateRole(
@@ -112,6 +197,12 @@ export class UsersService {
     }
 
     userStore.role = dto.role;
+
+    // When changing to CASHIER, auto-assign default permissions if none exist
+    if (dto.role === UserRole.CASHIER && (!userStore.permissions || userStore.permissions.length === 0)) {
+      userStore.permissions = [...DEFAULT_CASHIER_PERMISSIONS];
+    }
+
     await this.userStoreRepository.save(userStore);
 
     return {
@@ -119,6 +210,10 @@ export class UsersService {
       email: userStore.user.email,
       full_name: userStore.user.full_name,
       role: userStore.role,
+      permissions:
+        userStore.role === UserRole.ADMIN
+          ? ALL_PERMISSIONS
+          : (userStore.permissions ?? []),
     };
   }
 

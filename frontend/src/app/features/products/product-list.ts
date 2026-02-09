@@ -130,6 +130,7 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
             optionValue="id"
             placeholder="Select category"
             styleClass="w-full"
+            appendTo="body"
           />
         </div>
         <div class="field">

@@ -14,6 +14,7 @@ import { UserStore, UserRole } from '../database/entities/user-store.entity';
 import { Store } from '../database/entities/store.entity';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ALL_PERMISSIONS } from '../common/permissions/permission.enum';
 
 @Injectable()
 export class AuthService {
@@ -100,6 +101,7 @@ export class AuthService {
         name: store.name,
         role: UserRole.ADMIN,
         is_default: true,
+        permissions: ALL_PERMISSIONS,
       },
     ];
 
@@ -130,6 +132,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    if (!data.session) {
+      throw new UnauthorizedException('Authentication failed: no session returned. Please verify your email.');
+    }
+
     // Get user from database
     const user = await this.userRepository.findOne({
       where: { id: data.user.id },
@@ -145,13 +151,16 @@ export class AuthService {
       relations: ['store'],
     });
 
-    if (userStores.length === 0) {
+    // Filter out any user_stores with missing store relations
+    const validUserStores = userStores.filter((us) => us.store);
+
+    if (validUserStores.length === 0) {
       throw new ForbiddenException('User is not assigned to any store');
     }
 
     // Find default store or use first available
     const defaultStore =
-      userStores.find((us) => us.is_default) || userStores[0];
+      validUserStores.find((us) => us.is_default) || validUserStores[0];
 
     // Sign our own JWT so passport-jwt can verify it with JWT_SECRET
     const payload = { sub: user.id, email: user.email };
@@ -165,16 +174,24 @@ export class AuthService {
         email: user.email,
         full_name: user.full_name,
       },
-      stores: userStores.map((us) => ({
+      stores: validUserStores.map((us) => ({
         id: us.store_id,
         name: us.store.name,
         role: us.role,
         is_default: us.is_default,
+        permissions:
+          us.role === UserRole.ADMIN
+            ? ALL_PERMISSIONS
+            : (us.permissions ?? []),
       })),
       default_store: {
         id: defaultStore.store_id,
         name: defaultStore.store.name,
         role: defaultStore.role,
+        permissions:
+          defaultStore.role === UserRole.ADMIN
+            ? ALL_PERMISSIONS
+            : (defaultStore.permissions ?? []),
       },
     };
   }
@@ -198,6 +215,10 @@ export class AuthService {
         id: userStore.store_id,
         name: userStore.store.name,
         role: userStore.role,
+        permissions:
+          userStore.role === UserRole.ADMIN
+            ? ALL_PERMISSIONS
+            : (userStore.permissions ?? []),
       },
     };
   }
@@ -213,6 +234,10 @@ export class AuthService {
       name: us.store.name,
       role: us.role,
       is_default: us.is_default,
+      permissions:
+        us.role === UserRole.ADMIN
+          ? ALL_PERMISSIONS
+          : (us.permissions ?? []),
     }));
   }
 }

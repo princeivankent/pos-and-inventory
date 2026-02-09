@@ -103,6 +103,7 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
             placeholder="Select a product"
             styleClass="w-full"
             [filter]="true"
+            appendTo="body"
           />
         </div>
         <div class="field">
@@ -143,6 +144,7 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
               optionLabel="label"
               optionValue="value"
               styleClass="w-full"
+              appendTo="body"
             />
           </div>
           <div class="field">

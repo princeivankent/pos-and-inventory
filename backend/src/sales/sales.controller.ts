@@ -13,17 +13,21 @@ import { CreateSaleDto } from './dto/create-sale.dto';
 import { CurrentStore } from '../common/decorators/current-store.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { Roles } from '../common/decorators/roles.decorator';
+import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { PermissionsGuard } from '../common/guards/permissions.guard';
 import { UserRole } from '../database/entities/user-store.entity';
+import { Permission } from '../common/permissions/permission.enum';
 import { RequestUser } from '../common/interfaces/request-with-user.interface';
 
 @Controller('sales')
-@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard)
+@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard, PermissionsGuard)
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
   @Post()
+  @RequirePermissions(Permission.SALES_CREATE)
   create(
     @Body() createSaleDto: CreateSaleDto,
     @CurrentStore() storeId: string,
@@ -33,6 +37,7 @@ export class SalesController {
   }
 
   @Get('daily')
+  @RequirePermissions(Permission.SALES_VIEW)
   findDailySales(
     @CurrentStore() storeId: string,
     @Query('date') date?: string,
@@ -43,12 +48,14 @@ export class SalesController {
   }
 
   @Get(':id')
+  @RequirePermissions(Permission.SALES_VIEW)
   findOne(@Param('id') id: string, @CurrentStore() storeId: string) {
     return this.salesService.findOne(id, storeId);
   }
 
   @Post(':id/void')
   @Roles(UserRole.ADMIN)
+  @RequirePermissions(Permission.SALES_VOID)
   voidSale(
     @Param('id') id: string,
     @CurrentStore() storeId: string,
