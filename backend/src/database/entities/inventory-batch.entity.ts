@@ -22,7 +22,10 @@ export class InventoryBatch extends TenantBaseEntity {
   @Column({ type: 'date', nullable: true })
   expiry_date: Date;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   unit_cost: number;
 
   @Column({ type: 'integer' })
@@ -31,10 +34,16 @@ export class InventoryBatch extends TenantBaseEntity {
   @Column({ type: 'integer' })
   current_quantity: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   wholesale_price: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   retail_price: number;
 
   @Column({ type: 'boolean', default: true })

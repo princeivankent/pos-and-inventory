@@ -147,6 +147,12 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
             <p-inputNumber [(ngModel)]="form.cost_price" mode="currency" currency="PHP" locale="en-PH" styleClass="w-full" />
           </div>
         </div>
+        @if (form.cost_price > 0 && form.retail_price > 0 && form.cost_price >= form.retail_price) {
+          <small class="price-warning">
+            <i class="pi pi-exclamation-triangle"></i>
+            Cost price is higher than or equal to retail price. You may be selling at a loss.
+          </small>
+        }
         <div class="field-row">
           <div class="field">
             <label>Unit</label>
@@ -190,6 +196,14 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
       gap: 1rem;
     }
     .w-full { width: 100%; }
+    .price-warning {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      color: var(--color-warning, #f59e0b);
+      font-size: 0.8125rem;
+      margin-top: -0.5rem;
+    }
   `,
 })
 export class ProductListComponent implements OnInit {

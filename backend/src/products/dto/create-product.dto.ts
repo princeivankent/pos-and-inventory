@@ -8,6 +8,7 @@ import {
   IsInt,
   Min,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateProductDto {
   @IsUUID()
@@ -43,10 +44,12 @@ export class CreateProductDto {
   @IsOptional()
   has_expiry?: boolean;
 
+  @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   retail_price: number;
 
+  @Type(() => Number)
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   cost_price: number;

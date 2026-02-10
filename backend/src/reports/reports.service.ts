@@ -44,6 +44,30 @@ export class ReportsService {
 
     const netSales = totalRevenue - totalTax - totalDiscount;
 
+    // Build daily breakdown
+    const dailyMap = new Map<string, { total_sales: number; transaction_count: number }>();
+    for (const sale of sales) {
+      const d = new Date(sale.sale_date);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const entry = dailyMap.get(key) || { total_sales: 0, transaction_count: 0 };
+      entry.total_sales += Number(sale.total_amount);
+      entry.transaction_count += 1;
+      dailyMap.set(key, entry);
+    }
+
+    const dailyBreakdown: { date: string; total_sales: number; transaction_count: number }[] = [];
+    const cursor = new Date(startDate);
+    while (cursor <= endDate) {
+      const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
+      const entry = dailyMap.get(key);
+      dailyBreakdown.push({
+        date: key,
+        total_sales: entry ? Math.round(entry.total_sales * 100) / 100 : 0,
+        transaction_count: entry ? entry.transaction_count : 0,
+      });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
     return {
       period,
       start_date: startDate,
@@ -53,6 +77,7 @@ export class ReportsService {
       total_tax: Math.round(totalTax * 100) / 100,
       total_discount: Math.round(totalDiscount * 100) / 100,
       net_sales: Math.round(netSales * 100) / 100,
+      daily_breakdown: dailyBreakdown,
     };
   }
 

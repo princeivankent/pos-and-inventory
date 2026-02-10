@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource, Between, MoreThan } from 'typeorm';
+import { Repository, DataSource, Between, MoreThan, In } from 'typeorm';
 import { Sale, SaleStatus, PaymentMethod } from '../database/entities/sale.entity';
 import { SaleItem } from '../database/entities/sale-item.entity';
 import { Product } from '../database/entities/product.entity';
@@ -194,7 +194,7 @@ export class SalesService {
     const startDate = new Date(date + 'T00:00:00');
     const endDate = new Date(date + 'T23:59:59.999');
 
-    return await this.saleRepository.find({
+    const sales = await this.saleRepository.find({
       where: {
         store_id: storeId,
         sale_date: Between(startDate, endDate),
@@ -202,6 +202,27 @@ export class SalesService {
       relations: ['cashier'],
       order: { sale_date: 'DESC' },
     });
+
+    if (sales.length > 0) {
+      const saleIds = sales.map(s => s.id);
+      const items = await this.saleItemRepository.find({
+        where: { sale_id: In(saleIds) },
+        relations: ['product'],
+      });
+
+      const itemsBySaleId = new Map<string, SaleItem[]>();
+      for (const item of items) {
+        const list = itemsBySaleId.get(item.sale_id) || [];
+        list.push(item);
+        itemsBySaleId.set(item.sale_id, list);
+      }
+
+      for (const sale of sales) {
+        (sale as any).items = itemsBySaleId.get(sale.id) || [];
+      }
+    }
+
+    return sales;
   }
 
   async findOne(id: string, storeId: string): Promise<Sale> {

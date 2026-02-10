@@ -19,10 +19,16 @@ export class SaleItem extends BaseEntity {
   @Column({ type: 'integer' })
   quantity: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   unit_price: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   subtotal: number;
 
   @ManyToOne(() => Sale)

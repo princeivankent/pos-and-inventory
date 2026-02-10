@@ -32,16 +32,28 @@ export class Sale extends TenantBaseEntity {
   @Column({ type: 'timestamp' })
   sale_date: Date;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   subtotal: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, default: 0,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   tax_amount: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, default: 0,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   discount_amount: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   total_amount: number;
 
   @Column({
@@ -51,13 +63,22 @@ export class Sale extends TenantBaseEntity {
   })
   payment_method: PaymentMethod;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, default: 0,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   amount_paid: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, default: 0,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   change_amount: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, default: 0,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   credit_amount: number;
 
   @Column({ type: 'text', nullable: true })

@@ -31,10 +31,16 @@ export class Product extends TenantBaseEntity {
   @Column({ type: 'boolean', default: false })
   has_expiry: boolean;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, default: 0,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   retail_price: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, default: 0,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   cost_price: number;
 
   @Column({ type: 'integer', default: 0 })

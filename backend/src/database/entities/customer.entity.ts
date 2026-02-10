@@ -17,9 +17,15 @@ export class Customer extends TenantBaseEntity {
   @Column({ type: 'text', nullable: true })
   address: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, default: 0,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   credit_limit: number;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, default: 0,
+    transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
+  })
   current_balance: number;
 }

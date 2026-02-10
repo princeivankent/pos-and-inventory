@@ -5,10 +5,11 @@ import { ReportsController } from './reports.controller';
 import { Sale } from '../database/entities/sale.entity';
 import { SaleItem } from '../database/entities/sale-item.entity';
 import { Product } from '../database/entities/product.entity';
+import { InventoryBatch } from '../database/entities/inventory-batch.entity';
 import { UserStore } from '../database/entities/user-store.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Sale, SaleItem, Product, UserStore])],
+  imports: [TypeOrmModule.forFeature([Sale, SaleItem, Product, InventoryBatch, UserStore])],
   controllers: [ReportsController],
   providers: [ReportsService],
   exports: [ReportsService],
