@@ -1,0 +1,25 @@
+<header class="app-header">
+      <div class="header-left">
+        <p-select
+          [options]="stores()"
+          [(ngModel)]="selectedStoreId"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select store"
+          (onChange)="onStoreChange($event.value)"
+          styleClass="store-select"
+          appendTo="body"
+        />
+      </div>
+
+      <div class="header-right">
+        <span class="user-name">{{ auth.currentUser()?.full_name }}</span>
+        <p-button
+          icon="pi pi-sign-out"
+          [text]="true"
+          severity="secondary"
+          (onClick)="onLogout()"
+          pTooltip="Sign out"
+        />
+      </div>
+    </header>

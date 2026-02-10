@@ -1,0 +1,83 @@
+<app-page-header title="Categories" subtitle="Organize your products">
+      <p-button label="Add Category" icon="pi pi-plus" (onClick)="openNew()" />
+    </app-page-header>
+
+    <div class="card">
+      <p-table
+        [value]="categories()"
+        [loading]="loading()"
+        dataKey="id"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Parent</th>
+            <th style="width:100px">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-cat>
+          <tr>
+            <td>
+              @if (cat.parent_id) {
+                <span class="indent">&#8627; </span>
+              }
+              <span class="font-medium">{{ cat.name }}</span>
+            </td>
+            <td class="text-secondary">{{ cat.description ?? '-' }}</td>
+            <td>{{ getParentName(cat.parent_id) }}</td>
+            <td>
+              <div class="flex gap-2">
+                <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="info" (onClick)="editCategory(cat)" />
+                <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" (onClick)="confirmDelete(cat)" />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr><td colspan="4" class="text-center text-secondary" style="padding:2rem">No categories found</td></tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <p-dialog
+      [(visible)]="dialogVisible"
+      [header]="editMode ? 'Edit Category' : 'New Category'"
+      [modal]="true"
+      [style]="{ width: '420px' }"
+    >
+      <div class="form-grid">
+        <div class="field">
+          <label>Name *</label>
+          <input pInputText [(ngModel)]="form.name" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <input pInputText [(ngModel)]="form.description" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Parent Category</label>
+          <p-select
+            [(ngModel)]="form.parent_id"
+            [options]="parentOptions()"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="None (top-level)"
+            [showClear]="true"
+            styleClass="w-full"
+            appendTo="body"
+          />
+        </div>
+      </div>
+
+      <ng-template pTemplate="footer">
+        <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="dialogVisible = false" />
+        <p-button
+          [label]="editMode ? 'Update' : 'Create'"
+          icon="pi pi-check"
+          (onClick)="saveCategory()"
+          [loading]="saving()"
+          [disabled]="!form.name"
+        />
+      </ng-template>
+    </p-dialog>

@@ -1,0 +1,51 @@
+<div class="login-page">
+      <div class="login-card">
+        <div class="login-header">
+          <h1>POS & Inventory</h1>
+          <p>Sign in to your account</p>
+        </div>
+
+        <form (ngSubmit)="onLogin()" class="login-form">
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              pInputText
+              id="email"
+              type="email"
+              [(ngModel)]="email"
+              name="email"
+              placeholder="Enter your email"
+              class="w-full"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <p-password
+              id="password"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Enter your password"
+              [toggleMask]="true"
+              [feedback]="false"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+            />
+          </div>
+
+          <p-button
+            type="submit"
+            label="Sign In"
+            styleClass="w-full"
+            [loading]="loading()"
+            [disabled]="!email || !password"
+          />
+        </form>
+
+        <div class="login-footer">
+          <span>Don't have an account?</span>
+          <a routerLink="/register">Register</a>
+        </div>
+      </div>
+    </div>

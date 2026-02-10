@@ -1,0 +1,22 @@
+<aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="brand-icon">
+          <i class="pi pi-shopping-cart"></i>
+        </span>
+        <span class="brand-text">POS System</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        @for (item of visibleItems; track item.route) {
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+            class="nav-item"
+          >
+            <i [class]="'pi ' + item.icon"></i>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+      </nav>
+    </aside>

@@ -31,7 +31,8 @@
       "WebFetch(domain:www.shopify.com)",
       "WebFetch(domain:www.thoughtspot.com)",
       "Bash(find:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(node scripts/convert-to-multifile.js:*)"
     ]
   }
 }

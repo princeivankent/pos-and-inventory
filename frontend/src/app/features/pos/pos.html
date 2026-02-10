@@ -1,0 +1,25 @@
+<div class="pos-layout">
+      <div class="pos-products">
+        <app-product-search (productSelected)="addToCart($event)" />
+        <app-category-tabs (categoryChanged)="onCategoryChange($event)" />
+        <app-product-grid
+          [products]="filteredProducts()"
+          (productSelected)="addToCart($event)"
+        />
+      </div>
+      <div class="pos-cart">
+        <app-cart-panel (charge)="openPayment()" />
+      </div>
+    </div>
+
+    <app-payment-dialog
+      #paymentDialog
+      [totalAmount]="cart.total()"
+      [processing]="loading()"
+      (completed)="completeSale($event)"
+    />
+    <app-receipt-preview
+      #receiptPreview
+      [sale]="lastSale()"
+      [store]="currentStore()"
+    />

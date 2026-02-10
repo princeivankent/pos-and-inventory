@@ -1,0 +1,18 @@
+<div class="category-tabs">
+      <p-button
+        [label]="'All'"
+        [outlined]="selectedId() !== null"
+        [severity]="selectedId() === null ? undefined : 'secondary'"
+        size="small"
+        (onClick)="select(null)"
+      />
+      @for (cat of categories(); track cat.id) {
+        <p-button
+          [label]="cat.name"
+          [outlined]="selectedId() !== cat.id"
+          [severity]="selectedId() === cat.id ? undefined : 'secondary'"
+          size="small"
+          (onClick)="select(cat.id)"
+        />
+      }
+    </div>

@@ -1,0 +1,57 @@
+.payment-body {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .payment-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      background: var(--bg-secondary);
+      border-radius: var(--border-radius);
+    }
+    .total-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--color-primary);
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      label {
+        font-size: 0.875rem;
+        font-weight: 500;
+      }
+    }
+    :host ::ng-deep .payment-input {
+      width: 100%;
+      font-size: 1.25rem;
+      font-weight: 600;
+      text-align: right;
+      padding: 0.75rem 1rem;
+    }
+    :host ::ng-deep .w-full { width: 100%; }
+    .quick-amounts {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .change-display {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: #ecfdf5;
+      border-radius: var(--border-radius);
+      &.negative {
+        background: #fef2f2;
+        .change-value { color: var(--color-danger); }
+      }
+    }
+    .change-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-success);
+    }

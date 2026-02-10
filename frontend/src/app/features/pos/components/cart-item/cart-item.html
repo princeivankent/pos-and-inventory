@@ -1,0 +1,30 @@
+<div class="cart-item">
+      <div class="item-info">
+        <span class="item-name">{{ item.product.name }}</span>
+        <span class="item-price">{{ item.unit_price | phpCurrency }}</span>
+      </div>
+      <div class="item-controls">
+        <p-inputNumber
+          [ngModel]="item.quantity"
+          (ngModelChange)="quantityChanged.emit($event)"
+          [showButtons]="true"
+          buttonLayout="horizontal"
+          [min]="0"
+          [max]="item.product.current_stock"
+          incrementButtonIcon="pi pi-plus"
+          decrementButtonIcon="pi pi-minus"
+          size="small"
+          styleClass="cart-qty"
+          inputStyleClass="cart-qty-input"
+        />
+        <span class="item-subtotal">{{ item.unit_price * item.quantity | phpCurrency }}</span>
+        <p-button
+          icon="pi pi-times"
+          [rounded]="true"
+          [text]="true"
+          severity="danger"
+          size="small"
+          (onClick)="removed.emit()"
+        />
+      </div>
+    </div>

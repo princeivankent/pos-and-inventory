@@ -1,0 +1,63 @@
+<app-page-header title="Settings" subtitle="Store configuration" />
+
+    @if (store()) {
+      <div class="settings-grid">
+        <div class="card">
+          <h3>Store Information</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Store Name</label>
+              <input pInputText [(ngModel)]="storeForm.name" class="w-full" />
+            </div>
+            <div class="field">
+              <label>Address</label>
+              <textarea pTextarea [(ngModel)]="storeForm.address" class="w-full" rows="2"></textarea>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label>Phone</label>
+                <input pInputText [(ngModel)]="storeForm.phone" class="w-full" />
+              </div>
+              <div class="field">
+                <label>Email</label>
+                <input pInputText [(ngModel)]="storeForm.email" class="w-full" type="email" />
+              </div>
+            </div>
+            <div class="field">
+              <label>BIR TIN (Tax ID)</label>
+              <input pInputText [(ngModel)]="storeForm.tax_id" class="w-full" placeholder="000-000-000-000" />
+            </div>
+            <p-button label="Save Store Info" icon="pi pi-check" (onClick)="saveStoreInfo()" [loading]="saving()" />
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Tax Configuration</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Enable VAT</label>
+              <p-toggleswitch [(ngModel)]="settings.tax_enabled" />
+            </div>
+            @if (settings.tax_enabled) {
+              <div class="field">
+                <label>Tax Rate (%)</label>
+                <p-inputNumber [(ngModel)]="settings.tax_rate" [min]="0" [max]="100" suffix="%" styleClass="w-full" />
+              </div>
+            }
+          </div>
+
+          <h3 style="margin-top: 1.5rem">Receipt Settings</h3>
+          <div class="form-grid">
+            <div class="field">
+              <label>Receipt Header</label>
+              <textarea pTextarea [(ngModel)]="settings.receipt_header" class="w-full" rows="2" placeholder="Printed at top of receipt"></textarea>
+            </div>
+            <div class="field">
+              <label>Receipt Footer</label>
+              <textarea pTextarea [(ngModel)]="settings.receipt_footer" class="w-full" rows="2" placeholder="Printed at bottom of receipt"></textarea>
+            </div>
+            <p-button label="Save Settings" icon="pi pi-check" (onClick)="saveSettings()" [loading]="savingSettings()" />
+          </div>
+        </div>
+      </div>
+    }

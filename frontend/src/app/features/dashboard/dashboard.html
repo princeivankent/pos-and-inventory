@@ -1,0 +1,320 @@
+<!-- 1. Personalized Greeting Header -->
+    <div class="dashboard-welcome">
+      <div class="welcome-text">
+        <h1>{{ greeting }}, {{ userName }}</h1>
+        <p class="subtitle">{{ today }}</p>
+      </div>
+      <div class="quick-actions">
+        <a routerLink="/pos">
+          <p-button label="New Sale" icon="pi pi-calculator" />
+        </a>
+        @if (storeCtx.isAdmin()) {
+          <a routerLink="/products">
+            <p-button label="Products" icon="pi pi-box" severity="secondary" [outlined]="true" />
+          </a>
+          <a routerLink="/reports">
+            <p-button label="Reports" icon="pi pi-chart-bar" severity="secondary" [outlined]="true" />
+          </a>
+        }
+      </div>
+    </div>
+
+    <!-- 2. Stat Cards -->
+    <div class="stats-grid">
+      <a routerLink="/sales" class="stat-card stat-card--clickable">
+        @if (statsLoading()) {
+          <p-skeleton width="2.75rem" height="2.75rem" borderRadius="8px" />
+          <div class="stat-content">
+            <p-skeleton width="80px" height="13px" />
+            <p-skeleton width="100px" height="22px" />
+          </div>
+        } @else {
+          <div class="stat-icon" style="background: var(--color-primary-light); color: var(--color-primary)">
+            <i class="pi pi-wallet"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Today's Sales</span>
+            <span class="stat-value">{{ salesReport()?.total_sales ?? 0 | phpCurrency }}</span>
+          </div>
+        }
+      </a>
+      <a routerLink="/sales" class="stat-card stat-card--clickable">
+        @if (statsLoading()) {
+          <p-skeleton width="2.75rem" height="2.75rem" borderRadius="8px" />
+          <div class="stat-content">
+            <p-skeleton width="80px" height="13px" />
+            <p-skeleton width="60px" height="22px" />
+          </div>
+        } @else {
+          <div class="stat-icon" style="background: var(--color-info-light); color: var(--color-info)">
+            <i class="pi pi-receipt"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Transactions</span>
+            <span class="stat-value">{{ salesReport()?.total_transactions ?? 0 }}</span>
+          </div>
+        }
+      </a>
+      <a routerLink="/inventory" class="stat-card stat-card--clickable">
+        @if (statsLoading()) {
+          <p-skeleton width="2.75rem" height="2.75rem" borderRadius="8px" />
+          <div class="stat-content">
+            <p-skeleton width="80px" height="13px" />
+            <p-skeleton width="40px" height="22px" />
+          </div>
+        } @else {
+          <div class="stat-icon" style="background: var(--color-warning-light); color: var(--color-warning)">
+            <i class="pi pi-exclamation-triangle"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Low Stock Items</span>
+            <span class="stat-value">{{ lowStockProducts().length }}</span>
+          </div>
+        }
+      </a>
+      <a routerLink="/products" class="stat-card stat-card--clickable">
+        @if (statsLoading()) {
+          <p-skeleton width="2.75rem" height="2.75rem" borderRadius="8px" />
+          <div class="stat-content">
+            <p-skeleton width="80px" height="13px" />
+            <p-skeleton width="40px" height="22px" />
+          </div>
+        } @else {
+          <div class="stat-icon" style="background: var(--color-success-light); color: var(--color-success)">
+            <i class="pi pi-box"></i>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Active Products</span>
+            <span class="stat-value">{{ totalProducts() }}</span>
+          </div>
+        }
+      </a>
+    </div>
+
+    <!-- 3. Sales Trend Chart -->
+    <div class="card chart-section">
+      <div class="card-header">
+        <div>
+          <h3>Sales This Week</h3>
+          @if (!chartLoading() && weeklySalesReport()) {
+            <span class="chart-subtitle">Total: {{ weeklySalesReport()!.total_sales | phpCurrency }}</span>
+          }
+        </div>
+        <a routerLink="/reports"><p-button label="View Reports" [text]="true" size="small" /></a>
+      </div>
+      @if (chartLoading()) {
+        <p-skeleton width="100%" height="260px" borderRadius="8px" />
+      } @else {
+        <div class="chart-wrapper">
+          <p-chart type="line" [data]="salesChartData" [options]="chartOptions" height="260px" />
+        </div>
+      }
+    </div>
+
+    <!-- 4. Two-Column Grid -->
+    <div class="content-grid">
+      <!-- Recent Sales -->
+      <div class="card">
+        <div class="card-header">
+          <h3>Recent Sales</h3>
+          <a routerLink="/sales"><p-button label="View All" [text]="true" size="small" /></a>
+        </div>
+        @if (salesLoading()) {
+          @for (i of skeletonRows; track i) {
+            <div class="sale-row">
+              <div class="flex items-center gap-2">
+                <p-skeleton width="100px" height="14px" />
+                <p-skeleton width="50px" height="12px" />
+              </div>
+              <p-skeleton width="80px" height="14px" />
+            </div>
+          }
+        } @else if (recentSales().length === 0) {
+          <div class="empty-state">
+            <i class="pi pi-shopping-cart empty-icon"></i>
+            <p>No sales today</p>
+          </div>
+        } @else {
+          @for (sale of recentSales(); track sale.id) {
+            <a class="sale-row sale-row--clickable" [routerLink]="['/sales']">
+              <div class="sale-row-left">
+                <div class="timeline-dot"></div>
+                <div>
+                  <span class="font-medium">{{ sale.sale_number }}</span>
+                  <span class="text-secondary text-xs sale-time">{{ sale.sale_date | date:'h:mm a' }}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <app-status-badge [label]="sale.status" [severity]="sale.status === 'completed' ? 'success' : 'danger'" />
+                <span class="font-semibold">{{ sale.total_amount | phpCurrency }}</span>
+              </div>
+            </a>
+          }
+        }
+      </div>
+
+      <!-- Right column: Top Selling (admin) or Low Stock (cashier) -->
+      @if (storeCtx.isAdmin()) {
+        <div class="card">
+          <div class="card-header">
+            <h3>Top Selling Products</h3>
+            <a routerLink="/reports"><p-button label="Details" [text]="true" size="small" /></a>
+          </div>
+          @if (topSellingLoading()) {
+            @for (i of skeletonRows; track i) {
+              <div class="top-product-row">
+                <p-skeleton width="60%" height="14px" />
+                <p-skeleton width="50px" height="14px" />
+              </div>
+            }
+          } @else if (topSellingProducts().length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-trophy empty-icon"></i>
+              <p>No sales data this month</p>
+            </div>
+          } @else {
+            @for (item of topSellingProducts(); track item.product_id; let idx = $index) {
+              <div class="top-product-row">
+                <div class="top-product-info">
+                  <span class="top-product-rank">#{{ idx + 1 }}</span>
+                  <span class="font-medium">{{ item.name }}</span>
+                </div>
+                <div class="top-product-bar-area">
+                  <div class="top-product-bar"
+                    [style.width.%]="getBarWidth(item.total_quantity)">
+                  </div>
+                  <span class="top-product-qty">{{ item.total_quantity }} sold</span>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      } @else {
+        <!-- Cashier: Low Stock Alerts -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Low Stock Alerts</h3>
+            <a routerLink="/inventory/low-stock"><p-button label="View All" [text]="true" size="small" /></a>
+          </div>
+          @if (statsLoading()) {
+            @for (i of skeletonRows; track i) {
+              <div class="stock-row">
+                <p-skeleton width="60%" height="14px" />
+                <p-skeleton width="50px" height="14px" />
+              </div>
+            }
+          } @else if (lowStockProducts().length === 0) {
+            <div class="empty-state">
+              <i class="pi pi-check-circle empty-icon" style="color: var(--color-success)"></i>
+              <p>All products well stocked</p>
+            </div>
+          } @else {
+            @for (p of lowStockProducts().slice(0, 5); track p.id) {
+              <div class="stock-row">
+                <div>
+                  <span class="font-medium">{{ p.name }}</span>
+                  <span class="text-secondary text-xs" style="margin-left:0.5rem">{{ p.sku }}</span>
+                </div>
+                <app-status-badge
+                  [label]="p.current_stock + ' ' + p.unit"
+                  [severity]="p.current_stock <= 0 ? 'danger' : 'warn'"
+                />
+              </div>
+            }
+          }
+        </div>
+      }
+    </div>
+
+    <!-- 5. Bottom Row (Admin-only insights) -->
+    @if (storeCtx.isAdmin()) {
+      <div class="insights-grid">
+        <!-- Today's Profit -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Today's Profit</h3>
+          </div>
+          @if (profitLoading()) {
+            <div class="profit-grid">
+              @for (i of [1,2,3,4]; track i) {
+                <div class="profit-stat">
+                  <p-skeleton width="70px" height="12px" />
+                  <p-skeleton width="90px" height="20px" />
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="profit-grid">
+              <div class="profit-stat">
+                <span class="profit-label">Revenue</span>
+                <span class="profit-value">{{ profitReport()?.total_revenue ?? 0 | phpCurrency }}</span>
+              </div>
+              <div class="profit-stat">
+                <span class="profit-label">Cost</span>
+                <span class="profit-value">{{ profitReport()?.total_cost ?? 0 | phpCurrency }}</span>
+              </div>
+              <div class="profit-stat">
+                <span class="profit-label">Gross Profit</span>
+                <span class="profit-value" [class.profit-positive]="(profitReport()?.gross_profit ?? 0) >= 0"
+                  [class.profit-negative]="(profitReport()?.gross_profit ?? 0) < 0">
+                  {{ profitReport()?.gross_profit ?? 0 | phpCurrency }}
+                </span>
+              </div>
+              <div class="profit-stat">
+                <span class="profit-label">Margin</span>
+                <span class="profit-value" [class.profit-positive]="(profitReport()?.profit_margin ?? 0) >= 0"
+                  [class.profit-negative]="(profitReport()?.profit_margin ?? 0) < 0">
+                  {{ (profitReport()?.profit_margin ?? 0) | number:'1.1-1' }}%
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Inventory Snapshot -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Inventory Snapshot</h3>
+          </div>
+          @if (inventoryLoading()) {
+            <div class="profit-grid">
+              @for (i of [1,2,3,4]; track i) {
+                <div class="profit-stat">
+                  <p-skeleton width="70px" height="12px" />
+                  <p-skeleton width="90px" height="20px" />
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="profit-grid">
+              <div class="profit-stat">
+                <span class="profit-label">Stock Value</span>
+                <span class="profit-value">{{ inventoryReport()?.total_stock_value ?? 0 | phpCurrency }}</span>
+              </div>
+              <div class="profit-stat">
+                <span class="profit-label">Total Products</span>
+                <span class="profit-value">{{ inventoryReport()?.total_products ?? 0 }}</span>
+              </div>
+              <div class="profit-stat">
+                <span class="profit-label">Low Stock</span>
+                <span class="profit-value">
+                  <app-status-badge
+                    [label]="(inventoryReport()?.low_stock_count ?? 0).toString()"
+                    [severity]="(inventoryReport()?.low_stock_count ?? 0) > 0 ? 'warn' : 'success'"
+                  />
+                </span>
+              </div>
+              <div class="profit-stat">
+                <span class="profit-label">Out of Stock</span>
+                <span class="profit-value">
+                  <app-status-badge
+                    [label]="(inventoryReport()?.out_of_stock_count ?? 0).toString()"
+                    [severity]="(inventoryReport()?.out_of_stock_count ?? 0) > 0 ? 'danger' : 'success'"
+                  />
+                </span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }

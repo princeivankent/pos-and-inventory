@@ -1,0 +1,88 @@
+<p-dialog
+      header="Receipt"
+      [(visible)]="visible"
+      [modal]="true"
+      [style]="{ width: '380px' }"
+    >
+      @if (sale) {
+        <div class="receipt" id="receipt-content">
+          <div class="receipt-header">
+            <h3>{{ store?.name ?? 'Store' }}</h3>
+            @if (store?.address) {
+              <p>{{ store!.address }}</p>
+            }
+            @if (store?.tax_id) {
+              <p>TIN: {{ store!.tax_id }}</p>
+            }
+          </div>
+
+          <div class="receipt-meta">
+            <p>{{ sale.sale_number }}</p>
+            <p>{{ sale.sale_date | date:'MMM d, y h:mm a' }}</p>
+          </div>
+
+          <div class="receipt-items">
+            @for (item of sale.items ?? []; track item.id) {
+              <div class="receipt-item">
+                <div class="item-line">
+                  <span>{{ item.product?.name ?? 'Product' }}</span>
+                  <span>{{ item.subtotal | phpCurrency }}</span>
+                </div>
+                <div class="item-detail">
+                  {{ item.quantity }} x {{ item.unit_price | phpCurrency }}
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="receipt-totals">
+            <div class="total-line">
+              <span>Subtotal</span>
+              <span>{{ sale.subtotal | phpCurrency }}</span>
+            </div>
+            @if (sale.tax_amount > 0) {
+              <div class="total-line">
+                <span>VAT (12%)</span>
+                <span>{{ sale.tax_amount | phpCurrency }}</span>
+              </div>
+            }
+            @if (sale.discount_amount > 0) {
+              <div class="total-line">
+                <span>Discount</span>
+                <span>-{{ sale.discount_amount | phpCurrency }}</span>
+              </div>
+            }
+            <div class="total-line grand">
+              <span>TOTAL</span>
+              <span>{{ sale.total_amount | phpCurrency }}</span>
+            </div>
+            <div class="total-line">
+              <span>Paid</span>
+              <span>{{ sale.amount_paid | phpCurrency }}</span>
+            </div>
+            <div class="total-line">
+              <span>Change</span>
+              <span>{{ sale.change_amount | phpCurrency }}</span>
+            </div>
+          </div>
+
+          <div class="receipt-footer">
+            <p>Thank you for your purchase!</p>
+          </div>
+        </div>
+      }
+
+      <ng-template pTemplate="footer">
+        <p-button
+          label="Print"
+          icon="pi pi-print"
+          (onClick)="onPrint()"
+        />
+        <p-button
+          label="Close"
+          [text]="true"
+          severity="secondary"
+          (onClick)="visible = false"
+        />
+      </ng-template>
+    </p-dialog>

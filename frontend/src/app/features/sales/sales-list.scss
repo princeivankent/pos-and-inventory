@@ -1,0 +1,40 @@
+:host ::ng-deep .date-input { width: 160px; }
+    .sale-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.875rem;
+      &.total {
+        font-weight: 700;
+        font-size: 1rem;
+        padding: 0.5rem 0;
+        border-top: 2px solid var(--border-color);
+        margin-top: 0.25rem;
+      }
+    }
+    .items-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      margin: 0.5rem 0;
+      th, td {
+        padding: 0.5rem 0.25rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+      th {
+        font-weight: 500;
+        color: var(--text-secondary);
+        text-align: left;
+      }
+    }
+    .totals {
+      margin-top: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+    }

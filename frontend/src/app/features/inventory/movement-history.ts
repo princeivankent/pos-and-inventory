@@ -13,61 +13,8 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
   selector: 'app-movement-history',
   standalone: true,
   imports: [DatePipe, RouterLink, TableModule, ButtonModule, PageHeader, StatusBadge],
-  template: `
-    <app-page-header title="Stock Movements" subtitle="Track inventory changes">
-      <a routerLink="/inventory">
-        <p-button label="Back to Inventory" icon="pi pi-arrow-left" severity="secondary" [outlined]="true" />
-      </a>
-    </app-page-header>
-
-    <div class="card">
-      <p-table
-        [value]="movements()"
-        [paginator]="true"
-        [rows]="20"
-        [loading]="loading()"
-        [lazy]="true"
-        [totalRecords]="totalRecords()"
-        (onLazyLoad)="onPageChange($event)"
-        dataKey="id"
-      >
-        <ng-template pTemplate="header">
-          <tr>
-            <th>Date</th>
-            <th>Product</th>
-            <th>Type</th>
-            <th style="text-align:right">Quantity</th>
-            <th>Notes</th>
-            <th>By</th>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="body" let-m>
-          <tr>
-            <td>{{ m.created_at | date:'MMM d, y h:mm a' }}</td>
-            <td class="font-medium">{{ m.batch?.product?.name ?? 'N/A' }}</td>
-            <td>
-              <app-status-badge
-                [label]="m.movement_type"
-                [severity]="getTypeSeverity(m.movement_type)"
-              />
-            </td>
-            <td style="text-align:right" [class.positive]="m.quantity > 0" [class.negative]="m.quantity < 0">
-              {{ m.quantity > 0 ? '+' : '' }}{{ m.quantity }}
-            </td>
-            <td class="text-secondary text-sm">{{ m.notes ?? '-' }}</td>
-            <td>{{ m.creator?.full_name ?? '-' }}</td>
-          </tr>
-        </ng-template>
-        <ng-template pTemplate="emptymessage">
-          <tr><td colspan="6" class="text-center text-secondary" style="padding:2rem">No movements recorded</td></tr>
-        </ng-template>
-      </p-table>
-    </div>
-  `,
-  styles: `
-    .positive { color: var(--color-success); font-weight: 500; }
-    .negative { color: var(--color-danger); font-weight: 500; }
-  `,
+  templateUrl: './movement-history.html',
+  styleUrls: ['./movement-history.scss'],
 })
 export class MovementHistoryComponent implements OnInit {
   private http = inject(HttpClient);

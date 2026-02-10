@@ -1,0 +1,41 @@
+.cart-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .item-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .item-name {
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      flex: 1;
+      margin-right: 0.5rem;
+    }
+    .item-price {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+    .item-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .item-subtotal {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-left: auto;
+    }
+    :host ::ng-deep .cart-qty { width: 100px; }
+    :host ::ng-deep .cart-qty-input {
+      width: 2.5rem;
+      text-align: center;
+      font-size: 0.8125rem;
+      padding: 0.375rem;
+    }

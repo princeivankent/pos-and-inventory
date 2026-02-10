@@ -5,20 +5,8 @@ import { SkeletonModule } from 'primeng/skeleton';
   selector: 'app-loading-skeleton',
   standalone: true,
   imports: [SkeletonModule],
-  template: `
-    <div class="skeleton-container">
-      @for (_ of rows; track $index) {
-        <p-skeleton [height]="height" styleClass="mb-2" />
-      }
-    </div>
-  `,
-  styles: `
-    .skeleton-container {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-  `,
+  templateUrl: './loading-skeleton.html',
+  styleUrls: ['./loading-skeleton.scss'],
 })
 export class LoadingSkeleton {
   @Input() count = 5;

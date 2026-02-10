@@ -25,62 +25,8 @@ import { ReceiptPreviewComponent } from './components/receipt-preview/receipt-pr
     PaymentDialogComponent,
     ReceiptPreviewComponent,
   ],
-  template: `
-    <div class="pos-layout">
-      <div class="pos-products">
-        <app-product-search (productSelected)="addToCart($event)" />
-        <app-category-tabs (categoryChanged)="onCategoryChange($event)" />
-        <app-product-grid
-          [products]="filteredProducts()"
-          (productSelected)="addToCart($event)"
-        />
-      </div>
-      <div class="pos-cart">
-        <app-cart-panel (charge)="openPayment()" />
-      </div>
-    </div>
-
-    <app-payment-dialog
-      #paymentDialog
-      [totalAmount]="cart.total()"
-      [processing]="loading()"
-      (completed)="completeSale($event)"
-    />
-    <app-receipt-preview
-      #receiptPreview
-      [sale]="lastSale()"
-      [store]="currentStore()"
-    />
-  `,
-  styles: `
-    .pos-layout {
-      display: flex;
-      gap: 1rem;
-      height: calc(100vh - var(--header-height) - 3rem);
-    }
-    .pos-products {
-      flex: 3;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      overflow-y: auto;
-    }
-    .pos-cart {
-      flex: 2;
-      min-width: 320px;
-      max-width: 400px;
-    }
-    @media (max-width: 1024px) {
-      .pos-layout {
-        flex-direction: column;
-        height: auto;
-      }
-      .pos-cart {
-        max-width: none;
-        min-height: 300px;
-      }
-    }
-  `,
+  templateUrl: './pos.html',
+  styleUrls: ['./pos.scss'],
 })
 export class PosComponent implements OnInit {
   private http = inject(HttpClient);

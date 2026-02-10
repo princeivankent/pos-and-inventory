@@ -1,0 +1,48 @@
+@if (sale()) {
+      <app-page-header [title]="'Sale ' + sale()!.sale_number">
+        <a routerLink="/sales">
+          <p-button label="Back to Sales" icon="pi pi-arrow-left" severity="secondary" [outlined]="true" />
+        </a>
+      </app-page-header>
+
+      <div class="detail-grid">
+        <div class="card">
+          <h3>Sale Information</h3>
+          <div class="info-rows">
+            <div class="info-row"><span>Sale #</span><strong>{{ sale()!.sale_number }}</strong></div>
+            <div class="info-row"><span>Date</span><span>{{ sale()!.sale_date | date:'MMM d, y h:mm a' }}</span></div>
+            <div class="info-row"><span>Cashier</span><span>{{ sale()!.cashier?.full_name ?? '-' }}</span></div>
+            <div class="info-row"><span>Payment</span><app-status-badge [label]="sale()!.payment_method" severity="info" /></div>
+            <div class="info-row"><span>Status</span><app-status-badge [label]="sale()!.status" [severity]="sale()!.status === 'completed' ? 'success' : 'danger'" /></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Items</h3>
+          <table class="items-table">
+            <thead>
+              <tr><th>Product</th><th style="text-align:right">Qty</th><th style="text-align:right">Price</th><th style="text-align:right">Subtotal</th></tr>
+            </thead>
+            <tbody>
+              @for (item of sale()!.items ?? []; track item.id) {
+                <tr>
+                  <td>{{ item.product?.name ?? 'Product' }}</td>
+                  <td style="text-align:right">{{ item.quantity }}</td>
+                  <td style="text-align:right">{{ item.unit_price | phpCurrency }}</td>
+                  <td style="text-align:right">{{ item.subtotal | phpCurrency }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <div class="totals">
+            <div class="total-row"><span>Subtotal</span><span>{{ sale()!.subtotal | phpCurrency }}</span></div>
+            @if (sale()!.tax_amount > 0) {
+              <div class="total-row"><span>VAT</span><span>{{ sale()!.tax_amount | phpCurrency }}</span></div>
+            }
+            <div class="total-row grand"><span>Total</span><span>{{ sale()!.total_amount | phpCurrency }}</span></div>
+            <div class="total-row"><span>Paid</span><span>{{ sale()!.amount_paid | phpCurrency }}</span></div>
+            <div class="total-row"><span>Change</span><span>{{ sale()!.change_amount | phpCurrency }}</span></div>
+          </div>
+        </div>
+      </div>
+    }

@@ -1,0 +1,76 @@
+<div class="register-page">
+      <div class="register-card">
+        <div class="register-header">
+          <h1>Create Account</h1>
+          <p>Set up your store in minutes</p>
+        </div>
+
+        <form (ngSubmit)="onRegister()" class="register-form">
+          <div class="field">
+            <label for="fullName">Full Name</label>
+            <input
+              pInputText
+              id="fullName"
+              [(ngModel)]="fullName"
+              name="fullName"
+              placeholder="Your full name"
+              class="w-full"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="storeName">Store Name</label>
+            <input
+              pInputText
+              id="storeName"
+              [(ngModel)]="storeName"
+              name="storeName"
+              placeholder="Your store name"
+              class="w-full"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="email">Email</label>
+            <input
+              pInputText
+              id="email"
+              type="email"
+              [(ngModel)]="email"
+              name="email"
+              placeholder="your@email.com"
+              class="w-full"
+              required
+            />
+          </div>
+
+          <div class="field">
+            <label for="password">Password</label>
+            <p-password
+              id="password"
+              [(ngModel)]="password"
+              name="password"
+              placeholder="Minimum 6 characters"
+              [toggleMask]="true"
+              styleClass="w-full"
+              inputStyleClass="w-full"
+            />
+          </div>
+
+          <p-button
+            type="submit"
+            label="Create Account"
+            styleClass="w-full"
+            [loading]="loading()"
+            [disabled]="!fullName || !storeName || !email || !password"
+          />
+        </form>
+
+        <div class="register-footer">
+          <span>Already have an account?</span>
+          <a routerLink="/login">Sign in</a>
+        </div>
+      </div>
+    </div>

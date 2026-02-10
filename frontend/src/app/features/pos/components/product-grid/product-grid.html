@@ -1,0 +1,23 @@
+@if (products.length === 0) {
+      <div class="empty-grid">
+        <i class="pi pi-box"></i>
+        <p>No products found</p>
+      </div>
+    } @else {
+      <div class="product-grid">
+        @for (product of products; track product.id) {
+          <button
+            class="product-tile"
+            [class.out-of-stock]="product.current_stock <= 0"
+            [disabled]="product.current_stock <= 0"
+            (click)="onSelect(product)"
+          >
+            <span class="tile-name">{{ product.name }}</span>
+            <span class="tile-price">{{ product.retail_price | phpCurrency }}</span>
+            <span class="tile-stock" [class.low]="product.current_stock <= product.reorder_level && product.current_stock > 0">
+              {{ product.current_stock }} {{ product.unit }}
+            </span>
+          </button>
+        }
+      </div>
+    }
