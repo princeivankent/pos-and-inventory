@@ -24,7 +24,13 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(taskkill:*)",
-      "Bash(powershell:*)"
+      "Bash(powershell:*)",
+      "Bash(npm run start:dev:*)",
+      "Bash(curl:*)",
+      "WebSearch",
+      "WebFetch(domain:www.shopify.com)",
+      "WebFetch(domain:www.thoughtspot.com)",
+      "Bash(find:*)"
     ]
   }
 }
