@@ -30,7 +30,8 @@
       "WebSearch",
       "WebFetch(domain:www.shopify.com)",
       "WebFetch(domain:www.thoughtspot.com)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
