@@ -1,22 +1,28 @@
-<p-autocomplete
-      [(ngModel)]="searchText"
-      [suggestions]="suggestions"
-      (completeMethod)="search($event)"
-      (onSelect)="onSelect($event)"
-      optionLabel="name"
-      placeholder="Search products or scan barcode..."
-      [minLength]="1"
-      [delay]="300"
-      styleClass="pos-search"
-      inputStyleClass="pos-search-input"
-      [showClear]="true"
-    >
-      <ng-template let-product pTemplate="item">
-        <div class="search-item">
+<p-iconfield>
+  <p-inputicon styleClass="pi pi-barcode" />
+  <p-autocomplete
+    [(ngModel)]="searchText"
+    [suggestions]="suggestions"
+    (completeMethod)="search($event)"
+    (onSelect)="onSelect($event)"
+    optionLabel="name"
+    placeholder="Search products or scan barcode..."
+    [minLength]="1"
+    [delay]="300"
+    styleClass="pos-search"
+    inputStyleClass="pos-search-input"
+    [showClear]="true"
+  >
+    <ng-template let-product pTemplate="item">
+      <div class="search-item">
+        <div class="search-item-top">
           <span class="search-item-name">{{ product.name }}</span>
-          <span class="search-item-meta">
-            {{ product.sku }} &middot; {{ product.current_stock }} {{ product.unit }}
-          </span>
+          <span class="search-item-price">{{ product.retail_price | phpCurrency }}</span>
         </div>
-      </ng-template>
-    </p-autocomplete>
+        <span class="search-item-meta">
+          {{ product.sku }} &middot; {{ product.current_stock }} {{ product.unit }}
+        </span>
+      </div>
+    </ng-template>
+  </p-autocomplete>
+</p-iconfield>

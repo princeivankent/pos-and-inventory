@@ -1,25 +1,62 @@
 <div class="pos-layout">
-      <div class="pos-products">
-        <app-product-search (productSelected)="addToCart($event)" />
-        <app-category-tabs (categoryChanged)="onCategoryChange($event)" />
-        <app-product-grid
-          [products]="filteredProducts()"
-          (productSelected)="addToCart($event)"
+  <div class="pos-products">
+    <div class="pos-toolbar">
+      <app-product-search (productSelected)="addToCart($event)" />
+      <p-button
+        icon="pi pi-pause"
+        [outlined]="true"
+        severity="secondary"
+        (onClick)="holdOrder()"
+        [disabled]="cart.items().length === 0"
+      />
+      <span class="hold-badge">
+        <p-button
+          icon="pi pi-history"
+          [outlined]="true"
+          severity="secondary"
+          (onClick)="recallOrder()"
+          [disabled]="cart.heldOrders().length === 0"
         />
-      </div>
-      <div class="pos-cart">
-        <app-cart-panel (charge)="openPayment()" />
-      </div>
+        @if (cart.heldOrders().length > 0) {
+          <span class="badge">{{ cart.heldOrders().length }}</span>
+        }
+      </span>
     </div>
+    <div class="pos-categories">
+      <app-category-tabs (categoryChanged)="onCategoryChange($event)" />
+    </div>
+    <div class="pos-grid-area">
+      <app-product-grid
+        [products]="filteredProducts()"
+        [cartItems]="cart.items()"
+        (productSelected)="addToCart($event)"
+      />
+    </div>
+  </div>
+  <div class="pos-cart">
+    <app-cart-panel
+      (charge)="openPayment()"
+      (addCustomer)="openCustomerDialog()"
+      (addDiscount)="openDiscountDialog()"
+    />
+  </div>
+</div>
 
-    <app-payment-dialog
-      #paymentDialog
-      [totalAmount]="cart.total()"
-      [processing]="loading()"
-      (completed)="completeSale($event)"
-    />
-    <app-receipt-preview
-      #receiptPreview
-      [sale]="lastSale()"
-      [store]="currentStore()"
-    />
+<app-payment-dialog
+  #paymentDialog
+  [totalAmount]="cart.total()"
+  [processing]="loading()"
+  (completed)="completeSale($event)"
+/>
+<app-receipt-preview
+  #receiptPreview
+  [sale]="lastSale()"
+  [store]="currentStore()"
+/>
+<app-customer-search-dialog
+  #customerDialog
+  (customerSelected)="onCustomerSelected($event)"
+/>
+<app-discount-dialog
+  #discountDialog
+/>

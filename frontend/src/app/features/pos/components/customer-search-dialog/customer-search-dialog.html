@@ -1,0 +1,40 @@
+<p-dialog
+  header="Select Customer"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '440px' }"
+  [closable]="true"
+>
+  <div class="customer-search-body">
+    <p-autocomplete
+      [(ngModel)]="searchText"
+      [suggestions]="suggestions()"
+      (completeMethod)="search($event)"
+      (onSelect)="onSelect($event)"
+      optionLabel="name"
+      placeholder="Search by name or phone..."
+      [minLength]="1"
+      [delay]="300"
+      styleClass="w-full"
+      inputStyleClass="customer-search-input"
+    >
+      <ng-template let-customer pTemplate="item">
+        <div class="customer-item">
+          <div class="customer-item-top">
+            <span class="customer-item-name">{{ customer.name }}</span>
+            <span class="customer-item-balance">{{ customer.current_balance | phpCurrency }}</span>
+          </div>
+          <span class="customer-item-meta">
+            {{ customer.phone || 'No phone' }}
+            &middot; Limit: {{ customer.credit_limit | phpCurrency }}
+          </span>
+        </div>
+      </ng-template>
+    </p-autocomplete>
+
+    <button class="walkin-btn" (click)="selectWalkIn()" type="button">
+      <i class="pi pi-user"></i>
+      <span>Walk-in (No Customer)</span>
+    </button>
+  </div>
+</p-dialog>

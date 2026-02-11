@@ -1,30 +1,26 @@
 <div class="cart-item">
-      <div class="item-info">
-        <span class="item-name">{{ item.product.name }}</span>
-        <span class="item-price">{{ item.unit_price | phpCurrency }}</span>
-      </div>
-      <div class="item-controls">
-        <p-inputNumber
-          [ngModel]="item.quantity"
-          (ngModelChange)="quantityChanged.emit($event)"
-          [showButtons]="true"
-          buttonLayout="horizontal"
-          [min]="0"
-          [max]="item.product.current_stock"
-          incrementButtonIcon="pi pi-plus"
-          decrementButtonIcon="pi pi-minus"
-          size="small"
-          styleClass="cart-qty"
-          inputStyleClass="cart-qty-input"
-        />
-        <span class="item-subtotal">{{ item.unit_price * item.quantity | phpCurrency }}</span>
-        <p-button
-          icon="pi pi-times"
-          [rounded]="true"
-          [text]="true"
-          severity="danger"
-          size="small"
-          (onClick)="removed.emit()"
-        />
-      </div>
-    </div>
+  <div class="item-left">
+    <span class="item-name">{{ item.product.name }}</span>
+    <span class="item-price">{{ item.unit_price | phpCurrency }}</span>
+  </div>
+  <div class="item-center">
+    <button class="qty-btn" (click)="decrement()" type="button">
+      <i class="pi pi-minus"></i>
+    </button>
+    <span class="qty-value">{{ item.quantity }}</span>
+    <button
+      class="qty-btn"
+      (click)="increment()"
+      [disabled]="item.quantity >= item.product.current_stock"
+      type="button"
+    >
+      <i class="pi pi-plus"></i>
+    </button>
+  </div>
+  <div class="item-right">
+    <span class="item-subtotal">{{ item.unit_price * item.quantity | phpCurrency }}</span>
+    <button class="remove-btn" (click)="removed.emit()" type="button">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+</div>

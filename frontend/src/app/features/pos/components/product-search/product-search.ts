@@ -1,14 +1,17 @@
 import { Component, inject, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AutoCompleteModule, AutoCompleteCompleteEvent, AutoCompleteSelectEvent } from 'primeng/autocomplete';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { Product } from '../../../../core/models/product.model';
+import { PhpCurrencyPipe } from '../../../../shared/pipes/php-currency.pipe';
 
 @Component({
   selector: 'app-product-search',
   standalone: true,
-  imports: [FormsModule, AutoCompleteModule],
+  imports: [FormsModule, AutoCompleteModule, IconFieldModule, InputIconModule, PhpCurrencyPipe],
   templateUrl: './product-search.html',
   styleUrls: ['./product-search.scss'],
 })

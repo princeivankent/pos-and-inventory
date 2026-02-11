@@ -1,18 +1,26 @@
-<div class="category-tabs">
+<div class="category-tabs-wrapper">
+  @if (showLeftFade) {
+    <div class="scroll-fade-left"></div>
+  }
+  <div class="category-tabs" #tabsContainer (scroll)="onScroll()">
+    <p-button
+      [label]="'All'"
+      [outlined]="selectedId() !== null"
+      [severity]="selectedId() === null ? undefined : 'secondary'"
+      size="small"
+      (onClick)="select(null)"
+    />
+    @for (cat of categories(); track cat.id) {
       <p-button
-        [label]="'All'"
-        [outlined]="selectedId() !== null"
-        [severity]="selectedId() === null ? undefined : 'secondary'"
+        [label]="cat.name"
+        [outlined]="selectedId() !== cat.id"
+        [severity]="selectedId() === cat.id ? undefined : 'secondary'"
         size="small"
-        (onClick)="select(null)"
+        (onClick)="select(cat.id)"
       />
-      @for (cat of categories(); track cat.id) {
-        <p-button
-          [label]="cat.name"
-          [outlined]="selectedId() !== cat.id"
-          [severity]="selectedId() === cat.id ? undefined : 'secondary'"
-          size="small"
-          (onClick)="select(cat.id)"
-        />
-      }
-    </div>
+    }
+  </div>
+  @if (showRightFade) {
+    <div class="scroll-fade-right"></div>
+  }
+</div>
