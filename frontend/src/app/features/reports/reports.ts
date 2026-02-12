@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TabsModule } from 'primeng/tabs';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -17,7 +18,7 @@ import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [DecimalPipe, FormsModule, TabsModule, SelectModule, TableModule, ChartModule, ButtonModule, SkeletonModule, ProgressSpinnerModule, PageHeader, PhpCurrencyPipe],
+  imports: [DecimalPipe, FormsModule, RouterLink, TabsModule, SelectModule, TableModule, ChartModule, ButtonModule, SkeletonModule, ProgressSpinnerModule, PageHeader, PhpCurrencyPipe],
   templateUrl: './reports.html',
   styleUrls: ['./reports.scss'],
 })
@@ -53,16 +54,51 @@ export class ReportsComponent implements OnInit {
   profitLoading = signal(false);
 
   chartOptions = {
-    plugins: { legend: { display: false } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        titleFont: { size: 14 },
+        bodyFont: { size: 13 },
+        cornerRadius: 6,
+      },
+    },
     scales: {
-      y: { beginAtZero: true, ticks: { callback: (v: number) => '₱' + v.toLocaleString() } },
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+        ticks: { callback: (v: number) => '₱' + v.toLocaleString() },
+      },
+      x: {
+        grid: { display: false },
+      },
+    },
+    interaction: {
+      mode: 'index' as const,
+      intersect: false,
     },
   };
 
   horizontalChartOptions = {
     indexAxis: 'y' as const,
-    plugins: { legend: { display: false } },
-    scales: { x: { beginAtZero: true } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        padding: 12,
+        cornerRadius: 6,
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        grid: { color: 'rgba(0, 0, 0, 0.05)' },
+      },
+      y: {
+        grid: { display: false },
+      },
+    },
   };
 
   ngOnInit() {
@@ -198,6 +234,16 @@ export class ReportsComponent implements OnInit {
       next: (r) => {
         this.salesReport.set(r);
         if (r.daily_breakdown?.length) {
+          // Create gradient chart with area fill
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          let gradient = null;
+          if (ctx) {
+            gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.2)');
+            gradient.addColorStop(1, 'rgba(99, 102, 241, 0.02)');
+          }
+
           this.salesChartData.set({
             labels: r.daily_breakdown.map((d: DailySales) => {
               const dt = new Date(d.date);
@@ -206,8 +252,16 @@ export class ReportsComponent implements OnInit {
             datasets: [{
               label: 'Sales',
               data: r.daily_breakdown.map((d: DailySales) => d.total_sales),
-              backgroundColor: '#6366f1',
-              borderRadius: 4,
+              backgroundColor: gradient || 'rgba(99, 102, 241, 0.1)',
+              borderColor: '#6366f1',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.4,
+              pointRadius: 3,
+              pointHoverRadius: 5,
+              pointBackgroundColor: '#6366f1',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
             }],
           });
         } else {
@@ -238,13 +292,23 @@ export class ReportsComponent implements OnInit {
       next: (items) => {
         this.bestSelling.set(items);
         if (items.length) {
+          // Use distinct colors for top products (gold, silver, bronze theme)
+          const colors = items.map((_, index) => {
+            if (index === 0) return '#fbbf24'; // Gold
+            if (index === 1) return '#9ca3af'; // Silver
+            if (index === 2) return '#f97316'; // Bronze
+            return '#6366f1'; // Default purple
+          });
+
           this.bestSellingChartData.set({
             labels: items.map((i) => i.name),
             datasets: [{
               label: 'Quantity Sold',
               data: items.map((i) => i.total_quantity),
-              backgroundColor: '#6366f1',
-              borderRadius: 4,
+              backgroundColor: colors,
+              borderRadius: 6,
+              barThickness: 'flex',
+              maxBarThickness: 40,
             }],
           });
         } else {
