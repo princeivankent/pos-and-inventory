@@ -6,14 +6,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A multi-tenant POS & Inventory Management System for Philippine retail stores with FIFO inventory tracking, customer credit management (utang), and BIR compliance features.
 
-**Current Status**: Phase 1 Complete (Backend Foundation). Database schema and auth system implemented. Modules for products, inventory, sales, and frontend remain to be built.
+**Current Status**:
+- ✅ Phase 1-8 Complete: Backend foundation + all core modules (Categories, Products, Inventory, Sales, Receipts, Reports, Users)
+- ✅ Phase 9 Complete: Frontend (Angular 21 + PrimeNG) with all pages scaffolded
+- ✅ UI/UX Modernization Phase 1: Login & Reports pages enhanced with modern design
+- 🚧 Phase 10 In Progress: Testing & Deployment preparation
 
 ## Technology Stack
 
 - **Backend**: NestJS + TypeORM + PostgreSQL (Supabase)
 - **Authentication**: Supabase Auth + JWT (7d expiration)
-- **Frontend**: Angular 17+ (planned, not yet created)
+- **Frontend**: Angular 21 + PrimeNG (standalone components)
 - **Database**: 14 entities with multi-tenant isolation via `store_id`
+- **UI/UX**: Modern design system with gradients, animations, and responsive layouts
 
 ## Common Development Commands
 
@@ -43,13 +48,39 @@ npm run lint                  # Run ESLint with auto-fix
 npm run format               # Format with Prettier
 ```
 
+### Frontend Development
+```bash
+cd frontend
+
+# Development
+npm run start                 # Start dev server on port 4200 with hot-reload
+npm run dev                   # Alias for npm start
+
+# Build & Production
+npm run build                 # Production build to dist/ (670 kB)
+npm run build:dev            # Development build
+
+# Testing
+npm run test                  # Run unit tests with Karma
+npm run test:watch           # Run tests in watch mode
+npm run e2e                  # Run end-to-end tests
+
+# Code Quality
+npm run lint                  # Run ESLint
+```
+
 ### Environment Setup
-Required `.env` variables in `backend/`:
+**Backend** - Required `.env` variables in `backend/`:
 - `DATABASE_URL` - PostgreSQL connection string
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_KEY`
 - `JWT_SECRET`, `JWT_EXPIRATION` (default: 7d)
 - `NODE_ENV` (development/production)
 - `FRONTEND_URL` (for CORS)
+
+**Frontend** - Configure in `frontend/src/environments/`:
+- `environment.ts` - Development config (API: http://localhost:3000)
+- `environment.prod.ts` - Production config
+- Set `apiUrl` and `supabaseUrl` for backend integration
 
 ## Architecture Patterns
 
@@ -100,6 +131,54 @@ export class ExampleController {
   create(@Body() dto: CreateDto, @CurrentStore() storeId: string) {
     return this.service.create(dto, storeId);
   }
+}
+```
+
+### Frontend Component Pattern
+
+**Angular 21 Standalone Components** (multi-file structure):
+```typescript
+// feature-name.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+
+@Component({
+  selector: 'app-feature-name',
+  standalone: true,
+  imports: [CommonModule, FormsModule, ButtonModule],
+  templateUrl: './feature-name.html',
+  styleUrls: ['./feature-name.scss']
+})
+export class FeatureNameComponent implements OnInit {
+  // Component logic
+}
+```
+
+**PrimeNG Components Used**:
+- `TableModule` - Data tables with pagination, sorting, filtering
+- `ButtonModule` - Buttons with icons and variants
+- `InputTextModule`, `InputNumberModule` - Form inputs
+- `CardModule` - Card containers for content sections
+- `ChartModule` - Charts.js integration for reports
+- `DialogModule` - Modal dialogs
+- `ToastModule` - Notification messages
+- `DropdownModule` - Select dropdowns
+- `CalendarModule` - Date pickers
+
+**Service Pattern**:
+```typescript
+// Inject HttpClient + AuthService for API calls
+constructor(
+  private http: HttpClient,
+  private authService: AuthService
+) {}
+
+// Include X-Store-Id header in all requests
+getItems() {
+  const headers = { 'X-Store-Id': this.authService.currentStoreId };
+  return this.http.get('/api/items', { headers });
 }
 ```
 
@@ -169,7 +248,23 @@ Reverse the sale transaction:
 - **Auth**: `auth/` (Supabase + JWT integration)
 - **Common**: `common/` (guards, decorators, interceptors, filters)
 - **Config**: `config/` (environment, database, Supabase)
-- **Modules**: Individual directories for each domain module
+- **Modules**: `stores/`, `categories/`, `products/`, `inventory/`, `sales/`, `receipts/`, `reports/`, `users/`
+
+**Frontend Source**: `frontend/src/`
+- **App**: `app/` (standalone components, Angular 21)
+- **Features**: `app/features/` (auth, pos, products, inventory, sales, customers, reports, dashboard, settings)
+- **Core**: `app/core/` (services, guards, interceptors)
+- **Shared**: `app/shared/` (components, directives, pipes)
+- **Assets**: `assets/` (images, styles, i18n)
+
+**Component Structure** (multi-file pattern):
+```
+feature-name/
+├── feature-name.ts          # Component logic
+├── feature-name.html        # Template
+├── feature-name.scss        # Scoped styles
+└── feature-name.spec.ts     # Unit tests
+```
 
 **API Endpoints**:
 - Base path: `/api`
@@ -178,23 +273,53 @@ Reverse the sale transaction:
 
 ## Implementation Notes
 
-**Completed**:
-- ✅ Database schema (14 tables)
-- ✅ Multi-tenant guards and interceptors
-- ✅ Authentication module
-- ✅ Sample Stores module implementation
+**Completed - Backend (Phases 1-8)**:
+- ✅ Database schema (14 tables with multi-tenant isolation)
+- ✅ Multi-tenant guards and interceptors (`TenantGuard`, `RolesGuard`)
+- ✅ Authentication module (Supabase + JWT, store switching)
+- ✅ Stores module (CRUD + settings management)
+- ✅ Categories module (hierarchical categories with parent/child)
+- ✅ Products module (retail/cost pricing, stock tracking)
+- ✅ Inventory module (FIFO batch management, stock movements)
+- ✅ Sales module (atomic transactions, FIFO deduction, credit validation)
+- ✅ Receipts module (thermal printer support, BIR compliance)
+- ✅ Reports module (sales, inventory, customer statements)
+- ✅ Users module (store assignment, role management)
+- ✅ Customers module (credit limit, utang tracking)
 
-**To Implement** (follow Stores module pattern):
-- Products, Categories, Suppliers modules (basic CRUD)
-- Inventory module (FIFO logic, batch management)
-- Customers module (credit limit validation)
-- Sales module (transactions with atomic batch deductions)
-- Credit Payments module (payment tracking)
-- Reports module (sales, inventory, customer statements)
-- Alerts module (cron job for low stock/expiry warnings)
-- Receipts module (PDF + thermal printer support)
-- Users module (store assignment, role management)
-- Frontend (Angular 17+ application)
+**Completed - Frontend (Phase 9)**:
+- ✅ Angular 21 + PrimeNG setup (standalone components)
+- ✅ Authentication flow (login, register, store switching)
+- ✅ POS page (product selection, cart, checkout)
+- ✅ Products management (CRUD, categories, pricing)
+- ✅ Inventory management (batches, stock movements, FIFO tracking)
+- ✅ Sales history (search, filters, details)
+- ✅ Customers management (credit limits, payment tracking)
+- ✅ Reports & Dashboard (sales charts, inventory stats)
+- ✅ Settings page (store config, user profile)
+- ✅ UI/UX Modernization Phase 1 (login + reports with modern design)
+
+**To Implement (Phase 10 - Testing & Deployment)**:
+- Unit tests for backend services (Jest)
+- E2E tests for critical flows (sales, inventory)
+- Frontend unit tests (Jasmine/Karma)
+- Integration tests (API + database)
+- Performance optimization (lazy loading, caching)
+- Production deployment setup (Vercel + Supabase)
+- CI/CD pipeline (GitHub Actions)
+- User documentation and training materials
+
+**UI/UX Modernization Standards**:
+- Modern gradient backgrounds (linear-gradient with brand colors)
+- Smooth animations and hover effects (transform, box-shadow)
+- Emoji icons for visual hierarchy (📊 📈 📦 💰 etc.)
+- Trend indicators with arrows (↑ ↓) and color coding (green/red)
+- Empty states with CTAs linking to relevant actions
+- Professional typography (Inter font family)
+- Responsive layouts with proper spacing
+- Gradient charts (area fills for line charts, gradient bars)
+- Card-based layouts with subtle shadows
+- Brand consistency (purple/blue gradient theme)
 
 **Key Considerations**:
 - Always apply `TenantGuard` to tenant-specific endpoints

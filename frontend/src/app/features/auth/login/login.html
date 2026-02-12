@@ -1,11 +1,16 @@
 <div class="login-page">
       <div class="login-card">
+        <!-- Brand Identity -->
         <div class="login-header">
-          <h1>POS & Inventory</h1>
-          <p>Sign in to your account</p>
+          <div class="brand-logo">
+            <i class="pi pi-shopping-cart"></i>
+          </div>
+          <h1>POS System</h1>
+          <p>Manage your retail business with ease</p>
         </div>
 
         <form (ngSubmit)="onLogin()" class="login-form">
+          <!-- Email Field -->
           <div class="field">
             <label for="email">Email</label>
             <input
@@ -15,13 +20,21 @@
               [(ngModel)]="email"
               name="email"
               placeholder="Enter your email"
-              class="w-full"
+              class="w-full input-enhanced"
               required
+              #emailInput="ngModel"
             />
+            @if (emailInput.invalid && emailInput.touched) {
+              <small class="error-message">Please enter a valid email</small>
+            }
           </div>
 
+          <!-- Password Field -->
           <div class="field">
-            <label for="password">Password</label>
+            <div class="label-row">
+              <label for="password">Password</label>
+              <a href="#" class="forgot-link" (click)="onForgotPassword($event)">Forgot password?</a>
+            </div>
             <p-password
               id="password"
               [(ngModel)]="password"
@@ -30,14 +43,31 @@
               [toggleMask]="true"
               [feedback]="false"
               styleClass="w-full"
-              inputStyleClass="w-full"
+              inputStyleClass="w-full input-enhanced"
+              required
+              #passwordInput="ngModel"
             />
+            @if (passwordInput.invalid && passwordInput.touched) {
+              <small class="error-message">Password is required</small>
+            }
           </div>
 
+          <!-- Remember Me Checkbox -->
+          <div class="remember-me">
+            <p-checkbox
+              [(ngModel)]="rememberMe"
+              name="rememberMe"
+              [binary]="true"
+              inputId="remember"
+            />
+            <label for="remember" class="remember-label">Remember me</label>
+          </div>
+
+          <!-- Submit Button -->
           <p-button
             type="submit"
             label="Sign In"
-            styleClass="w-full"
+            styleClass="w-full btn-signin"
             [loading]="loading()"
             [disabled]="!email || !password"
           />

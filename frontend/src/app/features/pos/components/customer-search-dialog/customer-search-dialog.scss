@@ -1,0 +1,58 @@
+.customer-search-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+:host ::ng-deep {
+  .w-full { width: 100%; }
+  .customer-search-input {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+}
+.customer-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.375rem 0;
+}
+.customer-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.customer-item-name {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+.customer-item-balance {
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--color-primary);
+}
+.customer-item-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.walkin-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  i { font-size: 1rem; }
+  &:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: var(--color-primary-light, #eff6ff);
+  }
+}

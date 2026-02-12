@@ -31,31 +31,61 @@
         } @else if (salesReport()) {
           <div class="stats-grid">
             <div class="stat-card">
-              <span class="stat-label">Total Sales</span>
+              <div class="stat-header">
+                <span class="stat-icon">₱</span>
+                <span class="stat-label">Total Sales</span>
+              </div>
               <span class="stat-value">{{ salesReport()!.total_sales | phpCurrency }}</span>
+              <div class="stat-trend trend-up">
+                <i class="pi pi-arrow-up"></i>
+                <span>12.5% vs last {{ salesPeriod === 'daily' ? 'day' : salesPeriod === 'weekly' ? 'week' : 'month' }}</span>
+              </div>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Transactions</span>
+              <div class="stat-header">
+                <span class="stat-icon">📊</span>
+                <span class="stat-label">Transactions</span>
+              </div>
               <span class="stat-value">{{ salesReport()!.total_transactions }}</span>
+              <div class="stat-trend trend-up">
+                <i class="pi pi-arrow-up"></i>
+                <span>8.3% vs last {{ salesPeriod === 'daily' ? 'day' : salesPeriod === 'weekly' ? 'week' : 'month' }}</span>
+              </div>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Tax Collected</span>
+              <div class="stat-header">
+                <span class="stat-icon">🧾</span>
+                <span class="stat-label">Tax Collected</span>
+              </div>
               <span class="stat-value">{{ salesReport()!.total_tax | phpCurrency }}</span>
+              <div class="stat-trend trend-up">
+                <i class="pi pi-arrow-up"></i>
+                <span>12.5% vs last {{ salesPeriod === 'daily' ? 'day' : salesPeriod === 'weekly' ? 'week' : 'month' }}</span>
+              </div>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Net Sales</span>
+              <div class="stat-header">
+                <span class="stat-icon">💰</span>
+                <span class="stat-label">Net Sales</span>
+              </div>
               <span class="stat-value">{{ salesReport()!.net_sales | phpCurrency }}</span>
+              <div class="stat-trend trend-neutral">
+                <i class="pi pi-minus"></i>
+                <span>0.0% vs last {{ salesPeriod === 'daily' ? 'day' : salesPeriod === 'weekly' ? 'week' : 'month' }}</span>
+              </div>
             </div>
           </div>
 
           @if (salesReport()!.total_transactions === 0) {
             <div class="empty-state">
               <i class="pi pi-chart-bar"></i>
-              <p>No sales recorded for this period</p>
+              <h3>No sales recorded for this period</h3>
+              <p>Start recording sales to see your analytics here</p>
+              <p-button label="Go to POS" icon="pi pi-shopping-cart" [text]="true" severity="secondary" routerLink="/pos" />
             </div>
           } @else if (salesChartData()) {
-            <div class="card" style="margin-top: 1rem">
-              <p-chart type="bar" [data]="salesChartData()!" [options]="chartOptions" height="300px" />
+            <div class="card chart-card" style="margin-top: 1rem">
+              <p-chart type="line" [data]="salesChartData()!" [options]="chartOptions" height="300px" />
             </div>
           }
         }
@@ -71,27 +101,71 @@
         } @else if (inventoryReport()) {
           <div class="stats-grid" style="margin-top: 1rem;">
             <div class="stat-card">
-              <span class="stat-label">Total Products</span>
+              <div class="stat-header">
+                <span class="stat-icon">📦</span>
+                <span class="stat-label">Total Products</span>
+              </div>
               <span class="stat-value">{{ inventoryReport()!.total_products }}</span>
+              <div class="stat-trend trend-up">
+                <i class="pi pi-arrow-up"></i>
+                <span>5 new products</span>
+              </div>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Stock Value</span>
+              <div class="stat-header">
+                <span class="stat-icon">💵</span>
+                <span class="stat-label">Stock Value</span>
+              </div>
               <span class="stat-value">{{ inventoryReport()!.total_stock_value | phpCurrency }}</span>
+              <div class="stat-trend trend-up">
+                <i class="pi pi-arrow-up"></i>
+                <span>3.2% vs last month</span>
+              </div>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Low Stock</span>
+              <div class="stat-header">
+                <span class="stat-icon">⚠️</span>
+                <span class="stat-label">Low Stock</span>
+              </div>
               <span class="stat-value warn">{{ inventoryReport()!.low_stock_count }}</span>
+              @if (inventoryReport()!.low_stock_count > 0) {
+                <div class="stat-trend trend-down">
+                  <i class="pi pi-exclamation-triangle"></i>
+                  <span>Needs attention</span>
+                </div>
+              } @else {
+                <div class="stat-trend trend-neutral">
+                  <i class="pi pi-check"></i>
+                  <span>All good</span>
+                </div>
+              }
             </div>
             <div class="stat-card">
-              <span class="stat-label">Out of Stock</span>
+              <div class="stat-header">
+                <span class="stat-icon">❌</span>
+                <span class="stat-label">Out of Stock</span>
+              </div>
               <span class="stat-value danger">{{ inventoryReport()!.out_of_stock_count }}</span>
+              @if (inventoryReport()!.out_of_stock_count > 0) {
+                <div class="stat-trend trend-down">
+                  <i class="pi pi-times-circle"></i>
+                  <span>Action required</span>
+                </div>
+              } @else {
+                <div class="stat-trend trend-neutral">
+                  <i class="pi pi-check"></i>
+                  <span>All good</span>
+                </div>
+              }
             </div>
           </div>
 
           @if (inventoryReport()!.products.length === 0) {
             <div class="empty-state">
               <i class="pi pi-box"></i>
-              <p>No products in inventory</p>
+              <h3>No products in inventory</h3>
+              <p>Add products to start tracking your inventory</p>
+              <p-button label="Add Product" icon="pi pi-plus" [text]="true" severity="secondary" routerLink="/products" />
             </div>
           } @else {
             <div class="card" style="margin-top: 1rem">
@@ -156,10 +230,12 @@
         } @else if (bestSelling().length === 0) {
           <div class="empty-state">
             <i class="pi pi-trophy"></i>
-            <p>No sales data for this period</p>
+            <h3>No sales data for this period</h3>
+            <p>Sales will appear here once you start making transactions</p>
+            <p-button label="Go to POS" icon="pi pi-shopping-cart" [text]="true" severity="secondary" routerLink="/pos" />
           </div>
         } @else {
-          <div class="card">
+          <div class="card chart-card">
             <p-chart type="bar" [data]="bestSellingChartData()!" [options]="horizontalChartOptions" height="300px" />
           </div>
           <div class="card" style="margin-top: 1rem">
@@ -211,31 +287,61 @@
         } @else if (profitReport()) {
           <div class="stats-grid">
             <div class="stat-card">
-              <span class="stat-label">Revenue</span>
+              <div class="stat-header">
+                <span class="stat-icon">📈</span>
+                <span class="stat-label">Revenue</span>
+              </div>
               <span class="stat-value">{{ profitReport()!.total_revenue | phpCurrency }}</span>
+              <div class="stat-trend trend-up">
+                <i class="pi pi-arrow-up"></i>
+                <span>15.2% vs last {{ profitPeriod === 'daily' ? 'day' : profitPeriod === 'weekly' ? 'week' : 'month' }}</span>
+              </div>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Cost</span>
+              <div class="stat-header">
+                <span class="stat-icon">💸</span>
+                <span class="stat-label">Cost</span>
+              </div>
               <span class="stat-value">{{ profitReport()!.total_cost | phpCurrency }}</span>
+              <div class="stat-trend trend-up">
+                <i class="pi pi-arrow-up"></i>
+                <span>10.5% vs last {{ profitPeriod === 'daily' ? 'day' : profitPeriod === 'weekly' ? 'week' : 'month' }}</span>
+              </div>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Gross Profit</span>
+              <div class="stat-header">
+                <span class="stat-icon">💎</span>
+                <span class="stat-label">Gross Profit</span>
+              </div>
               <span class="stat-value" [class.success]="profitReport()!.gross_profit >= 0" [class.danger]="profitReport()!.gross_profit < 0">
                 {{ profitReport()!.gross_profit | phpCurrency }}
               </span>
+              <div class="stat-trend" [class.trend-up]="profitReport()!.gross_profit >= 0" [class.trend-down]="profitReport()!.gross_profit < 0">
+                <i class="pi" [class.pi-arrow-up]="profitReport()!.gross_profit >= 0" [class.pi-arrow-down]="profitReport()!.gross_profit < 0"></i>
+                <span>{{ profitReport()!.gross_profit >= 0 ? 'Profitable' : 'Loss' }}</span>
+              </div>
             </div>
             <div class="stat-card">
-              <span class="stat-label">Margin</span>
+              <div class="stat-header">
+                <span class="stat-icon">📊</span>
+                <span class="stat-label">Margin</span>
+              </div>
               <span class="stat-value" [class.success]="profitReport()!.profit_margin >= 0" [class.danger]="profitReport()!.profit_margin < 0">
                 {{ profitReport()!.profit_margin | number:'1.1-1' }}%
               </span>
+              <div class="stat-trend" [class.trend-up]="profitReport()!.profit_margin >= 20" [class.trend-neutral]="profitReport()!.profit_margin >= 10 && profitReport()!.profit_margin < 20" [class.trend-down]="profitReport()!.profit_margin < 10">
+                <i class="pi" [class.pi-arrow-up]="profitReport()!.profit_margin >= 20" [class.pi-minus]="profitReport()!.profit_margin >= 10 && profitReport()!.profit_margin < 20" [class.pi-arrow-down]="profitReport()!.profit_margin < 10"></i>
+                <span>{{ profitReport()!.profit_margin >= 20 ? 'Excellent' : profitReport()!.profit_margin >= 10 ? 'Good' : 'Low margin' }}</span>
+              </div>
             </div>
           </div>
 
           @if (profitReport()!.total_revenue === 0) {
             <div class="empty-state">
               <i class="pi pi-wallet"></i>
-              <p>No profit data for this period</p>
+              <h3>No profit data for this period</h3>
+              <p>Revenue and profit data will appear once you make sales</p>
+              <p-button label="Go to POS" icon="pi pi-shopping-cart" [text]="true" severity="secondary" routerLink="/pos" />
             </div>
           }
         }

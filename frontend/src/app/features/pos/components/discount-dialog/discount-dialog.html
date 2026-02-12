@@ -1,0 +1,59 @@
+<p-dialog
+  header="Apply Discount"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '400px' }"
+  [closable]="true"
+>
+  <div class="discount-body">
+    <div class="discount-type">
+      <p-selectButton
+        [options]="typeOptions"
+        [ngModel]="discountType()"
+        (ngModelChange)="discountType.set($event)"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="field">
+      <label>{{ discountType() === 'percentage' ? 'Percentage' : 'Amount' }}</label>
+      <p-inputNumber
+        [ngModel]="discountAmount()"
+        (ngModelChange)="discountAmount.set($event)"
+        [min]="0"
+        [max]="discountType() === 'percentage' ? 100 : cart.subtotal()"
+        [suffix]="discountType() === 'percentage' ? '%' : ''"
+        [prefix]="discountType() === 'fixed' ? '₱' : ''"
+        inputStyleClass="discount-input"
+        styleClass="w-full"
+        placeholder="Enter discount"
+      />
+    </div>
+
+    @if (preview() > 0) {
+      <div class="discount-preview">
+        <span>Discount amount</span>
+        <span class="preview-value">-{{ preview() | phpCurrency }}</span>
+      </div>
+    }
+  </div>
+
+  <ng-template pTemplate="footer">
+    @if (cart.discountAmount() > 0) {
+      <p-button
+        label="Remove Discount"
+        [text]="true"
+        severity="danger"
+        (onClick)="remove()"
+      />
+    }
+    <p-button
+      label="Apply"
+      icon="pi pi-check"
+      [disabled]="!discountAmount() || discountAmount()! <= 0"
+      (onClick)="apply()"
+    />
+  </ng-template>
+</p-dialog>

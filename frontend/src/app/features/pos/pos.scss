@@ -1,27 +1,86 @@
+:host {
+  display: block;
+  height: calc(100vh - var(--header-height, 60px) - 2rem);
+  overflow: hidden;
+}
 .pos-layout {
-      display: flex;
-      gap: 1rem;
-      height: calc(100vh - var(--header-height) - 3rem);
-    }
-    .pos-products {
-      flex: 3;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      overflow-y: auto;
-    }
-    .pos-cart {
-      flex: 2;
-      min-width: 320px;
-      max-width: 400px;
-    }
-    @media (max-width: 1024px) {
-      .pos-layout {
-        flex-direction: column;
-        height: auto;
-      }
-      .pos-cart {
-        max-width: none;
-        min-height: 300px;
-      }
-    }
+  display: flex;
+  gap: 1rem;
+  height: 100%;
+  overflow: hidden;
+}
+.pos-products {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+.pos-toolbar {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  padding-bottom: 0.75rem;
+  flex-shrink: 0;
+  app-product-search { flex: 1; }
+}
+.pos-categories {
+  flex-shrink: 0;
+  padding-bottom: 0.75rem;
+}
+.pos-grid-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  &::-webkit-scrollbar { width: 6px; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+  }
+}
+.pos-cart {
+  min-width: 380px;
+  max-width: 440px;
+  width: 35%;
+  flex-shrink: 0;
+}
+.hold-badge {
+  position: relative;
+  .badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--color-danger, #ef4444);
+    color: white;
+    font-size: 0.625rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+}
+@media (max-width: 1024px) {
+  :host {
+    height: auto;
+    overflow: auto;
+  }
+  .pos-layout {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+  .pos-cart {
+    max-width: none;
+    min-width: 0;
+    width: 100%;
+    min-height: 300px;
+  }
+  .pos-grid-area {
+    max-height: 50vh;
+  }
+}

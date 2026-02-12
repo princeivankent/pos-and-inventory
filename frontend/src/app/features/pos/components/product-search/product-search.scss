@@ -1,21 +1,36 @@
 :host { display: block; }
-    :host ::ng-deep .pos-search { width: 100%; }
-    :host ::ng-deep .pos-search-input {
-      width: 100%;
-      font-size: 1rem;
-      padding: 0.75rem 1rem;
-    }
-    .search-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.125rem;
-      padding: 0.25rem 0;
-    }
-    .search-item-name {
-      font-weight: 500;
-      font-size: 0.875rem;
-    }
-    .search-item-meta {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-    }
+:host ::ng-deep {
+  .p-iconfield { width: 100%; }
+  .pos-search { width: 100%; }
+  .pos-search-input {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+  }
+}
+.search-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  padding: 0.25rem 0;
+}
+.search-item-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+.search-item-name {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+.search-item-price {
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+.search-item-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
