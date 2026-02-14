@@ -1,0 +1,26 @@
+<div class="category-filter-wrapper">
+  @if (showLeftFade) {
+    <div class="scroll-fade-left"></div>
+  }
+  <div class="category-filter" #filterContainer (scroll)="onScroll()">
+    <p-button
+      label="All"
+      size="small"
+      [outlined]="selectedCategoryId !== null"
+      [severity]="selectedCategoryId === null ? undefined : 'secondary'"
+      (onClick)="selectCategory(null)"
+    />
+    @for (category of categories; track category.id) {
+      <p-button
+        [label]="category.name"
+        size="small"
+        [outlined]="selectedCategoryId !== category.id"
+        [severity]="selectedCategoryId === category.id ? undefined : 'secondary'"
+        (onClick)="selectCategory(category.id)"
+      />
+    }
+  </div>
+  @if (showRightFade) {
+    <div class="scroll-fade-right"></div>
+  }
+</div>

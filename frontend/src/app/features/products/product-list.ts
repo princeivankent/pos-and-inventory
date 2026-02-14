@@ -1,33 +1,41 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, computed, HostListener } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { DialogModule } from 'primeng/dialog';
-import { SelectModule } from 'primeng/select';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { CheckboxModule } from 'primeng/checkbox';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
+import { ButtonGroupModule } from 'primeng/buttongroup';
 import { environment } from '../../../environments/environment';
 import { Product, CreateProductDto, UpdateProductDto } from '../../core/models/product.model';
 import { Category } from '../../core/models/category.model';
 import { ToastService } from '../../core/services/toast.service';
 import { StoreContextService } from '../../core/services/store-context.service';
 import { PageHeader } from '../../shared/components/page-header/page-header';
-import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
-import { StatusBadge } from '../../shared/components/status-badge/status-badge';
+import { ProductSearchComponent } from './components/product-search/product-search';
+import { ProductCardComponent } from './components/product-card/product-card';
+import { ProductTableComponent } from './components/product-table/product-table';
+import { CategoryFilterComponent } from './components/category-filter/category-filter';
+import { ProductFormDialogComponent } from './components/product-form-dialog/product-form-dialog';
+
+const CATEGORY_COLORS = [
+  '#3b82f6', '#8b5cf6', '#ec4899', '#f97316',
+  '#10b981', '#06b6d4', '#6366f1', '#ef4444',
+];
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
   imports: [
-    FormsModule, TableModule, ButtonModule, InputTextModule, DialogModule,
-    SelectModule, InputNumberModule, CheckboxModule, ConfirmDialogModule,
-    IconFieldModule, InputIconModule, PageHeader, PhpCurrencyPipe, StatusBadge,
+    FormsModule,
+    ButtonModule,
+    ButtonGroupModule,
+    ConfirmDialogModule,
+    PageHeader,
+    ProductSearchComponent,
+    ProductCardComponent,
+    ProductTableComponent,
+    CategoryFilterComponent,
+    ProductFormDialogComponent,
   ],
   templateUrl: './product-list.html',
   styleUrls: ['./product-list.scss'],
@@ -46,7 +54,52 @@ export class ProductListComponent implements OnInit {
   editMode = false;
   editId = '';
 
+  // View mode and filtering
+  viewMode = signal<'table' | 'cards'>('table');
+  selectedCategoryId = signal<string | null>(null);
+  selectedProduct = signal<Product | null>(null);
+  searchQuery = signal<string>('');
+
+  // Computed filtered products
+  filteredProducts = computed(() => {
+    const categoryId = this.selectedCategoryId();
+    const query = this.searchQuery().toLowerCase().trim();
+    let filtered = this.products();
+
+    // Filter by category
+    if (categoryId) {
+      filtered = filtered.filter((p) => p.category_id === categoryId);
+    }
+
+    // Filter by search query
+    if (query.length >= 2) {
+      filtered = filtered.filter((p) =>
+        p.name.toLowerCase().includes(query) ||
+        p.sku.toLowerCase().includes(query) ||
+        (p.barcode && p.barcode.toLowerCase().includes(query))
+      );
+    }
+
+    return filtered;
+  });
+
   form: CreateProductDto & { barcode?: string; description?: string } = this.emptyForm();
+
+  // Keyboard shortcuts
+  @HostListener('document:keydown.f2', ['$event'])
+  onF2(event: Event) {
+    event.preventDefault();
+    const input = document.querySelector<HTMLInputElement>('.product-search-input');
+    input?.focus();
+  }
+
+  @HostListener('document:keydown.control.n', ['$event'])
+  onCtrlN(event: Event) {
+    if (this.storeCtx.isAdmin()) {
+      event.preventDefault();
+      this.openNew();
+    }
+  }
 
   ngOnInit() {
     this.loadProducts();
@@ -65,6 +118,38 @@ export class ProductListComponent implements OnInit {
     this.http.get<Category[]>(`${environment.apiUrl}/categories`).subscribe(
       (c) => this.categories.set(c)
     );
+  }
+
+  toggleView(mode: 'table' | 'cards') {
+    this.viewMode.set(mode);
+  }
+
+  onCategoryChange(categoryId: string | null) {
+    this.selectedCategoryId.set(categoryId);
+  }
+
+  onSearchQueryChange(query: string) {
+    this.searchQuery.set(query);
+  }
+
+  onProductSelected(product: Product) {
+    this.selectedProduct.set(product);
+    // Highlight the product in the current view
+    setTimeout(() => {
+      const element = document.querySelector(`[data-product-id="${product.id}"]`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  }
+
+  getCategoryColor(product: Product): string {
+    const name = product.category?.name || product.category_id || '';
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return CATEGORY_COLORS[Math.abs(hash) % CATEGORY_COLORS.length];
   }
 
   openNew() {

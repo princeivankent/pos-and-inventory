@@ -1,0 +1,104 @@
+<p-table
+  [value]="products"
+  [paginator]="true"
+  [rows]="15"
+  [rowsPerPageOptions]="[15, 30, 50]"
+  [globalFilterFields]="['name', 'sku', 'barcode']"
+  [loading]="loading"
+  dataKey="id"
+  [sortField]="'name'"
+  [sortOrder]="1"
+  styleClass="enhanced-table"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
+      <th pSortableColumn="sku">SKU <p-sortIcon field="sku" /></th>
+      <th>Category</th>
+      <th pSortableColumn="retail_price" style="text-align:right">Price <p-sortIcon field="retail_price" /></th>
+      <th pSortableColumn="cost_price" style="text-align:right">Cost <p-sortIcon field="cost_price" /></th>
+      <th pSortableColumn="current_stock" style="text-align:right">Stock <p-sortIcon field="current_stock" /></th>
+      <th>Status</th>
+      @if (storeCtx.isAdmin()) {
+        <th style="width:100px">Actions</th>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-product>
+    <tr class="table-row">
+      <td>
+        <span class="font-medium">{{ product.name }}</span>
+        @if (product.barcode) {
+          <br><span class="text-xs text-secondary">{{ product.barcode }}</span>
+        }
+      </td>
+      <td>{{ product.sku }}</td>
+      <td>
+        @if (product.category) {
+          <span class="category-chip" [style.borderColor]="getCategoryColor(product)">
+            {{ product.category.name }}
+          </span>
+        } @else {
+          <span class="text-secondary">-</span>
+        }
+      </td>
+      <td style="text-align:right">
+        <div class="price-cell">
+          <span class="retail-price">{{ product.retail_price | phpCurrency }}</span>
+          @if (product.cost_price > 0) {
+            <small class="margin-indicator" [class]="getMarginClass(product)">
+              {{ getMarginPercent(product) }}%
+            </small>
+          }
+        </div>
+      </td>
+      <td style="text-align:right">{{ product.cost_price | phpCurrency }}</td>
+      <td style="text-align:right">
+        <span class="stock-badge" [class]="getStockBadgeClass(product)">
+          {{ product.current_stock }} {{ product.unit }}
+        </span>
+      </td>
+      <td>
+        <app-status-badge
+          [label]="product.is_active ? 'Active' : 'Inactive'"
+          [severity]="product.is_active ? 'success' : 'neutral'"
+        />
+      </td>
+      @if (storeCtx.isAdmin()) {
+        <td>
+          <div class="flex gap-2">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              (onClick)="onEdit(product)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              (onClick)="onDelete(product)"
+            />
+          </div>
+        </td>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td [attr.colspan]="storeCtx.isAdmin() ? 8 : 7" class="empty-state">
+        <div class="empty-content">
+          <i class="pi pi-box" style="font-size: 3rem; color: #d1d5db;"></i>
+          <h3>No products found</h3>
+          <p class="text-secondary">
+            Get started by adding your first product to the catalog.
+          </p>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

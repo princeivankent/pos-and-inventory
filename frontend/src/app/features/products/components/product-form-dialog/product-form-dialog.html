@@ -1,0 +1,117 @@
+<p-dialog
+  [(visible)]="visible"
+  [header]="editMode ? 'Edit Product' : 'New Product'"
+  [modal]="true"
+  [style]="{ width: '500px' }"
+  (onHide)="onHide()"
+>
+  <div class="form-grid">
+    <!-- Basic Information Section -->
+    <div class="form-section">
+      <h4>Basic Information</h4>
+
+      <div class="field">
+        <label>Name *</label>
+        <input pInputText [(ngModel)]="form.name" class="w-full" placeholder="Product name" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>SKU *</label>
+          <input pInputText [(ngModel)]="form.sku" class="w-full" placeholder="Stock keeping unit" />
+        </div>
+        <div class="field">
+          <label>Barcode</label>
+          <input pInputText [(ngModel)]="form.barcode" class="w-full" placeholder="Barcode" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Category *</label>
+        <p-select
+          [(ngModel)]="form.category_id"
+          [options]="categories"
+          optionLabel="name"
+          optionValue="id"
+          placeholder="Select category"
+          styleClass="w-full"
+          appendTo="body"
+        />
+      </div>
+
+      <div class="field">
+        <label>Description</label>
+        <input pInputText [(ngModel)]="form.description" class="w-full" placeholder="Optional description" />
+      </div>
+    </div>
+
+    <!-- Pricing Section -->
+    <div class="form-section">
+      <h4>Pricing</h4>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Retail Price *</label>
+          <p-inputNumber
+            [(ngModel)]="form.retail_price"
+            mode="currency"
+            currency="PHP"
+            locale="en-PH"
+            styleClass="w-full"
+          />
+        </div>
+        <div class="field">
+          <label>Cost Price *</label>
+          <p-inputNumber
+            [(ngModel)]="form.cost_price"
+            mode="currency"
+            currency="PHP"
+            locale="en-PH"
+            styleClass="w-full"
+          />
+        </div>
+      </div>
+
+      @if (form.cost_price > 0 && form.retail_price > 0 && form.cost_price >= form.retail_price) {
+        <small class="price-warning">
+          <i class="pi pi-exclamation-triangle"></i>
+          Cost price is higher than or equal to retail price. You may be selling at a loss.
+        </small>
+      }
+
+      @if (form.cost_price > 0 && form.retail_price > 0 && form.retail_price > form.cost_price) {
+        <div class="margin-display" [class]="getMarginClass()">
+          <span class="margin-label">Profit Margin:</span>
+          <span class="margin-value">{{ getMarginPercent() }}%</span>
+        </div>
+      }
+    </div>
+
+    <!-- Inventory Section -->
+    <div class="form-section">
+      <h4>Inventory</h4>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Unit</label>
+          <input pInputText [(ngModel)]="form.unit" class="w-full" placeholder="pcs" />
+        </div>
+        <div class="field">
+          <label>Reorder Level</label>
+          <p-inputNumber [(ngModel)]="form.reorder_level" [min]="0" styleClass="w-full" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="onHide()" />
+    <p-button
+      [label]="editMode ? 'Update' : 'Create'"
+      icon="pi pi-check"
+      (onClick)="onSave()"
+      [loading]="saving"
+      [disabled]="!form.name || !form.sku || !form.category_id"
+    />
+  </ng-template>
+</p-dialog>

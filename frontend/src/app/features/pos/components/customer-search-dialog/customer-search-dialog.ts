@@ -35,7 +35,6 @@ export class CustomerSearchDialogComponent {
   }
 
   search(event: AutoCompleteCompleteEvent) {
-    // TODO: Adjust endpoint if backend uses different path
     this.http
       .get<Customer[]>(`${environment.apiUrl}/customers`, {
         params: { search: event.query },

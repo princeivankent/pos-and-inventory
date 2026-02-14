@@ -1,0 +1,59 @@
+<app-page-header title="Customers" subtitle="Manage customer accounts and credit">
+  @if (storeCtx.isAdmin()) {
+    <p-button label="Add Customer" icon="pi pi-plus" (onClick)="openNew()" />
+  }
+</app-page-header>
+
+<!-- Search -->
+<div class="page-controls">
+  <div class="search-section">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        [(ngModel)]="searchQuery"
+        (input)="onSearch()"
+        placeholder="Search by name or phone..."
+        class="w-full"
+      />
+    </span>
+  </div>
+</div>
+
+<!-- Customer Table -->
+<div class="card">
+  <app-customer-table
+    [customers]="customers()"
+    [loading]="loading()"
+    [isAdmin]="storeCtx.isAdmin()"
+    (viewStatement)="viewStatement($event)"
+    (recordPayment)="openPayment($event)"
+    (edit)="editCustomer($event)"
+    (delete)="confirmDelete($event)"
+  />
+</div>
+
+<!-- Dialogs -->
+<app-customer-form-dialog
+  [(visible)]="formDialogVisible"
+  [editMode]="editMode"
+  [form]="form"
+  [saving]="saving()"
+  (save)="saveCustomer()"
+/>
+
+<app-credit-statement-dialog
+  [(visible)]="statementDialogVisible"
+  [statement]="statement()"
+  [loading]="statementLoading()"
+/>
+
+<app-record-payment-dialog
+  [(visible)]="paymentDialogVisible"
+  [customer]="paymentCustomer()"
+  [saving]="saving()"
+  (submitPayment)="submitPayment($event)"
+/>
+
+<p-confirmDialog />

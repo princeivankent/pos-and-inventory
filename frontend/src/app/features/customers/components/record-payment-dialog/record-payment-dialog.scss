@@ -1,0 +1,59 @@
+.customer-info {
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .info-label {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+
+  .info-value {
+    font-weight: 600;
+    color: #111827;
+
+    &.balance {
+      color: #ef4444;
+      font-size: 1.125rem;
+    }
+  }
+}
+
+.payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+  }
+}
+
+.amount-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.w-full {
+  width: 100%;
+}

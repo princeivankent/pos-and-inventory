@@ -1,0 +1,82 @@
+.loading-state {
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border: 1px solid #e5e7eb;
+
+  .summary-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .summary-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+
+    &.danger {
+      color: #ef4444;
+    }
+
+    &.success {
+      color: #10b981;
+    }
+  }
+}
+
+.text-right {
+  text-align: right;
+}
+
+.amount-charge {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.amount-payment {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.empty-transactions {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #6b7280;
+
+  i {
+    font-size: 2.5rem;
+    color: #d1d5db;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+}

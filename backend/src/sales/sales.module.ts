@@ -8,6 +8,7 @@ import { Product } from '../database/entities/product.entity';
 import { InventoryBatch } from '../database/entities/inventory-batch.entity';
 import { StockMovement } from '../database/entities/stock-movement.entity';
 import { Store } from '../database/entities/store.entity';
+import { Customer } from '../database/entities/customer.entity';
 import { UserStore } from '../database/entities/user-store.entity';
 
 @Module({
@@ -19,6 +20,7 @@ import { UserStore } from '../database/entities/user-store.entity';
       InventoryBatch,
       StockMovement,
       Store,
+      Customer,
       UserStore,
     ]),
   ],

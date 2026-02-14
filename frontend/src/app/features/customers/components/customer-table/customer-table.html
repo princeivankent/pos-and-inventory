@@ -1,0 +1,88 @@
+@if (customers.length === 0 && !loading) {
+  <div class="empty-state">
+    <i class="pi pi-users"></i>
+    <h3>No customers found</h3>
+    <p>Get started by adding your first customer.</p>
+  </div>
+} @else {
+  <p-table
+    [value]="customers"
+    [loading]="loading"
+    [paginator]="customers.length > 10"
+    [rows]="10"
+    [rowHover]="true"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} customers"
+    [sortField]="'name'"
+    [sortOrder]="1"
+    styleClass="p-datatable-sm"
+  >
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
+        <th>Phone</th>
+        <th pSortableColumn="credit_limit" class="text-right">Credit Limit <p-sortIcon field="credit_limit" /></th>
+        <th pSortableColumn="current_balance" class="text-right">Balance <p-sortIcon field="current_balance" /></th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-customer>
+      <tr>
+        <td>
+          <div class="customer-name">
+            <span class="name">{{ customer.name }}</span>
+            @if (customer.email) {
+              <span class="email">{{ customer.email }}</span>
+            }
+          </div>
+        </td>
+        <td>{{ customer.phone }}</td>
+        <td class="text-right">{{ customer.credit_limit | currency:'PHP':'symbol':'1.2-2' }}</td>
+        <td class="text-right">
+          <p-tag
+            [value]="getBalanceLabel(customer)"
+            [severity]="getBalanceSeverity(customer)"
+          />
+        </td>
+        <td class="text-center actions-cell">
+          <p-button
+            icon="pi pi-file"
+            [rounded]="true"
+            [text]="true"
+            severity="info"
+            pTooltip="View Statement"
+            (onClick)="viewStatement.emit(customer)"
+          />
+          @if (customer.current_balance > 0) {
+            <p-button
+              icon="pi pi-wallet"
+              [rounded]="true"
+              [text]="true"
+              severity="success"
+              pTooltip="Record Payment"
+              (onClick)="recordPayment.emit(customer)"
+            />
+          }
+          @if (isAdmin) {
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              severity="secondary"
+              pTooltip="Edit"
+              (onClick)="edit.emit(customer)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              pTooltip="Deactivate"
+              (onClick)="delete.emit(customer)"
+            />
+          }
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+}

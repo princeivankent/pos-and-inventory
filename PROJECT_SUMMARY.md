@@ -6,9 +6,9 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 
 ## Current Implementation Status
 
-### ✅ Completed (Phase 1)
+### ✅ Completed (Phases 1-9)
 
-#### Backend Foundation
+#### Backend Foundation (Phase 1)
 1. **Project Structure**: Complete NestJS backend setup with proper folder structure
 2. **Database Schema**: All 14 tables designed and migration created
    - stores, users, user_stores
@@ -16,60 +16,47 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
    - inventory_batches, customers
    - sales, sale_items, credit_payments
    - stock_movements, low_stock_alerts
-
 3. **Entities**: All TypeORM entities created with proper relationships
 4. **Multi-Tenant Architecture**:
    - `TenantBaseEntity` - Base class with store_id
    - `TenantGuard` - Validates user access to stores
    - `TenantInterceptor` - Request context management
    - User-store association with role-based access
+5. **Authentication System**: Supabase Auth + JWT with store switching
+6. **Security Components**: Auth guards, Tenant guards, Role guards, Permissions guard, Exception filters, Validation pipes
 
-5. **Authentication System**:
-   - Supabase integration
-   - JWT strategy with Passport
-   - User registration and login
-   - Store switching capability
-   - Multi-store per user support
+#### Backend Modules (Phases 2-8)
+- ✅ **Stores module**: CRUD + settings management (tax, receipt config)
+- ✅ **Categories module**: Hierarchical categories with parent/child support
+- ✅ **Products module**: Retail/cost pricing, stock tracking, SKU/barcode
+- ✅ **Inventory module**: FIFO batch management, stock movements, low stock alerts
+- ✅ **Sales module**: Atomic transactions, FIFO deduction, credit/partial payment validation
+- ✅ **Customers module**: CRUD, credit limits, utang tracking, credit statements, payment recording
+- ✅ **Receipts module**: Thermal printer support, BIR compliance
+- ✅ **Reports module**: Sales, inventory, customer statements
+- ✅ **Users module**: Store assignment, role management, permissions
 
-6. **Security Components**:
-   - Auth guards (JWT authentication)
-   - Tenant guards (store access validation)
-   - Role guards (admin/cashier permissions)
-   - Exception filters
-   - Validation pipes
+#### Frontend Application (Phase 9)
+- ✅ **Angular 21 + PrimeNG** setup (standalone components)
+- ✅ **Authentication flow**: Login, register, store switching
+- ✅ **POS page**: Product grid, cart, 6 payment methods (Cash, GCash, Maya, Card, Credit, Partial), customer selection, discount, receipt preview
+- ✅ **Products management**: CRUD with table/card views, search autocomplete, category filters
+- ✅ **Inventory management**: Batches, stock movements, FIFO tracking
+- ✅ **Sales history**: Search, filters, sale details
+- ✅ **Customers management**: Customer list, credit statements, payment recording, form dialogs
+- ✅ **Reports & Dashboard**: Sales charts, inventory stats
+- ✅ **Settings page**: Store config, user profile
+- ✅ **UI/UX Modernization**: Login, Reports, Products pages with modern design
 
-7. **Configuration**:
-   - Environment-based configuration
-   - Database connection setup
-   - Supabase client configuration
-
-8. **Sample Module**: Stores module as implementation reference
-
-### ⏳ To Be Implemented (Phases 2-5)
-
-#### Backend Modules
-- Products module
-- Categories module
-- Suppliers module
-- Inventory module (with FIFO logic)
-- Customers module
-- Sales module (with returns/refunds)
-- Credit payments module
-- Reports module
-- Alerts module (with cron jobs)
-- Receipts module (PDF + thermal printing)
-- Users management module
-
-#### Frontend Application
-- Angular 17+ standalone components
-- Authentication pages
-- Dashboard with alerts
-- POS interface with barcode scanning
-- Product management
-- Inventory management
-- Customer management
-- Sales history
-- Reports and analytics
+### 🚧 To Be Implemented (Phase 10 - Testing & Deployment)
+- Unit tests for backend services (Jest)
+- E2E tests for critical flows (sales, inventory, credit)
+- Frontend unit tests (Jasmine/Karma)
+- Integration tests (API + database)
+- Performance optimization (lazy loading, caching)
+- Production deployment setup (Vercel + Supabase)
+- CI/CD pipeline (GitHub Actions)
+- User documentation and training materials
 
 ## Key Features
 
@@ -78,34 +65,39 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 - **Multi-Store Access**: Users can manage multiple stores
 - **Store Switching**: Easy switching between accessible stores
 - **Role-Based Access**: Admin and Cashier roles per store
+- **Granular Permissions**: Per-user permission overrides (CUSTOMERS_VIEW, SALES_CREATE, etc.)
 
 ### Inventory Management
 - **Batch Tracking**: Each inventory batch tracked separately
-- **FIFO Logic**: Automatic oldest-first batch selection
+- **FIFO Logic**: Automatic oldest-first batch selection for sales
 - **Expiry Tracking**: Date tracking for perishable goods
-- **Stock Movements**: Complete audit trail
+- **Stock Movements**: Complete audit trail (purchase, sale, adjustment, return)
 - **Reorder Levels**: Low stock alerting
 
 ### Sales & POS
-- **Fixed 12% VAT**: Philippine tax compliance
-- **Flexible Pricing**: Wholesale and retail prices per batch
-- **Payment Methods**: Cash, credit (utang), partial payments
-- **Returns/Refunds**: Full support with inventory restocking
-- **Barcode Scanning**: Quick product lookup
-- **Receipt Generation**: PDF and thermal printer support
+- **6 Payment Methods**: Cash, GCash, Maya, Card, Credit (utang), Partial (cash + credit split)
+- **Fixed 12% VAT**: Philippine tax compliance (configurable per store)
+- **Flexible Pricing**: Retail/cost prices per product
+- **Discounts**: Fixed amount or percentage, per-item or whole-sale
+- **Returns/Refunds**: Full support with inventory restocking and credit reversal
+- **Receipt Generation**: PDF and thermal printer support (BIR compliant)
+- **Customer Selection**: Search and attach customers to sales
+- **Order Hold/Recall**: Hold current cart, recall later
 
-### Customer Credit Management
-- **Credit Limits**: Per-customer credit limits
-- **Balance Tracking**: Current utang balance
-- **Payment Recording**: Payment history and allocation
-- **Credit Validation**: Automatic validation before sale
+### Customer Credit Management (Utang)
+- **Credit Limits**: Per-customer credit limits set by admin
+- **Balance Tracking**: Real-time utang balance tracking
+- **Credit Sales**: Full credit or partial (cash + credit split) via POS
+- **Credit Validation**: Automatic limit check before allowing credit sales
+- **Payment Recording**: Record payments against outstanding balance (cash, gcash, maya, card)
+- **Credit Statements**: Unified transaction history (sales + payments) with running balance
+- **Void Reversal**: Voiding a credit sale automatically reverses the customer balance
 
 ### Reporting & Alerts
 - **Sales Reports**: Daily, monthly, custom date ranges
-- **Inventory Reports**: Stock levels, expiring items
+- **Inventory Reports**: Stock levels, expiring items, best-selling products
 - **Customer Reports**: Outstanding balances, payment history
 - **Low Stock Alerts**: Automatic reorder notifications
-- **Expiry Alerts**: Near-expiry and expired batch warnings
 
 ## Technology Stack
 
@@ -113,60 +105,19 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 - **Framework**: NestJS (TypeScript)
 - **Database**: PostgreSQL via Supabase
 - **ORM**: TypeORM
-- **Authentication**: Supabase Auth + JWT
+- **Authentication**: Supabase Auth + JWT (7d expiry)
 - **Validation**: class-validator, class-transformer
-- **Scheduling**: @nestjs/schedule (for cron jobs)
-- **PDF Generation**: pdfkit
-- **Thermal Printing**: escpos
 
-### Frontend (Planned)
-- **Framework**: Angular 17+
-- **Auth**: Supabase JS Client
-- **HTTP Client**: Angular HttpClient
-- **UI Library**: PrimeNG or Angular Material
-- **State**: RxJS
+### Frontend
+- **Framework**: Angular 21 (standalone components)
+- **UI Library**: PrimeNG
+- **State**: Angular Signals + RxJS
+- **HTTP**: Angular HttpClient with tenant interceptor
 
-### Deployment
-- **Backend**: Railway
+### Deployment (Planned)
 - **Frontend**: Vercel
+- **Backend**: Railway or Vercel Serverless
 - **Database**: Supabase (PostgreSQL)
-
-## Architecture Highlights
-
-### Request Flow
-1. User authenticates → Receives JWT token
-2. User selects store (if multiple)
-3. Frontend sends requests with:
-   - `Authorization: Bearer <token>` header
-   - `X-Store-Id: <store_id>` header
-4. Backend validates:
-   - JWT token (AuthGuard)
-   - User access to store (TenantGuard)
-   - User role for operation (RolesGuard)
-5. All queries automatically filtered by store_id
-
-### Database Design Principles
-- UUID primary keys for all tables
-- Proper foreign key relationships
-- Indexes on frequently queried columns
-- Composite indexes for multi-column queries
-- Soft delete support where needed
-- Audit timestamps (created_at, updated_at)
-
-### Security Layers
-1. **Authentication**: Supabase Auth + JWT
-2. **Authorization**: Role-based access control
-3. **Tenant Isolation**: Automatic store_id filtering
-4. **Validation**: Input validation on all DTOs
-5. **Error Handling**: Consistent error responses
-
-## Philippine Market Adaptations
-
-1. **Tax System**: Fixed 12% VAT (Value Added Tax)
-2. **BIR Compliance**: TIN (Tax Identification Number) field
-3. **Currency**: Philippine Peso (PHP)
-4. **Credit System**: Built-in "utang" (credit/debt) management
-5. **Receipt Format**: BIR-compliant receipt layout
 
 ## File Structure
 
@@ -174,102 +125,45 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 POS/
 ├── backend/
 │   ├── src/
-│   │   ├── auth/              # ✅ Authentication
-│   │   ├── common/            # ✅ Guards, decorators, interceptors
-│   │   ├── config/            # ✅ Configuration
-│   │   ├── database/          # ✅ Entities, migrations
-│   │   ├── stores/            # ✅ Stores module (sample)
-│   │   ├── products/          # ⏳ To implement
-│   │   ├── categories/        # ⏳ To implement
-│   │   ├── suppliers/         # ⏳ To implement
-│   │   ├── inventory/         # ⏳ To implement
-│   │   ├── customers/         # ⏳ To implement
-│   │   ├── sales/             # ⏳ To implement
-│   │   ├── reports/           # ⏳ To implement
-│   │   ├── receipts/          # ⏳ To implement
-│   │   ├── alerts/            # ⏳ To implement
+│   │   ├── auth/              # ✅ Authentication (Supabase + JWT)
+│   │   ├── common/            # ✅ Guards, decorators, interceptors, permissions
+│   │   ├── config/            # ✅ Configuration (env, database, supabase)
+│   │   ├── database/          # ✅ Entities (14), migrations
+│   │   ├── stores/            # ✅ Store CRUD + settings
+│   │   ├── categories/        # ✅ Hierarchical categories
+│   │   ├── products/          # ✅ Products CRUD + pricing
+│   │   ├── inventory/         # ✅ FIFO batches + stock movements
+│   │   ├── sales/             # ✅ Atomic transactions + credit
+│   │   ├── customers/         # ✅ Credit management + payments
+│   │   ├── receipts/          # ✅ Receipt generation
+│   │   ├── reports/           # ✅ Sales/inventory/customer reports
+│   │   ├── users/             # ✅ User management + permissions
 │   │   ├── app.module.ts      # ✅ Root module
 │   │   └── main.ts            # ✅ Entry point
-│   ├── package.json           # ✅ Dependencies
-│   ├── tsconfig.json          # ✅ TypeScript config
-│   └── .env.example           # ✅ Environment template
-├── frontend/                  # ⏳ To implement
-├── README.md                  # ✅ Project overview
-├── IMPLEMENTATION_GUIDE.md    # ✅ Detailed implementation steps
-├── QUICKSTART.md              # ✅ Quick start guide
-└── PROJECT_SUMMARY.md         # ✅ This file
+│   └── package.json
+├── frontend/
+│   ├── src/app/
+│   │   ├── core/              # ✅ Services, guards, interceptors, models
+│   │   ├── shared/            # ✅ Shared components, pipes
+│   │   ├── layout/            # ✅ Sidebar, layout shell
+│   │   └── features/
+│   │       ├── auth/          # ✅ Login, register
+│   │       ├── dashboard/     # ✅ Dashboard
+│   │       ├── pos/           # ✅ POS with 6 payment methods
+│   │       ├── products/      # ✅ Product management (table/card views)
+│   │       ├── categories/    # ✅ Category management
+│   │       ├── inventory/     # ✅ Inventory overview, movements, low stock
+│   │       ├── sales/         # ✅ Sales list, sale detail
+│   │       ├── customers/     # ✅ Customer list, credit statements, payments
+│   │       ├── reports/       # ✅ Reports with charts
+│   │       ├── users/         # ✅ User management
+│   │       └── settings/      # ✅ Store settings
+│   └── package.json
+├── CLAUDE.md                  # ✅ AI development context
+├── ARCHITECTURE.md            # ✅ System architecture diagrams
+├── PROJECT_SUMMARY.md         # ✅ This file
+└── README.md                  # ✅ Quick start guide
 ```
-
-## Documentation Files
-
-1. **README.md**: Project overview and getting started
-2. **IMPLEMENTATION_GUIDE.md**: Detailed implementation instructions for remaining modules
-3. **QUICKSTART.md**: Quick setup guide with common issues
-4. **backend/README.md**: Backend-specific documentation with API details
-5. **PROJECT_SUMMARY.md**: This comprehensive summary
-
-## Next Steps
-
-### Immediate (Phase 2)
-1. Implement Products module
-2. Implement Categories module
-3. Implement Suppliers module
-4. Test basic CRUD operations
-
-### Short Term (Phase 3)
-1. Implement Inventory module with FIFO logic
-2. Implement Customers module
-3. Implement Sales module
-4. Test sales transactions
-
-### Medium Term (Phase 4)
-1. Implement Reports module
-2. Implement Alerts module with cron jobs
-3. Implement Receipts module
-4. Complete backend testing
-
-### Long Term (Phase 5)
-1. Initialize Angular frontend
-2. Implement authentication UI
-3. Build POS interface
-4. Create management dashboards
-5. Deploy to production
-
-## Development Guidelines
-
-### Code Standards
-- Use TypeScript strict mode
-- Follow NestJS best practices
-- Use DTOs for all inputs
-- Validate all user inputs
-- Handle errors consistently
-- Write meaningful commit messages
-
-### Module Pattern
-Each module should have:
-- `*.module.ts` - Module definition
-- `*.service.ts` - Business logic
-- `*.controller.ts` - HTTP endpoints
-- `dto/*.dto.ts` - Data transfer objects
-- Proper dependency injection
-- Export services for use in other modules
-
-### Testing Strategy
-- Unit tests for services
-- Integration tests for controllers
-- E2E tests for critical flows
-- Test multi-tenant isolation
-- Test role-based access
-
-### Security Checklist
-- [ ] All endpoints protected with guards
-- [ ] Store access validated on every request
-- [ ] Role permissions enforced
-- [ ] Input validation on all DTOs
-- [ ] SQL injection prevention (TypeORM handles this)
-- [ ] XSS prevention in frontend
-- [ ] CSRF protection where needed
-- [ ] Rate limiting for sensitive endpoints
 
 ## Business Logic Notes
 
@@ -284,25 +178,27 @@ When processing a sale:
 ### VAT Calculation
 ```
 subtotal = sum of all item subtotals
-tax_amount = subtotal × 0.12
+tax_amount = subtotal * tax_rate (default 12%)
 total_amount = subtotal + tax_amount - discount
 ```
 
-### Credit Validation
+### Credit Validation (Utang)
 Before allowing credit sale:
-1. Check customer.current_balance + sale_total <= customer.credit_limit
+1. Check `customer.current_balance + credit_amount <= customer.credit_limit`
 2. Reject if limit exceeded
-3. Update balance after sale
-4. Deduct balance when payment recorded
+3. After sale: update `customer.current_balance += credit_amount`
+4. On payment: validate `amount <= current_balance`, decrement balance
+5. On void: reverse `customer.current_balance -= sale.credit_amount`
 
-### Returns Processing
-1. Validate original sale exists and not already returned
-2. Create new sale with status='returned'
-3. Link to original sale (returned_from_sale_id)
-4. Restock items to original batches
-5. Update customer balance if credit sale
-6. Calculate refund amount
-7. Record stock movements
+### Sales Transaction (Atomic)
+Uses database transaction (`DataSource.transaction()`) to:
+1. Validate customer and credit limit (if credit/partial)
+2. Validate products and check stock
+3. Calculate totals (subtotal, discount, tax, total)
+4. Generate sale number (SALE-YYYYMMDD-0001)
+5. Create Sale record with payment method and credit amount
+6. Process items: FIFO batch selection, create SaleItems, stock movements
+7. Update customer balance if credit was used
 
 ## Support & Resources
 
@@ -310,8 +206,7 @@ Before allowing credit sale:
 - **TypeORM Docs**: https://typeorm.io
 - **Supabase Docs**: https://supabase.com/docs
 - **Angular Docs**: https://angular.dev
-- **Implementation Guide**: See IMPLEMENTATION_GUIDE.md
-- **Quick Start**: See QUICKSTART.md
+- **PrimeNG Docs**: https://primeng.org
 
 ## License
 
@@ -320,6 +215,6 @@ Proprietary - All rights reserved
 ---
 
 **Project Created**: February 5, 2026
-**Last Updated**: February 5, 2026
-**Version**: 1.0.0 (Backend Foundation)
-**Status**: Phase 1 Complete, Ready for Phase 2 Development
+**Last Updated**: February 13, 2026
+**Version**: 2.0.0 (Full Stack - Backend + Frontend Complete)
+**Status**: Phases 1-9 Complete, Phase 10 (Testing & Deployment) Pending

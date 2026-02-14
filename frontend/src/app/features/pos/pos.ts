@@ -150,13 +150,20 @@ export class PosComponent implements OnInit {
       payload['discount_type'] = this.cart.discountType();
     }
 
-    // TODO: Send customer_id when backend CreateSaleDto supports it
-    // if (this.cart.customer()) {
-    //   payload['customer_id'] = this.cart.customer()!.id;
-    // }
+    // Send customer_id if a customer is selected
+    if (this.cart.customer()) {
+      payload['customer_id'] = this.cart.customer()!.id;
+    }
 
-    // TODO: Send payment_method when backend supports non-cash methods
-    // payload['payment_method'] = this.cart.paymentMethod();
+    // Send payment method and credit amount for credit/partial sales
+    const method = this.cart.paymentMethod();
+    if (method === 'credit' || method === 'partial') {
+      payload['payment_method'] = method;
+      const creditAmount = method === 'credit'
+        ? this.cart.total()
+        : Math.max(0, this.cart.total() - amountPaid);
+      payload['credit_amount'] = Math.round(creditAmount * 100) / 100;
+    }
 
     this.loading.set(true);
 

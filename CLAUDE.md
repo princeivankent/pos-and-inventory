@@ -194,6 +194,8 @@ getItems() {
 - `Product` → `Category` (many-to-one, hierarchical categories via `parent_id`)
 - `Product` → `InventoryBatch` (one-to-many, FIFO selection by `purchase_date`)
 - `Sale` → `SaleItem` → `InventoryBatch` (tracks which batches used in sales)
+- `Customer` → `Sale` (one-to-many, tracks customer purchases)
+- `Customer` → `CreditPayment` (one-to-many, tracks utang payments)
 
 **FIFO Inventory**: When creating sales, query `inventory_batches` ordered by `purchase_date ASC`, select oldest batches first until quantity met.
 
@@ -233,6 +235,16 @@ Must use database transaction to:
 6. Create `StockMovement` records (type: 'sale', negative quantity)
 7. Update `Customer.current_balance` if credit purchase
 
+### Customer Credit (Utang) Flow
+**Payment methods**: Cash, GCash, Maya, Card, Credit (full utang), Partial (cash + credit split)
+- POS payment dialog shows Credit/Partial tabs only when a customer is selected
+- **Credit sale**: `amount_paid = 0`, `credit_amount = total`, full amount on utang
+- **Partial sale**: `amount_paid = cash portion`, `credit_amount = total - cash portion`
+- Backend validates: `customer.current_balance + credit_amount <= customer.credit_limit`
+- After sale: `customer.current_balance += credit_amount`
+- Payment recording (Customers page): validates `amount <= current_balance`, creates `CreditPayment`, decrements balance
+- Credit statement: unified transaction history (credit sales + payments) with running balance
+
 ### Returns/Refunds
 Reverse the sale transaction:
 - Create return sale (negative quantities/amounts)
@@ -248,7 +260,7 @@ Reverse the sale transaction:
 - **Auth**: `auth/` (Supabase + JWT integration)
 - **Common**: `common/` (guards, decorators, interceptors, filters)
 - **Config**: `config/` (environment, database, Supabase)
-- **Modules**: `stores/`, `categories/`, `products/`, `inventory/`, `sales/`, `receipts/`, `reports/`, `users/`
+- **Modules**: `stores/`, `categories/`, `products/`, `inventory/`, `sales/`, `customers/`, `receipts/`, `reports/`, `users/`
 
 **Frontend Source**: `frontend/src/`
 - **App**: `app/` (standalone components, Angular 21)
@@ -269,6 +281,7 @@ feature-name/
 **API Endpoints**:
 - Base path: `/api`
 - Auth: `/api/auth/login`, `/api/auth/register`, `/api/auth/switch-store`
+- Customers: `GET /api/customers?search=`, `GET /api/customers/:id`, `POST /api/customers`, `PATCH /api/customers/:id`, `DELETE /api/customers/:id`, `GET /api/customers/:id/statement`, `POST /api/customers/:id/payments`
 - All other endpoints require `Authorization` + `X-Store-Id` headers
 
 ## Implementation Notes

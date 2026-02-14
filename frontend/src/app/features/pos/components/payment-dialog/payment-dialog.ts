@@ -1,4 +1,4 @@
-import { Component, input, Output, EventEmitter, computed, signal, inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, input, Output, EventEmitter, computed, signal, inject, ViewChild } from '@angular/core';
 import { InputNumber } from 'primeng/inputnumber';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
@@ -28,12 +28,19 @@ export class PaymentDialogComponent {
   amountPaid = signal<number | null>(null);
   referenceNumber = signal('');
 
-  paymentMethods = [
-    { label: 'Cash', value: 'cash', icon: 'pi pi-money-bill' },
-    { label: 'GCash', value: 'gcash', icon: 'pi pi-mobile' },
-    { label: 'Maya', value: 'maya', icon: 'pi pi-credit-card' },
-    { label: 'Card', value: 'card', icon: 'pi pi-id-card' },
+  allPaymentMethods = [
+    { label: 'Cash', value: 'cash', icon: 'pi pi-money-bill', requiresCustomer: false },
+    { label: 'GCash', value: 'gcash', icon: 'pi pi-mobile', requiresCustomer: false },
+    { label: 'Maya', value: 'maya', icon: 'pi pi-credit-card', requiresCustomer: false },
+    { label: 'Card', value: 'card', icon: 'pi pi-id-card', requiresCustomer: false },
+    { label: 'Credit', value: 'credit', icon: 'pi pi-wallet', requiresCustomer: true },
+    { label: 'Partial', value: 'partial', icon: 'pi pi-arrows-h', requiresCustomer: true },
   ];
+
+  paymentMethods = computed(() => {
+    const hasCustomer = !!this.cart.customer();
+    return this.allPaymentMethods.filter(m => !m.requiresCustomer || hasCustomer);
+  });
 
   numpadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '00'];
 
@@ -54,6 +61,37 @@ export class PaymentDialogComponent {
   });
 
   isCash = computed(() => this.cart.paymentMethod() === 'cash');
+  isCredit = computed(() => this.cart.paymentMethod() === 'credit');
+  isPartial = computed(() => this.cart.paymentMethod() === 'partial');
+  isDigital = computed(() => ['gcash', 'maya', 'card'].includes(this.cart.paymentMethod()));
+
+  creditAmount = computed(() => {
+    const method = this.cart.paymentMethod();
+    if (method === 'credit') return this.totalAmount();
+    if (method === 'partial') return Math.max(0, this.totalAmount() - (this.amountPaid() ?? 0));
+    return 0;
+  });
+
+  availableCredit = computed(() => {
+    const customer = this.cart.customer();
+    if (!customer) return 0;
+    return Math.max(0, customer.credit_limit - customer.current_balance);
+  });
+
+  creditExceeded = computed(() => this.creditAmount() > this.availableCredit());
+
+  canComplete = computed(() => {
+    if (this.processing()) return false;
+    const method = this.cart.paymentMethod();
+    if (method === 'cash') return this.change() >= 0;
+    if (method === 'credit') return !this.creditExceeded();
+    if (method === 'partial') {
+      const paid = this.amountPaid() ?? 0;
+      return paid > 0 && paid < this.totalAmount() && !this.creditExceeded();
+    }
+    // digital: always completable
+    return true;
+  });
 
   open() {
     this.amountPaid.set(null);
@@ -62,8 +100,6 @@ export class PaymentDialogComponent {
   }
 
   onDialogShow() {
-    // PrimeNG dialog runs its own focus trap after onShow;
-    // wait for that to finish before overriding focus.
     setTimeout(() => {
       this.amountInput?.input?.nativeElement?.focus();
       this.amountInput?.input?.nativeElement?.select();
@@ -80,14 +116,20 @@ export class PaymentDialogComponent {
   }
 
   onComplete() {
-    if (this.processing()) return;
-    if (this.isCash() && this.change() < 0) return;
-    if (!this.isCash()) {
-      // For non-cash, assume exact amount
+    if (!this.canComplete()) return;
+    const method = this.cart.paymentMethod();
+
+    if (method === 'credit') {
+      // Full credit - amount_paid is 0
+      this.completed.emit(0);
+    } else if (method === 'partial') {
+      this.completed.emit(this.amountPaid() ?? 0);
+    } else if (this.isDigital()) {
       this.completed.emit(this.totalAmount());
-      return;
+    } else {
+      // Cash
+      this.completed.emit(this.amountPaid() ?? 0);
     }
-    this.completed.emit(this.amountPaid() ?? 0);
   }
 
   close() {
@@ -110,5 +152,7 @@ export class PaymentDialogComponent {
 
   selectPaymentMethod(method: string) {
     this.cart.paymentMethod.set(method);
+    // Reset amount when switching methods
+    this.amountPaid.set(null);
   }
 }

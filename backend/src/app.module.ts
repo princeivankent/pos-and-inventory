@@ -11,6 +11,7 @@ import { SalesModule } from './sales/sales.module';
 import { ReceiptsModule } from './receipts/receipts.module';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
+import { CustomersModule } from './customers/customers.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { ValidationPipe } from './common/pipes/validation.pipe';
 
@@ -27,6 +28,7 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     ReceiptsModule,
     ReportsModule,
     UsersModule,
+    CustomersModule,
   ],
   providers: [
     {

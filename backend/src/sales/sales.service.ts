@@ -14,6 +14,7 @@ import {
   MovementType,
 } from '../database/entities/stock-movement.entity';
 import { Store } from '../database/entities/store.entity';
+import { Customer } from '../database/entities/customer.entity';
 import { CreateSaleDto, DiscountType } from './dto/create-sale.dto';
 
 @Injectable()
@@ -40,6 +41,19 @@ export class SalesService {
     cashierId: string,
   ): Promise<Sale> {
     const result = await this.dataSource.transaction(async (manager) => {
+      // 0. Validate customer if provided
+      let customer: Customer | null = null;
+      if (dto.customer_id) {
+        customer = await manager.findOne(Customer, {
+          where: { id: dto.customer_id, store_id: storeId, is_active: true },
+        });
+        if (!customer) {
+          throw new NotFoundException(
+            `Customer with ID ${dto.customer_id} not found`,
+          );
+        }
+      }
+
       // 1. Validate all products and check stock
       const productMap = new Map<string, Product>();
       for (const item of dto.items) {
@@ -88,23 +102,53 @@ export class SalesService {
       const totalAmount = taxableAmount + taxAmount;
       const changeAmount = Math.max(0, dto.amount_paid - totalAmount);
 
-      // 3. Generate sale number
+      // 3. Determine payment method and credit amount
+      let paymentMethod = PaymentMethod.CASH;
+      let creditAmount = 0;
+
+      if (dto.payment_method === 'credit' || dto.payment_method === 'partial') {
+        if (!customer) {
+          throw new BadRequestException(
+            'A customer must be selected for credit or partial payment',
+          );
+        }
+        paymentMethod =
+          dto.payment_method === 'credit'
+            ? PaymentMethod.CREDIT
+            : PaymentMethod.PARTIAL;
+
+        creditAmount =
+          dto.credit_amount != null
+            ? dto.credit_amount
+            : Math.max(0, totalAmount - dto.amount_paid);
+
+        // Validate credit limit
+        const newBalance = Number(customer.current_balance) + creditAmount;
+        if (newBalance > Number(customer.credit_limit)) {
+          throw new BadRequestException(
+            `Credit limit exceeded. Limit: ${customer.credit_limit}, Current balance: ${customer.current_balance}, Requested credit: ${creditAmount}`,
+          );
+        }
+      }
+
+      // 4. Generate sale number
       const saleNumber = await this.generateSaleNumber(manager, storeId);
 
-      // 4. Create sale record
+      // 5. Create sale record
       const sale = manager.create(Sale, {
         sale_number: saleNumber,
         store_id: storeId,
+        customer_id: dto.customer_id || null,
         cashier_id: cashierId,
         sale_date: new Date(),
         subtotal,
         tax_amount: Math.round(taxAmount * 100) / 100,
         discount_amount: Math.round(discountAmount * 100) / 100,
         total_amount: Math.round(totalAmount * 100) / 100,
-        payment_method: PaymentMethod.CASH,
+        payment_method: paymentMethod,
         amount_paid: dto.amount_paid,
         change_amount: Math.round(changeAmount * 100) / 100,
-        credit_amount: 0,
+        credit_amount: Math.round(creditAmount * 100) / 100,
         notes: dto.notes,
         status: SaleStatus.COMPLETED,
       });
@@ -181,6 +225,14 @@ export class SalesService {
         // Deduct from product current_stock
         product.current_stock = Number(product.current_stock) - item.quantity;
         await manager.save(Product, product);
+      }
+
+      // Update customer balance if credit was used
+      if (customer && creditAmount > 0) {
+        customer.current_balance =
+          Math.round((Number(customer.current_balance) + creditAmount) * 100) /
+          100;
+        await manager.save(Customer, customer);
       }
 
       return savedSale;
@@ -294,6 +346,21 @@ export class SalesService {
             created_by: userId,
           });
           await manager.save(StockMovement, movement);
+        }
+      }
+
+      // Reverse customer credit if applicable
+      if (sale.customer_id && sale.credit_amount > 0) {
+        const customer = await manager.findOne(Customer, {
+          where: { id: sale.customer_id },
+        });
+        if (customer) {
+          customer.current_balance =
+            Math.round(
+              (Number(customer.current_balance) - sale.credit_amount) * 100,
+            ) / 100;
+          if (customer.current_balance < 0) customer.current_balance = 0;
+          await manager.save(Customer, customer);
         }
       }
 

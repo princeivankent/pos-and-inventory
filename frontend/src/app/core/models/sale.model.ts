@@ -48,6 +48,9 @@ export interface CreateSaleDto {
   discount_amount?: number;
   discount_type?: DiscountType;
   amount_paid: number;
+  customer_id?: string;
+  payment_method?: string;
+  credit_amount?: number;
   payment_notes?: string;
   notes?: string;
 }

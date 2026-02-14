@@ -1,0 +1,64 @@
+<p-dialog
+  [header]="editMode ? 'Edit Customer' : 'New Customer'"
+  [visible]="visible"
+  (visibleChange)="onHide()"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [closable]="true"
+>
+  <div class="form-grid">
+    <!-- Basic Info -->
+    <div class="form-section">
+      <h4>Basic Information</h4>
+
+      <div class="field">
+        <label for="name">Name *</label>
+        <input pInputText id="name" [(ngModel)]="form.name" placeholder="Customer name" class="w-full" />
+      </div>
+
+      <div class="field">
+        <label for="phone">Phone *</label>
+        <input pInputText id="phone" [(ngModel)]="form.phone" placeholder="09XX-XXX-XXXX" class="w-full" />
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input pInputText id="email" [(ngModel)]="form.email" placeholder="email@example.com" class="w-full" />
+      </div>
+    </div>
+
+    <!-- Address & Credit -->
+    <div class="form-section">
+      <h4>Address & Credit</h4>
+
+      <div class="field">
+        <label for="address">Address</label>
+        <textarea pTextarea id="address" [(ngModel)]="form.address" placeholder="Customer address" [rows]="2" class="w-full"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="credit_limit">Credit Limit (PHP)</label>
+        <p-inputNumber
+          id="credit_limit"
+          [(ngModel)]="form.credit_limit"
+          mode="currency"
+          currency="PHP"
+          locale="en-PH"
+          [min]="0"
+          styleClass="w-full"
+        />
+      </div>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="onHide()" />
+    <p-button
+      [label]="editMode ? 'Update' : 'Create'"
+      icon="pi pi-check"
+      (onClick)="save.emit()"
+      [disabled]="!isValid || saving"
+      [loading]="saving"
+    />
+  </ng-template>
+</p-dialog>

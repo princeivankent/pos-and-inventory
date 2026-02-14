@@ -1,0 +1,120 @@
+:host ::ng-deep .enhanced-table .table-row {
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: #f9fafb !important;
+    cursor: pointer;
+  }
+}
+
+.category-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.stock-badge {
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  &.stock-out {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+
+  &.stock-low {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &.stock-good {
+    color: inherit;
+  }
+}
+
+.price-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+}
+
+.retail-price {
+  font-weight: 500;
+}
+
+.margin-indicator {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+
+  &.margin-good {
+    background: #d1fae5;
+    color: #065f46;
+  }
+
+  &.margin-medium {
+    background: #fef3c7;
+    color: #92400e;
+  }
+
+  &.margin-low {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem !important;
+}
+
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: #111827;
+  }
+
+  p {
+    max-width: 400px;
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #6b7280;
+  }
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-secondary {
+  color: #6b7280;
+}
+
+.flex {
+  display: flex;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}

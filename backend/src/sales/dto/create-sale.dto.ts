@@ -55,6 +55,19 @@ export class CreateSaleDto {
   @Min(0)
   amount_paid: number;
 
+  @IsUUID()
+  @IsOptional()
+  customer_id?: string;
+
+  @IsString()
+  @IsOptional()
+  payment_method?: string;
+
+  @IsNumber({ maxDecimalPlaces: 2 })
+  @Min(0)
+  @IsOptional()
+  credit_amount?: number;
+
   @IsString()
   @IsOptional()
   payment_notes?: string;

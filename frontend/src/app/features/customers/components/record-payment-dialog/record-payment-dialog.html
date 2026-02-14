@@ -1,0 +1,76 @@
+<p-dialog
+  header="Record Payment"
+  [visible]="visible"
+  (visibleChange)="onHide()"
+  [modal]="true"
+  [style]="{ width: '420px' }"
+  [closable]="true"
+>
+  @if (customer) {
+    <!-- Customer Info -->
+    <div class="customer-info">
+      <div class="info-row">
+        <span class="info-label">Customer</span>
+        <span class="info-value">{{ customer.name }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Outstanding Balance</span>
+        <span class="info-value balance">{{ customer.current_balance | currency:'PHP':'symbol':'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Payment Form -->
+    <div class="payment-form">
+      <div class="field">
+        <label for="amount">Payment Amount</label>
+        <div class="amount-row">
+          <p-inputNumber
+            id="amount"
+            [(ngModel)]="amount"
+            mode="currency"
+            currency="PHP"
+            locale="en-PH"
+            [min]="0"
+            [max]="maxAmount"
+            styleClass="w-full"
+          />
+          <p-button
+            label="Pay Full"
+            [text]="true"
+            severity="success"
+            size="small"
+            (onClick)="payFull()"
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="method">Payment Method</label>
+        <p-select
+          id="method"
+          [(ngModel)]="paymentMethod"
+          [options]="paymentMethods"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+        />
+      </div>
+
+      <div class="field">
+        <label for="notes">Notes (optional)</label>
+        <textarea pTextarea id="notes" [(ngModel)]="notes" [rows]="2" class="w-full" placeholder="Payment notes..."></textarea>
+      </div>
+    </div>
+  }
+
+  <ng-template #footer>
+    <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="onHide()" />
+    <p-button
+      label="Record Payment"
+      icon="pi pi-check"
+      (onClick)="onSubmit()"
+      [disabled]="!isValid || saving"
+      [loading]="saving"
+    />
+  </ng-template>
+</p-dialog>

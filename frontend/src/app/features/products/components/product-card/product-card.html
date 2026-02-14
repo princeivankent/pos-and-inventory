@@ -1,0 +1,65 @@
+<div class="product-card" [class.out-of-stock]="product.current_stock === 0">
+  <!-- Category color bar -->
+  <div class="category-bar" [style.backgroundColor]="categoryColor"></div>
+
+  <!-- Product image area -->
+  <div class="product-image-area" [style.backgroundColor]="categoryColor">
+    <span>{{ getInitial() }}</span>
+  </div>
+
+  <!-- Product info -->
+  <div class="product-info">
+    <h4 class="product-name">{{ product.name }}</h4>
+
+    <div class="product-meta">
+      <span class="sku">{{ product.sku }}</span>
+      <span class="stock-badge" [class]="getStockBadgeClass()">
+        {{ product.current_stock }} {{ product.unit }}
+      </span>
+    </div>
+
+    <!-- Pricing -->
+    <div class="price-section">
+      <div class="price-row">
+        <span class="price-label">Retail:</span>
+        <span class="price-value retail">{{ product.retail_price | phpCurrency }}</span>
+      </div>
+      <div class="price-row">
+        <span class="price-label">Cost:</span>
+        <span class="price-value">{{ product.cost_price | phpCurrency }}</span>
+      </div>
+      @if (product.cost_price > 0 && product.retail_price > 0) {
+        <div class="margin-indicator" [class]="getMarginClass()">
+          {{ getMarginPercent() }}% margin
+        </div>
+      }
+    </div>
+
+    <!-- Category badge -->
+    @if (product.category) {
+      <div class="category-chip" [style.borderColor]="categoryColor">
+        {{ product.category.name }}
+      </div>
+    }
+  </div>
+
+  <!-- Quick actions (hover) -->
+  @if (showActions) {
+    <div class="quick-actions">
+      <p-button
+        icon="pi pi-pencil"
+        [rounded]="true"
+        size="small"
+        severity="info"
+        (onClick)="onEdit()"
+      />
+      <p-button
+        icon="pi pi-trash"
+        [rounded]="true"
+        size="small"
+        severity="danger"
+        (onClick)="onDelete()"
+      />
+    </div>
+  }
+</div>

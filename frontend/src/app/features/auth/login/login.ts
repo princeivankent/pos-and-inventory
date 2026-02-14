@@ -58,9 +58,4 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  onForgotPassword(event: Event) {
-    event.preventDefault();
-    // TODO: Implement forgot password functionality
-    this.toast.info('Forgot password feature coming soon!');
-  }
 }

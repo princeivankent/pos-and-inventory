@@ -28,4 +28,7 @@ export class Customer extends TenantBaseEntity {
     transformer: { to: (value: number) => value, from: (value: string) => parseFloat(value) },
   })
   current_balance: number;
+
+  @Column({ type: 'boolean', default: true })
+  is_active: boolean;
 }

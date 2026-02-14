@@ -1,242 +1,151 @@
 # Multi-Tenant POS & Inventory Management System
 
-A comprehensive Point of Sale and Inventory Management System designed for small retail stores in the Philippines with multi-tenant support, batch-based inventory tracking, customer credit management, and flexible pricing.
+A comprehensive Point of Sale and Inventory Management System designed for small retail stores in the Philippines with multi-tenant support, FIFO inventory tracking, customer credit management (utang), and BIR compliance.
 
 ## Project Status
 
-✅ **Phase 1 Complete**: Backend Foundation
-- Database schema and entities created
-- Multi-tenant architecture with Row-Level Security
-- Authentication module with Supabase integration
-- JWT-based authentication with store switching
-- User-store association for multi-store access
+- ✅ **Phases 1-8**: Backend complete (NestJS + TypeORM + PostgreSQL)
+- ✅ **Phase 9**: Frontend complete (Angular 21 + PrimeNG)
+- ✅ **UI/UX Modernization**: Login, Reports, Products, Customers pages
+- 🚧 **Phase 10**: Testing & Deployment (in progress)
 
 ## Tech Stack
 
-### Backend
-- **Framework**: NestJS
-- **Database**: PostgreSQL via Supabase
-- **ORM**: TypeORM
-- **Authentication**: Supabase Auth + JWT
-- **Language**: TypeScript
-
-### Frontend (To be implemented)
-- **Framework**: Angular 17+ (standalone components)
-- **State Management**: RxJS
-- **UI Library**: TBD (PrimeNG or Angular Material)
-
-## Project Structure
-
-```
-POS/
-├── backend/
-│   ├── src/
-│   │   ├── auth/              # Authentication module
-│   │   ├── common/            # Guards, decorators, interceptors
-│   │   ├── config/            # Configuration files
-│   │   ├── database/          # Entities and migrations
-│   │   └── main.ts            # Application entry point
-│   ├── package.json
-│   └── tsconfig.json
-└── README.md
-```
-
-## Database Schema
-
-### Core Tables
-- **stores**: Tenant/store management
-- **users**: User accounts
-- **user_stores**: User-store associations with roles
-- **categories**: Product categories with hierarchy
-- **products**: Product master data
-- **suppliers**: Supplier information
-- **inventory_batches**: Batch/lot tracking with FIFO
-- **customers**: Customer management with credit limits
-- **sales**: Sales transactions
-- **sale_items**: Sales line items
-- **credit_payments**: Customer payment history (utang)
-- **stock_movements**: Inventory audit trail
-- **low_stock_alerts**: Stock and expiry alerts
+| Layer | Technology |
+|-------|-----------|
+| **Backend** | NestJS, TypeORM, PostgreSQL (Supabase) |
+| **Frontend** | Angular 21, PrimeNG, Angular Signals |
+| **Auth** | Supabase Auth + JWT (7d expiry) |
+| **Database** | 14 entities with multi-tenant isolation via `store_id` |
 
 ## Features
 
-### Implemented
-- ✅ Multi-tenant architecture with store isolation
-- ✅ User authentication with Supabase
-- ✅ JWT-based authorization
-- ✅ Multi-store access per user
-- ✅ Store switching capability
-- ✅ Role-based access control (Admin, Cashier)
-- ✅ Complete database schema with migrations
+### POS & Sales
+- 6 payment methods: Cash, GCash, Maya, Card, Credit (utang), Partial (cash + credit split)
+- Product grid with category filtering and barcode/SKU search
+- Cart with quantity management, discounts (fixed/percentage), hold/recall
+- 12% VAT calculation (configurable per store)
+- Receipt preview (BIR compliant)
 
-### To Be Implemented
-- ⏳ Product management module
-- ⏳ Inventory management with FIFO batch selection
-- ⏳ POS interface with barcode scanning
-- ⏳ Customer credit management
-- ⏳ Sales transactions with returns/refunds
-- ⏳ Receipt generation (PDF + thermal printer)
-- ⏳ Reporting and analytics
-- ⏳ Low stock and expiry alerts (cron jobs)
-- ⏳ Frontend application
+### Customer Credit (Utang)
+- Per-customer credit limits with real-time balance tracking
+- Credit and partial payment sales directly from POS
+- Credit limit validation before allowing credit sales
+- Payment recording (cash, gcash, maya, card) against outstanding balance
+- Credit statements with unified transaction history and running balance
+- Automatic balance reversal on voided credit sales
+
+### Inventory
+- FIFO batch tracking with automatic oldest-first selection
+- Stock movements audit trail (purchase, sale, adjustment, return, expired, damaged)
+- Low stock alerts with reorder levels
+- Expiry date tracking for perishable goods
+
+### Multi-Tenancy
+- Row-level isolation via `store_id` on all tenant tables
+- Multi-store access per user with role-based permissions (Admin/Cashier)
+- Granular permissions: PRODUCTS_VIEW, SALES_CREATE, CUSTOMERS_MANAGE, etc.
+- Store switching without re-authentication
+
+### Management Pages
+- **Products**: Table/card views, search autocomplete, category filters, CRUD
+- **Categories**: Hierarchical categories with parent/child
+- **Inventory**: Batch overview, stock movements, low stock alerts
+- **Sales**: Daily sales, sale details, void capability
+- **Customers**: Customer list, credit statements, payment dialogs
+- **Reports**: Sales charts, best-selling products, inventory stats
+- **Users**: Role assignment, permission management
+- **Settings**: Store configuration (tax, receipts)
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js 18+
 - PostgreSQL database (via Supabase)
-- npm or yarn
 
 ### Backend Setup
 
-1. Navigate to backend directory:
 ```bash
 cd backend
-```
-
-2. Install dependencies:
-```bash
 npm install
+cp .env.example .env   # Configure your environment variables
+npm run migration:run   # Apply database migrations
+npm run start:dev       # Start on port 3000
 ```
 
-3. Create `.env` file:
-```bash
-cp .env.example .env
-```
-
-4. Configure environment variables:
+**Required `.env` variables:**
 ```env
-NODE_ENV=development
-PORT=3000
+DATABASE_URL=postgresql://user:password@host:port/database
 SUPABASE_URL=your_supabase_project_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_KEY=your_supabase_service_key
-DATABASE_URL=postgresql://user:password@host:port/database
-JWT_SECRET=your_jwt_secret_here
+JWT_SECRET=your_jwt_secret
 JWT_EXPIRATION=7d
+FRONTEND_URL=http://localhost:4200
 ```
 
-5. Run migrations:
+### Frontend Setup
+
 ```bash
-npm run migration:run
+cd frontend
+npm install
+npm run start           # Start on port 4200
 ```
 
-6. Start development server:
-```bash
-npm run start:dev
-```
-
-The API will be available at `http://localhost:3000/api`
+Configure API URL in `frontend/src/environments/environment.ts`.
 
 ## API Endpoints
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - User login
-- `POST /api/auth/switch-store` - Switch active store
-- `GET /api/auth/stores` - Get user's accessible stores
+All endpoints (except auth) require `Authorization: Bearer <token>` and `X-Store-Id: <uuid>` headers.
 
-### Multi-Tenant Flow
-1. User logs in → receives JWT token + list of accessible stores
-2. Frontend stores token and default store ID
-3. All API requests include:
-   - `Authorization: Bearer <token>` header
-   - `X-Store-Id: <store_id>` header
-4. Backend validates user access to store via TenantGuard
-5. All queries automatically filtered by store_id
+| Module | Endpoints |
+|--------|-----------|
+| **Auth** | `POST /api/auth/login`, `POST /api/auth/register`, `POST /api/auth/switch-store` |
+| **Products** | `GET/POST /api/products`, `GET/PATCH/DELETE /api/products/:id` |
+| **Categories** | `GET/POST /api/categories`, `GET/PATCH/DELETE /api/categories/:id` |
+| **Inventory** | `GET/POST /api/inventory/batches`, `GET /api/inventory/movements`, `POST /api/inventory/adjust` |
+| **Sales** | `POST /api/sales`, `GET /api/sales/daily`, `GET /api/sales/:id`, `POST /api/sales/:id/void` |
+| **Customers** | `GET/POST /api/customers`, `GET/PATCH/DELETE /api/customers/:id`, `GET /api/customers/:id/statement`, `POST /api/customers/:id/payments` |
+| **Reports** | `GET /api/reports/sales`, `GET /api/reports/inventory`, `GET /api/reports/best-selling` |
+| **Users** | `GET/POST /api/users`, `PATCH/DELETE /api/users/:id` |
+| **Stores** | `GET/PATCH /api/stores/:id` |
 
-## Multi-Tenant Architecture
+## Project Structure
 
-### Key Components
-- **TenantGuard**: Validates user access to requested store
-- **TenantInterceptor**: Injects store context into requests
-- **TenantBaseEntity**: Base entity with store_id column
-- **UserStore**: Junction table for user-store associations
+```
+pos-and-inventory/
+├── backend/src/
+│   ├── auth/           # Supabase + JWT authentication
+│   ├── common/         # Guards, decorators, interceptors, permissions
+│   ├── config/         # Environment, database, Supabase config
+│   ├── database/       # 14 entities + migrations
+│   ├── stores/         # Store CRUD + settings
+│   ├── categories/     # Hierarchical categories
+│   ├── products/       # Products + pricing
+│   ├── inventory/      # FIFO batches + stock movements
+│   ├── sales/          # Atomic transactions + credit
+│   ├── customers/      # Credit management + payments
+│   ├── receipts/       # Receipt generation
+│   ├── reports/        # Sales/inventory reports
+│   └── users/          # User + permission management
+├── frontend/src/app/
+│   ├── core/           # Services, guards, interceptors, models
+│   ├── shared/         # Shared components, pipes
+│   ├── layout/         # Sidebar, layout shell
+│   └── features/       # auth, pos, products, categories, inventory,
+│                       # sales, customers, reports, users, settings, dashboard
+├── CLAUDE.md           # AI development context
+├── ARCHITECTURE.md     # System architecture diagrams
+└── PROJECT_SUMMARY.md  # Comprehensive feature specs
+```
 
-### Security
-- Row-Level Security via store_id filtering
-- JWT tokens contain user identity
-- Store access validated on every request
-- Role-based permissions per store
+## Documentation
 
-## Philippine Market Features
-
-- Fixed 12% VAT (Value Added Tax)
-- BIR TIN (Tax Identification Number) support
-- Customer credit management (utang system)
-- Philippine Peso (PHP) currency
-- Receipt formats compliant with BIR requirements
-
-## Development Roadmap
-
-### Phase 1: Backend Foundation ✅
-- Database schema design
-- Multi-tenant architecture
-- Authentication and authorization
-- Core entities and migrations
-
-### Phase 2: Core Modules (In Progress)
-- Product and category management
-- Supplier management
-- Inventory batch tracking
-- Customer management
-
-### Phase 3: POS Module
-- Sales transaction processing
-- FIFO inventory deduction
-- Credit/utang handling
-- Returns and refunds
-
-### Phase 4: Reports & Alerts
-- Sales reports
-- Inventory reports
-- Customer statements
-- Low stock alerts
-- Expiry warnings
-
-### Phase 5: Frontend Application
-- Angular application setup
-- Authentication UI
-- Dashboard
-- POS interface
-- Management interfaces
-
-### Phase 6: Advanced Features
-- Receipt printing (PDF + thermal)
-- Barcode scanning
-- Multi-device support
-- Offline mode
-- Export capabilities
-
-## Contributing
-
-This is a private project. For questions or suggestions, please contact the development team.
+- **CLAUDE.md** - Development patterns and AI context
+- **ARCHITECTURE.md** - System architecture and flow diagrams
+- **PROJECT_SUMMARY.md** - Comprehensive feature specifications
+- **QUICKSTART.md** - Quick setup guide
 
 ## License
 
 Proprietary - All rights reserved
-
-## Next Steps
-
-1. **Backend Development**:
-   - Implement remaining modules (products, inventory, sales, etc.)
-   - Add business logic for FIFO inventory
-   - Create receipt generation services
-   - Set up cron jobs for alerts
-
-2. **Frontend Development**:
-   - Initialize Angular project
-   - Create authentication pages
-   - Build POS interface
-   - Implement management dashboards
-
-3. **Testing**:
-   - Unit tests for services
-   - Integration tests for APIs
-   - E2E tests for critical flows
-
-4. **Deployment**:
-   - Set up CI/CD pipeline
-   - Configure production environment
-   - Deploy to Railway (backend)
-   - Deploy to Vercel (frontend)

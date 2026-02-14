@@ -27,6 +27,7 @@ export class SidebarComponent {
     { label: 'Categories', icon: 'pi-tags', route: '/categories', adminOnly: true },
     { label: 'Inventory', icon: 'pi-warehouse', route: '/inventory' },
     { label: 'Sales', icon: 'pi-receipt', route: '/sales' },
+    { label: 'Customers', icon: 'pi-id-card', route: '/customers' },
     { label: 'Reports', icon: 'pi-chart-bar', route: '/reports', adminOnly: true },
     { label: 'Users', icon: 'pi-users', route: '/users', adminOnly: true },
     { label: 'Settings', icon: 'pi-cog', route: '/settings', adminOnly: true },

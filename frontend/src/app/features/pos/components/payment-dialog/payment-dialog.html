@@ -10,7 +10,7 @@
 >
   <div class="payment-body">
     <div class="payment-method-tabs">
-      @for (method of paymentMethods; track method.value) {
+      @for (method of paymentMethods(); track method.value) {
         <button
           class="method-tab"
           [class.active]="cart.paymentMethod() === method.value"
@@ -28,6 +28,7 @@
       <span class="total-value">{{ totalAmount() | phpCurrency }}</span>
     </div>
 
+    <!-- CASH payment -->
     @if (isCash()) {
       <div class="field">
         <label>Amount Received</label>
@@ -75,7 +76,105 @@
         <span>{{ change() >= 0 ? 'Change' : 'Remaining' }}</span>
         <span class="change-value">{{ (change() >= 0 ? change() : -change()) | phpCurrency }}</span>
       </div>
-    } @else {
+    }
+
+    <!-- CREDIT payment (full credit) -->
+    @else if (isCredit()) {
+      <div class="credit-info">
+        <div class="credit-customer">
+          <i class="pi pi-user"></i>
+          <span>{{ cart.customer()?.name }}</span>
+        </div>
+        <div class="credit-summary">
+          <div class="credit-row">
+            <span>Credit Limit</span>
+            <span>{{ cart.customer()?.credit_limit | phpCurrency }}</span>
+          </div>
+          <div class="credit-row">
+            <span>Current Balance</span>
+            <span class="balance-value">{{ cart.customer()?.current_balance | phpCurrency }}</span>
+          </div>
+          <div class="credit-row">
+            <span>Available Credit</span>
+            <span class="available-value">{{ availableCredit() | phpCurrency }}</span>
+          </div>
+          <div class="credit-divider"></div>
+          <div class="credit-row highlight">
+            <span>Amount to Charge</span>
+            <span>{{ totalAmount() | phpCurrency }}</span>
+          </div>
+        </div>
+        @if (creditExceeded()) {
+          <div class="credit-warning">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>Credit limit exceeded. Available: {{ availableCredit() | phpCurrency }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- PARTIAL payment (cash + credit split) -->
+    @else if (isPartial()) {
+      <div class="credit-info">
+        <div class="credit-customer">
+          <i class="pi pi-user"></i>
+          <span>{{ cart.customer()?.name }}</span>
+          <span class="credit-badge">Available: {{ availableCredit() | phpCurrency }}</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Cash Amount</label>
+        <p-inputNumber
+          #amountInput
+          [ngModel]="amountPaid()"
+          (ngModelChange)="amountPaid.set($event)"
+          (onInput)="onAmountInput($event)"
+          mode="currency"
+          currency="PHP"
+          locale="en-PH"
+          [min]="0"
+          [max]="totalAmount()"
+          inputStyleClass="payment-input"
+          styleClass="w-full"
+          placeholder="Cash portion"
+        />
+      </div>
+
+      <div class="numpad-grid">
+        @for (key of numpadKeys; track key) {
+          <button
+            class="numpad-btn"
+            [class.clear-btn]="key === 'C'"
+            (click)="onNumpad(key)"
+            type="button"
+          >
+            {{ key }}
+          </button>
+        }
+      </div>
+
+      <div class="split-display">
+        <div class="split-row">
+          <span>Cash</span>
+          <span class="split-value cash">{{ (amountPaid() ?? 0) | phpCurrency }}</span>
+        </div>
+        <div class="split-row">
+          <span>Credit (Utang)</span>
+          <span class="split-value credit">{{ creditAmount() | phpCurrency }}</span>
+        </div>
+      </div>
+
+      @if (creditExceeded()) {
+        <div class="credit-warning">
+          <i class="pi pi-exclamation-triangle"></i>
+          <span>Credit limit exceeded. Available: {{ availableCredit() | phpCurrency }}</span>
+        </div>
+      }
+    }
+
+    <!-- DIGITAL payment (GCash, Maya, Card) -->
+    @else {
       <div class="field">
         <label>Reference Number</label>
         <input
@@ -86,7 +185,6 @@
           placeholder="Enter reference / approval code"
           class="ref-input"
         />
-        <!-- TODO: Store reference number when backend supports it -->
       </div>
 
       <div class="non-cash-note">
@@ -107,7 +205,7 @@
     <p-button
       [label]="processing() ? 'Processing...' : 'Complete Sale'"
       [icon]="processing() ? 'pi pi-spinner pi-spin' : 'pi pi-check'"
-      [disabled]="(isCash() && change() < 0) || processing()"
+      [disabled]="!canComplete()"
       [loading]="processing()"
       (onClick)="onComplete()"
     />
