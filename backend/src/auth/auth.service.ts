@@ -12,6 +12,9 @@ import { SupabaseService } from './supabase.service';
 import { User } from '../database/entities/user.entity';
 import { UserStore, UserRole } from '../database/entities/user-store.entity';
 import { Store } from '../database/entities/store.entity';
+import { Organization } from '../database/entities/organization.entity';
+import { SubscriptionPlan } from '../database/entities/subscription-plan.entity';
+import { Subscription, SubscriptionStatus } from '../database/entities/subscription.entity';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ALL_PERMISSIONS } from '../common/permissions/permission.enum';
@@ -27,6 +30,12 @@ export class AuthService {
     private userStoreRepository: Repository<UserStore>,
     @InjectRepository(Store)
     private storeRepository: Repository<Store>,
+    @InjectRepository(Organization)
+    private organizationRepository: Repository<Organization>,
+    @InjectRepository(SubscriptionPlan)
+    private planRepository: Repository<SubscriptionPlan>,
+    @InjectRepository(Subscription)
+    private subscriptionRepository: Repository<Subscription>,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -63,10 +72,20 @@ export class AuthService {
 
     await this.userRepository.save(user);
 
-    // Create a default store for the user
+    // Create Organization for the user
+    const organization = this.organizationRepository.create({
+      name: `${full_name}'s Organization`,
+      owner_user_id: user.id,
+      billing_email: email,
+    });
+
+    await this.organizationRepository.save(organization);
+
+    // Create a default store linked to the organization
     const store = this.storeRepository.create({
       name: store_name || 'My Store',
       settings: {},
+      organization_id: organization.id,
     });
 
     await this.storeRepository.save(store);
@@ -80,6 +99,9 @@ export class AuthService {
     });
 
     await this.userStoreRepository.save(userStore);
+
+    // Create trial subscription on Tindahan plan (14 days)
+    const subscriptionInfo = await this.createTrialForOrganization(organization.id);
 
     // Sign in the newly created user to get session tokens
     const { data: signInData, error: signInError } =
@@ -115,6 +137,7 @@ export class AuthService {
       },
       stores,
       default_store: stores[0],
+      subscription: subscriptionInfo,
     };
   }
 
@@ -166,6 +189,9 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email };
     const access_token = this.jwtService.sign(payload);
 
+    // Get subscription info from default store's organization
+    const subscriptionInfo = await this.getSubscriptionInfo(defaultStore.store.id);
+
     return {
       access_token,
       refresh_token: data.session.refresh_token,
@@ -193,6 +219,7 @@ export class AuthService {
             ? ALL_PERMISSIONS
             : (defaultStore.permissions ?? []),
       },
+      subscription: subscriptionInfo,
     };
   }
 
@@ -239,5 +266,71 @@ export class AuthService {
           ? ALL_PERMISSIONS
           : (us.permissions ?? []),
     }));
+  }
+
+  private async createTrialForOrganization(organizationId: string) {
+    const plan = await this.planRepository.findOne({
+      where: { plan_code: 'tindahan', is_active: true },
+    });
+
+    if (!plan) {
+      return null;
+    }
+
+    const now = new Date();
+    const trialEnd = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+
+    const subscription = this.subscriptionRepository.create({
+      organization_id: organizationId,
+      plan_id: plan.id,
+      status: SubscriptionStatus.TRIAL,
+      trial_start: now,
+      trial_end: trialEnd,
+    });
+
+    await this.subscriptionRepository.save(subscription);
+
+    return {
+      status: 'trial',
+      plan_code: plan.plan_code,
+      plan_name: plan.name,
+      trial_ends_at: trialEnd,
+      features: plan.features,
+    };
+  }
+
+  private async getSubscriptionInfo(storeId: string) {
+    const store = await this.storeRepository.findOne({
+      where: { id: storeId },
+      select: ['id', 'organization_id'],
+    });
+
+    if (!store?.organization_id) {
+      return null;
+    }
+
+    const subscription = await this.subscriptionRepository.findOne({
+      where: { organization_id: store.organization_id },
+      relations: ['plan'],
+      order: { created_at: 'DESC' },
+    });
+
+    if (!subscription) {
+      return null;
+    }
+
+    return {
+      status: subscription.status,
+      plan_code: subscription.plan.plan_code,
+      plan_name: subscription.plan.name,
+      trial_ends_at: subscription.trial_end,
+      current_period_end: subscription.current_period_end,
+      features: subscription.plan.features,
+      usage: {
+        max_stores: subscription.plan.max_stores,
+        max_users_per_store: subscription.plan.max_users_per_store,
+        max_products_per_store: subscription.plan.max_products_per_store,
+      },
+    };
   }
 }

@@ -32,7 +32,8 @@
       "WebFetch(domain:www.thoughtspot.com)",
       "Bash(find:*)",
       "Bash(npx tsc:*)",
-      "Bash(node scripts/convert-to-multifile.js:*)"
+      "Bash(node scripts/convert-to-multifile.js:*)",
+      "Bash(python3:*)"
     ]
   }
 }

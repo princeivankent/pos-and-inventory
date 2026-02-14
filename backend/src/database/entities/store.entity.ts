@@ -1,5 +1,6 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { BaseEntity } from './base.entity';
+import { Organization } from './organization.entity';
 
 @Entity('stores')
 export class Store extends BaseEntity {
@@ -20,4 +21,11 @@ export class Store extends BaseEntity {
 
   @Column({ type: 'jsonb', nullable: true, default: {} })
   settings: Record<string, any>;
+
+  @Column({ type: 'uuid', nullable: true })
+  organization_id: string;
+
+  @ManyToOne(() => Organization, (org) => org.stores)
+  @JoinColumn({ name: 'organization_id' })
+  organization: Organization;
 }

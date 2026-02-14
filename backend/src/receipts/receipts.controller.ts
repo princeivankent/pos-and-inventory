@@ -7,10 +7,12 @@ import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { SubscriptionGuard } from '../common/guards/subscription.guard';
+import { FeatureGateGuard } from '../common/guards/feature-gate.guard';
 import { Permission } from '../common/permissions/permission.enum';
 
 @Controller('receipts')
-@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard, PermissionsGuard)
+@UseGuards(AuthGuard('jwt'), TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard, FeatureGateGuard)
 @RequirePermissions(Permission.RECEIPTS_VIEW)
 export class ReceiptsController {
   constructor(private readonly receiptsService: ReceiptsService) {}

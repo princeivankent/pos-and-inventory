@@ -21,12 +21,15 @@ import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { SubscriptionGuard } from '../common/guards/subscription.guard';
+import { FeatureGateGuard } from '../common/guards/feature-gate.guard';
+import { RequireFeature } from '../common/decorators/require-feature.decorator';
 import { UserRole } from '../database/entities/user-store.entity';
 import { Permission } from '../common/permissions/permission.enum';
 import { RequestUser } from '../common/interfaces/request-with-user.interface';
 
 @Controller('customers')
-@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard, PermissionsGuard)
+@UseGuards(AuthGuard('jwt'), TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard, FeatureGateGuard)
 export class CustomersController {
   constructor(private readonly customersService: CustomersService) {}
 
@@ -75,12 +78,14 @@ export class CustomersController {
 
   @Get(':id/statement')
   @RequirePermissions(Permission.CUSTOMERS_VIEW)
+  @RequireFeature('utang_management')
   getStatement(@Param('id') id: string, @CurrentStore() storeId: string) {
     return this.customersService.getCreditStatement(id, storeId);
   }
 
   @Post(':id/payments')
   @RequirePermissions(Permission.CUSTOMERS_MANAGE)
+  @RequireFeature('utang_management')
   recordPayment(
     @Param('id') id: string,
     @Body() dto: RecordPaymentDto,

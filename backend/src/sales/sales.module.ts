@@ -10,6 +10,7 @@ import { StockMovement } from '../database/entities/stock-movement.entity';
 import { Store } from '../database/entities/store.entity';
 import { Customer } from '../database/entities/customer.entity';
 import { UserStore } from '../database/entities/user-store.entity';
+import { SubscriptionGuardModule } from '../common/guards/subscription-guard.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { UserStore } from '../database/entities/user-store.entity';
       Customer,
       UserStore,
     ]),
+    SubscriptionGuardModule,
   ],
   controllers: [SalesController],
   providers: [SalesService],

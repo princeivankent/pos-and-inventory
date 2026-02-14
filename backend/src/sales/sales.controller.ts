@@ -17,12 +17,14 @@ import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { SubscriptionGuard } from '../common/guards/subscription.guard';
+import { FeatureGateGuard } from '../common/guards/feature-gate.guard';
 import { UserRole } from '../database/entities/user-store.entity';
 import { Permission } from '../common/permissions/permission.enum';
 import { RequestUser } from '../common/interfaces/request-with-user.interface';
 
 @Controller('sales')
-@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard, PermissionsGuard)
+@UseGuards(AuthGuard('jwt'), TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard, FeatureGateGuard)
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 

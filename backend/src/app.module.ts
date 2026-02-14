@@ -12,6 +12,9 @@ import { ReceiptsModule } from './receipts/receipts.module';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { CustomersModule } from './customers/customers.module';
+import { SubscriptionPlansModule } from './subscription-plans/subscription-plans.module';
+import { BillingModule } from './billing/billing.module';
+import { PaymentsModule } from './payments/payments.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { ValidationPipe } from './common/pipes/validation.pipe';
 
@@ -29,6 +32,9 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     ReportsModule,
     UsersModule,
     CustomersModule,
+    SubscriptionPlansModule,
+    BillingModule,
+    PaymentsModule,
   ],
   providers: [
     {

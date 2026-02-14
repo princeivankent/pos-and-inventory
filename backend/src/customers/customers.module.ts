@@ -6,10 +6,12 @@ import { Customer } from '../database/entities/customer.entity';
 import { CreditPayment } from '../database/entities/credit-payment.entity';
 import { Sale } from '../database/entities/sale.entity';
 import { UserStore } from '../database/entities/user-store.entity';
+import { SubscriptionGuardModule } from '../common/guards/subscription-guard.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Customer, CreditPayment, Sale, UserStore]),
+    SubscriptionGuardModule,
   ],
   controllers: [CustomersController],
   providers: [CustomersService],

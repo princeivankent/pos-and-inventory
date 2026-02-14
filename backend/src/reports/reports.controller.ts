@@ -6,6 +6,9 @@ import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { SubscriptionGuard } from '../common/guards/subscription.guard';
+import { FeatureGateGuard } from '../common/guards/feature-gate.guard';
+import { RequireFeature } from '../common/decorators/require-feature.decorator';
 import { Permission } from '../common/permissions/permission.enum';
 
 function localDateString(): string {
@@ -14,7 +17,8 @@ function localDateString(): string {
 }
 
 @Controller('reports')
-@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard, PermissionsGuard)
+@UseGuards(AuthGuard('jwt'), TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard, FeatureGateGuard)
+@RequireFeature('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 

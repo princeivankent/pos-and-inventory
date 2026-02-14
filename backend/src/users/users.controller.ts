@@ -19,11 +19,15 @@ import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { SubscriptionGuard } from '../common/guards/subscription.guard';
+import { FeatureGateGuard } from '../common/guards/feature-gate.guard';
+import { UsageLimitGuard } from '../common/guards/usage-limit.guard';
+import { CheckLimit } from '../common/decorators/check-limit.decorator';
 import { UserRole } from '../database/entities/user-store.entity';
 import { Permission } from '../common/permissions/permission.enum';
 
 @Controller('users')
-@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard, PermissionsGuard)
+@UseGuards(AuthGuard('jwt'), TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard, FeatureGateGuard, UsageLimitGuard)
 @Roles(UserRole.ADMIN)
 @RequirePermissions(Permission.USERS_MANAGE)
 export class UsersController {
@@ -40,6 +44,7 @@ export class UsersController {
   }
 
   @Post()
+  @CheckLimit({ resource: 'users' })
   create(@Body() createUserDto: CreateUserDto, @CurrentStore() storeId: string) {
     return this.usersService.create(createUserDto, storeId);
   }

@@ -19,17 +19,22 @@ import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { SubscriptionGuard } from '../common/guards/subscription.guard';
+import { FeatureGateGuard } from '../common/guards/feature-gate.guard';
+import { UsageLimitGuard } from '../common/guards/usage-limit.guard';
+import { CheckLimit } from '../common/decorators/check-limit.decorator';
 import { UserRole } from '../database/entities/user-store.entity';
 import { Permission } from '../common/permissions/permission.enum';
 
 @Controller('products')
-@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard, PermissionsGuard)
+@UseGuards(AuthGuard('jwt'), TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard, FeatureGateGuard, UsageLimitGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
   @Roles(UserRole.ADMIN)
   @RequirePermissions(Permission.PRODUCTS_MANAGE)
+  @CheckLimit({ resource: 'products' })
   create(
     @Body() createProductDto: CreateProductDto,
     @CurrentStore() storeId: string,

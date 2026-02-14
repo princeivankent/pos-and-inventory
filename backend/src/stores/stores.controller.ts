@@ -18,6 +18,10 @@ import { RequirePermissions } from '../common/decorators/permissions.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { TenantGuard } from '../common/guards/tenant.guard';
 import { PermissionsGuard } from '../common/guards/permissions.guard';
+import { SubscriptionGuard } from '../common/guards/subscription.guard';
+import { FeatureGateGuard } from '../common/guards/feature-gate.guard';
+import { UsageLimitGuard } from '../common/guards/usage-limit.guard';
+import { CheckLimit } from '../common/decorators/check-limit.decorator';
 import { UserRole } from '../database/entities/user-store.entity';
 import { Permission } from '../common/permissions/permission.enum';
 import { RequestUser } from '../common/interfaces/request-with-user.interface';
@@ -28,9 +32,10 @@ export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 
   @Post()
-  @UseGuards(TenantGuard, RolesGuard, PermissionsGuard)
+  @UseGuards(TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard, FeatureGateGuard, UsageLimitGuard)
   @Roles(UserRole.ADMIN)
   @RequirePermissions(Permission.STORES_MANAGE)
+  @CheckLimit({ resource: 'stores' })
   create(@Body() createStoreDto: CreateStoreDto) {
     return this.storesService.create(createStoreDto);
   }
@@ -47,7 +52,7 @@ export class StoresController {
   }
 
   @Patch(':id')
-  @UseGuards(TenantGuard, RolesGuard, PermissionsGuard)
+  @UseGuards(TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard)
   @Roles(UserRole.ADMIN)
   @RequirePermissions(Permission.STORES_MANAGE)
   update(@Param('id') id: string, @Body() updateStoreDto: UpdateStoreDto) {
@@ -55,7 +60,7 @@ export class StoresController {
   }
 
   @Patch(':id/settings')
-  @UseGuards(TenantGuard, RolesGuard, PermissionsGuard)
+  @UseGuards(TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard)
   @Roles(UserRole.ADMIN)
   @RequirePermissions(Permission.STORES_MANAGE)
   updateSettings(
@@ -66,7 +71,7 @@ export class StoresController {
   }
 
   @Delete(':id')
-  @UseGuards(TenantGuard, RolesGuard, PermissionsGuard)
+  @UseGuards(TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard)
   @Roles(UserRole.ADMIN)
   @RequirePermissions(Permission.STORES_MANAGE)
   remove(@Param('id') id: string) {

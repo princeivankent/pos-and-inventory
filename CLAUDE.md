@@ -7,9 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A multi-tenant POS & Inventory Management System for Philippine retail stores with FIFO inventory tracking, customer credit management (utang), and BIR compliance features.
 
 **Current Status**:
-- ✅ Phase 1-8 Complete: Backend foundation + all core modules (Categories, Products, Inventory, Sales, Receipts, Reports, Users)
+- ✅ Phase 1-8 Complete: Backend foundation + all core modules (Categories, Products, Inventory, Sales, Receipts, Reports, Users, Customers)
 - ✅ Phase 9 Complete: Frontend (Angular 21 + PrimeNG) with all pages scaffolded
 - ✅ UI/UX Modernization Phase 1: Login & Reports pages enhanced with modern design
+- ✅ **Subscription System Complete**: 3-tier billing (Tindahan/Negosyo/Kadena), feature gates, usage limits, PayMongo integration
 - 🚧 Phase 10 In Progress: Testing & Deployment preparation
 
 ## Technology Stack
@@ -17,7 +18,8 @@ A multi-tenant POS & Inventory Management System for Philippine retail stores wi
 - **Backend**: NestJS + TypeORM + PostgreSQL (Supabase)
 - **Authentication**: Supabase Auth + JWT (7d expiration)
 - **Frontend**: Angular 21 + PrimeNG (standalone components)
-- **Database**: 14 entities with multi-tenant isolation via `store_id`
+- **Database**: 20 entities (14 core + 6 subscription) with multi-tenant isolation via `store_id`
+- **Billing**: 3-tier subscription system with PayMongo integration
 - **UI/UX**: Modern design system with gradients, animations, and responsive layouts
 
 ## Common Development Commands
@@ -76,6 +78,7 @@ npm run lint                  # Run ESLint
 - `JWT_SECRET`, `JWT_EXPIRATION` (default: 7d)
 - `NODE_ENV` (development/production)
 - `FRONTEND_URL` (for CORS)
+- `PAYMONGO_SECRET_KEY` (optional, uses mock payment service if not set)
 
 **Frontend** - Configure in `frontend/src/environments/`:
 - `environment.ts` - Development config (API: http://localhost:3000)
@@ -93,15 +96,24 @@ npm run lint                  # Run ESLint
 2. Client sends store ID in `X-Store-Id: <uuid>` header
 3. `AuthGuard` validates JWT and extracts `user_id`
 4. `TenantGuard` validates user has access to requested store (via `user_stores` junction table)
-5. `RolesGuard` validates user role (ADMIN or CASHIER) for the action
-6. Service layer queries filtered by `store_id`
+5. **`SubscriptionGuard` checks organization has active/trial subscription, injects subscription context**
+6. `RolesGuard` validates user role (ADMIN or CASHIER) for the action
+7. `PermissionsGuard` validates user has required permissions
+8. **`FeatureGateGuard` validates plan includes required features (e.g., reports)**
+9. **`UsageLimitGuard` validates resource count within plan limits (e.g., products)**
+10. Service layer queries filtered by `store_id`
 
 **Key Components**:
 - `TenantBaseEntity`: Base class with `store_id` column - extend this for all tenant-specific entities
 - `TenantGuard`: Validates user access to requested store, injects `storeId` and `role` into `request.user`
+- **`SubscriptionGuard`: Validates active subscription, injects `organizationId` and `subscription` context**
+- **`FeatureGateGuard`: Checks plan features based on `@RequireFeature('reports')` decorator**
+- **`UsageLimitGuard`: Enforces resource limits based on `@CheckLimit({ resource: 'products' })` decorator**
 - `@CurrentUser()` decorator: Extracts user from request
 - `@CurrentStore()` decorator: Extracts storeId from request (set by TenantGuard)
 - `@Roles(UserRole.ADMIN)` decorator: Restricts endpoint to specific roles
+- **`@RequireFeature('feature_name')` decorator: Requires plan feature (e.g., 'reports', 'utang_management')**
+- **`@CheckLimit({ resource: 'products' })` decorator: Enforces plan resource limits**
 
 ### Module Structure Pattern
 
@@ -116,20 +128,37 @@ module-name/
     └── update-module.dto.ts     # Use PartialType(CreateDto)
 ```
 
-**Controller Pattern**:
+**Controller Pattern** (with full guard chain):
 ```typescript
 @Controller('endpoint')
-@UseGuards(AuthGuard('jwt'), TenantGuard, RolesGuard)
+@UseGuards(
+  AuthGuard('jwt'),
+  TenantGuard,
+  SubscriptionGuard,    // Check subscription status
+  RolesGuard,
+  PermissionsGuard,
+  FeatureGateGuard,     // Check plan features
+  UsageLimitGuard       // Check resource limits
+)
 export class ExampleController {
   @Get()
+  @RequirePermissions(Permission.EXAMPLE_VIEW)
   findAll(@CurrentStore() storeId: string) {
     return this.service.findAllByStore(storeId);
   }
 
   @Post()
   @Roles(UserRole.ADMIN)  // Admin-only action
+  @RequirePermissions(Permission.EXAMPLE_MANAGE)
+  @CheckLimit({ resource: 'examples' })  // Enforce plan limit
   create(@Body() dto: CreateDto, @CurrentStore() storeId: string) {
     return this.service.create(dto, storeId);
+  }
+
+  @Get('premium-feature')
+  @RequireFeature('premium_feature')  // Require plan feature
+  getPremiumFeature(@CurrentStore() storeId: string) {
+    return this.service.getPremiumFeature(storeId);
   }
 }
 ```
@@ -190,6 +219,10 @@ getItems() {
 
 **Key Relationships**:
 - `User` ↔ `UserStore` ↔ `Store` (many-to-many with roles)
+- **`Organization` → `Store` (one-to-many, billing account owns stores)**
+- **`Organization` → `Subscription` (one-to-many, subscription history)**
+- **`Subscription` → `SubscriptionPlan` (many-to-one, current plan)**
+- **`Organization` → `Invoice` → `Payment` (billing records)**
 - `Store` → all tenant entities (one-to-many)
 - `Product` → `Category` (many-to-one, hierarchical categories via `parent_id`)
 - `Product` → `InventoryBatch` (one-to-many, FIFO selection by `purchase_date`)
@@ -311,6 +344,19 @@ feature-name/
 - ✅ Reports & Dashboard (sales charts, inventory stats)
 - ✅ Settings page (store config, user profile)
 - ✅ UI/UX Modernization Phase 1 (login + reports with modern design)
+
+**Completed - Subscription System (Feb 14, 2026)**:
+- ✅ Database entities (Organization, SubscriptionPlan, Subscription, Invoice, Payment, PaymentMethod)
+- ✅ Migration for subscription tables with 3 plan tiers (Tindahan ₱799, Negosyo ₱1499, Kadena ₱2999)
+- ✅ SubscriptionGuard (validates active subscription, backward compatible with legacy stores)
+- ✅ FeatureGateGuard + @RequireFeature decorator (e.g., reports, utang_management)
+- ✅ UsageLimitGuard + @CheckLimit decorator (products, stores, users per plan)
+- ✅ Guards applied to all controllers (Products, Reports, Customers, Inventory, Sales, etc.)
+- ✅ Auth flow integration (register creates org + trial, login returns subscription info)
+- ✅ Subscription Plans module (public GET /subscription-plans)
+- ✅ Billing module (GET/POST /billing/* for subscription management)
+- ✅ Payments module (PaymentGateway interface, MockPaymentService, PaymongoService)
+- ✅ Cron jobs for subscription renewals and trial reminders
 
 **To Implement (Phase 10 - Testing & Deployment)**:
 - Unit tests for backend services (Jest)

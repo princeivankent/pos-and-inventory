@@ -10,10 +10,13 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { User } from '../database/entities/user.entity';
 import { UserStore } from '../database/entities/user-store.entity';
 import { Store } from '../database/entities/store.entity';
+import { Organization } from '../database/entities/organization.entity';
+import { SubscriptionPlan } from '../database/entities/subscription-plan.entity';
+import { Subscription } from '../database/entities/subscription.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserStore, Store]),
+    TypeOrmModule.forFeature([User, UserStore, Store, Organization, SubscriptionPlan, Subscription]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

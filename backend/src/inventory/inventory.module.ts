@@ -6,6 +6,7 @@ import { Product } from '../database/entities/product.entity';
 import { InventoryBatch } from '../database/entities/inventory-batch.entity';
 import { StockMovement } from '../database/entities/stock-movement.entity';
 import { UserStore } from '../database/entities/user-store.entity';
+import { SubscriptionGuardModule } from '../common/guards/subscription-guard.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { UserStore } from '../database/entities/user-store.entity';
       StockMovement,
       UserStore,
     ]),
+    SubscriptionGuardModule,
   ],
   controllers: [InventoryController],
   providers: [InventoryService],

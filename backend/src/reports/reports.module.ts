@@ -7,9 +7,13 @@ import { SaleItem } from '../database/entities/sale-item.entity';
 import { Product } from '../database/entities/product.entity';
 import { InventoryBatch } from '../database/entities/inventory-batch.entity';
 import { UserStore } from '../database/entities/user-store.entity';
+import { SubscriptionGuardModule } from '../common/guards/subscription-guard.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Sale, SaleItem, Product, InventoryBatch, UserStore])],
+  imports: [
+    TypeOrmModule.forFeature([Sale, SaleItem, Product, InventoryBatch, UserStore]),
+    SubscriptionGuardModule,
+  ],
   controllers: [ReportsController],
   providers: [ReportsService],
   exports: [ReportsService],
