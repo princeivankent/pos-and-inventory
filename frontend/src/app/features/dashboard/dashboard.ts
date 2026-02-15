@@ -130,26 +130,37 @@ export class DashboardComponent implements OnInit {
     const api = environment.apiUrl;
     const hasReports = this.subscriptionService.hasFeature('reports');
 
-    // Always available: Daily sales stats
-    this.http
-      .get<SalesReport>(`${api}/reports/sales`, { params: { period: 'daily' } })
-      .subscribe({
-        next: (r) => this.salesReport.set(r),
-        error: () => {},
-        complete: () => this.statsLoading.set(false),
-      });
+    // Daily sales stats (requires reports feature)
+    if (hasReports) {
+      this.http
+        .get<SalesReport>(`${api}/reports/sales`, { params: { period: 'daily' } })
+        .subscribe({
+          next: (r) => this.salesReport.set(r),
+          error: () => this.statsLoading.set(false),
+          complete: () => this.statsLoading.set(false),
+        });
+    } else {
+      this.statsLoading.set(false);
+    }
 
-    // Always available: Weekly chart
-    this.http
-      .get<SalesReport>(`${api}/reports/sales`, { params: { period: 'weekly' } })
-      .subscribe({
-        next: (r) => {
-          this.weeklySalesReport.set(r);
-          this.buildChartData(r);
-        },
-        error: () => this.buildChartData(null),
-        complete: () => this.chartLoading.set(false),
-      });
+    // Weekly chart (requires reports feature)
+    if (hasReports) {
+      this.http
+        .get<SalesReport>(`${api}/reports/sales`, { params: { period: 'weekly' } })
+        .subscribe({
+          next: (r) => {
+            this.weeklySalesReport.set(r);
+            this.buildChartData(r);
+          },
+          error: () => {
+            this.buildChartData(null);
+            this.chartLoading.set(false);
+          },
+          complete: () => this.chartLoading.set(false),
+        });
+    } else {
+      this.chartLoading.set(false);
+    }
 
     // Recent sales (always available)
     this.http.get<Sale[]>(`${api}/sales/daily`).subscribe({
