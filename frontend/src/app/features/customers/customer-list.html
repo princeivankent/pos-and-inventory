@@ -27,6 +27,7 @@
     [customers]="customers()"
     [loading]="loading()"
     [isAdmin]="storeCtx.isAdmin()"
+    [hasUtangFeature]="hasUtangFeature()"
     (viewStatement)="viewStatement($event)"
     (recordPayment)="openPayment($event)"
     (edit)="editCustomer($event)"

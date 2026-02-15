@@ -10,6 +10,7 @@ import {
   RegisterResponse,
   StoreAccess,
 } from '../models/user.model';
+import { SubscriptionService } from './subscription.service';
 
 const TOKEN_KEY = 'access_token';
 const REFRESH_TOKEN_KEY = 'refresh_token';
@@ -20,6 +21,7 @@ const STORES_KEY = 'stores';
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private subscriptionService = inject(SubscriptionService);
 
   currentUser = signal<{ id: string; email: string; full_name: string } | null>(
     this.loadUser()
@@ -39,6 +41,9 @@ export class AuthService {
           localStorage.setItem(STORES_KEY, JSON.stringify(res.stores));
           this.currentUser.set(res.user);
           this.stores.set(res.stores);
+          if (res.subscription) {
+            this.subscriptionService.setSubscription(res.subscription);
+          }
         })
       );
   }
@@ -54,6 +59,9 @@ export class AuthService {
           localStorage.setItem(STORES_KEY, JSON.stringify(res.stores));
           this.currentUser.set(res.user);
           this.stores.set(res.stores);
+          if (res.subscription) {
+            this.subscriptionService.setSubscription(res.subscription);
+          }
         })
       );
   }
@@ -66,6 +74,7 @@ export class AuthService {
     localStorage.removeItem('active_store');
     this.currentUser.set(null);
     this.stores.set([]);
+    this.subscriptionService.clear();
     this.router.navigate(['/login']);
   }
 

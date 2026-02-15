@@ -27,8 +27,22 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
             toast.error('Login Failed', message);
           }
           break;
+        case 402:
+          toast.error(
+            'Subscription Required',
+            'Your subscription is inactive. Please renew to continue.'
+          );
+          break;
         case 403:
-          toast.error('Access Denied', message);
+          // Check if it's a subscription feature gate error
+          if (message.includes('does not include this feature') || message.includes('Please upgrade')) {
+            toast.error(
+              'Feature Locked',
+              'This feature requires an upgraded plan. Visit Settings to upgrade.'
+            );
+          } else {
+            toast.error('Access Denied', message);
+          }
           break;
         case 404:
           toast.error('Not Found', message);

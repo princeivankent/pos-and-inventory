@@ -16,6 +16,7 @@ export class CustomerTableComponent {
   @Input() customers: Customer[] = [];
   @Input() loading = false;
   @Input() isAdmin = false;
+  @Input() hasUtangFeature = true;
 
   @Output() viewStatement = new EventEmitter<Customer>();
   @Output() recordPayment = new EventEmitter<Customer>();

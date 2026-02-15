@@ -12,9 +12,11 @@
           <a routerLink="/products">
             <p-button label="Products" icon="pi pi-box" severity="secondary" [outlined]="true" />
           </a>
-          <a routerLink="/reports">
-            <p-button label="Reports" icon="pi pi-chart-bar" severity="secondary" [outlined]="true" />
-          </a>
+          @if (hasReportsFeature()) {
+            <a routerLink="/reports">
+              <p-button label="Reports" icon="pi pi-chart-bar" severity="secondary" [outlined]="true" />
+            </a>
+          }
         }
       </div>
     </div>
@@ -100,7 +102,9 @@
             <span class="chart-subtitle">Total: {{ weeklySalesReport()!.total_sales | phpCurrency }}</span>
           }
         </div>
-        <a routerLink="/reports"><p-button label="View Reports" [text]="true" size="small" /></a>
+        @if (hasReportsFeature()) {
+          <a routerLink="/reports"><p-button label="View Reports" [text]="true" size="small" /></a>
+        }
       </div>
       @if (chartLoading()) {
         <p-skeleton width="100%" height="260px" borderRadius="8px" />
@@ -157,9 +161,14 @@
       @if (storeCtx.isAdmin()) {
         <div class="card">
           <div class="card-header">
-            <h3>Top Selling Products</h3>
-            <a routerLink="/reports"><p-button label="Details" [text]="true" size="small" /></a>
+            <h3>📊 Top Selling Products</h3>
+            @if (hasReportsFeature()) {
+              <a routerLink="/reports">
+                <p-button label="View All" [text]="true" size="small" />
+              </a>
+            }
           </div>
+
           @if (topSellingLoading()) {
             @for (i of skeletonRows; track i) {
               <div class="top-product-row">
@@ -167,6 +176,17 @@
                 <p-skeleton width="50px" height="14px" />
               </div>
             }
+          } @else if (!hasReportsFeature()) {
+            <div class="upgrade-prompt">
+              <i class="pi pi-lock upgrade-icon"></i>
+              <p class="upgrade-title">Unlock Sales Analytics</p>
+              <p class="upgrade-text">
+                Track your best-selling products and analyze sales trends with the Negosyo plan
+              </p>
+              <a routerLink="/settings">
+                <p-button label="Upgrade Now" icon="pi pi-arrow-up" size="small" />
+              </a>
+            </div>
           } @else if (topSellingProducts().length === 0) {
             <div class="empty-state">
               <i class="pi pi-trophy empty-icon"></i>
@@ -232,8 +252,9 @@
         <!-- Today's Profit -->
         <div class="card">
           <div class="card-header">
-            <h3>Today's Profit</h3>
+            <h3>💰 Today's Profit</h3>
           </div>
+
           @if (profitLoading()) {
             <div class="profit-grid">
               @for (i of [1,2,3,4]; track i) {
@@ -242,6 +263,14 @@
                   <p-skeleton width="90px" height="20px" />
                 </div>
               }
+            </div>
+          } @else if (!hasReportsFeature()) {
+            <div class="upgrade-prompt compact">
+              <i class="pi pi-lock"></i>
+              <p>Advanced profit tracking available in Negosyo plan</p>
+              <a routerLink="/settings">
+                <p-button label="View Plans" size="small" [text]="true" />
+              </a>
             </div>
           } @else {
             <div class="profit-grid">
@@ -274,8 +303,9 @@
         <!-- Inventory Snapshot -->
         <div class="card">
           <div class="card-header">
-            <h3>Inventory Snapshot</h3>
+            <h3>📦 Inventory Snapshot</h3>
           </div>
+
           @if (inventoryLoading()) {
             <div class="profit-grid">
               @for (i of [1,2,3,4]; track i) {
@@ -284,6 +314,14 @@
                   <p-skeleton width="90px" height="20px" />
                 </div>
               }
+            </div>
+          } @else if (!hasReportsFeature()) {
+            <div class="upgrade-prompt compact">
+              <i class="pi pi-lock"></i>
+              <p>Detailed inventory reports available in Negosyo plan</p>
+              <a routerLink="/settings">
+                <p-button label="View Plans" size="small" [text]="true" />
+              </a>
             </div>
           } @else {
             <div class="profit-grid">
