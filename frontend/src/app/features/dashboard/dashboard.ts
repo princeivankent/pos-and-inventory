@@ -16,6 +16,7 @@ import {
 } from '../../core/models/report.model';
 import { StoreContextService } from '../../core/services/store-context.service';
 import { AuthService } from '../../core/services/auth.service';
+import { SubscriptionService } from '../../core/services/subscription.service';
 import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 
@@ -39,6 +40,7 @@ export class DashboardComponent implements OnInit {
   private http = inject(HttpClient);
   private auth = inject(AuthService);
   storeCtx = inject(StoreContextService);
+  private subscriptionService = inject(SubscriptionService);
 
   // Data signals
   salesReport = signal<SalesReport | null>(null);
@@ -54,9 +56,14 @@ export class DashboardComponent implements OnInit {
   statsLoading = signal(true);
   chartLoading = signal(true);
   salesLoading = signal(true);
+  lowStockLoading = signal(true);
+  productsLoading = signal(true);
   topSellingLoading = signal(true);
   profitLoading = signal(true);
   inventoryLoading = signal(true);
+
+  // Subscription feature check
+  hasReportsFeature = this.subscriptionService.hasFeatureSignal('reports');
 
   // Chart data
   salesChartData: any = { labels: [], datasets: [] };
@@ -121,17 +128,20 @@ export class DashboardComponent implements OnInit {
 
   private loadAllData() {
     const api = environment.apiUrl;
+    const hasReports = this.subscriptionService.hasFeature('reports');
 
-    // Daily sales report (stat cards)
-    this.http.get<SalesReport>(`${api}/reports/sales`, { params: { period: 'daily' } })
+    // Always available: Daily sales stats
+    this.http
+      .get<SalesReport>(`${api}/reports/sales`, { params: { period: 'daily' } })
       .subscribe({
         next: (r) => this.salesReport.set(r),
         error: () => {},
         complete: () => this.statsLoading.set(false),
       });
 
-    // Weekly sales report (chart)
-    this.http.get<SalesReport>(`${api}/reports/sales`, { params: { period: 'weekly' } })
+    // Always available: Weekly chart
+    this.http
+      .get<SalesReport>(`${api}/reports/sales`, { params: { period: 'weekly' } })
       .subscribe({
         next: (r) => {
           this.weeklySalesReport.set(r);
@@ -141,39 +151,46 @@ export class DashboardComponent implements OnInit {
         complete: () => this.chartLoading.set(false),
       });
 
-    // Recent sales
+    // Recent sales (always available)
     this.http.get<Sale[]>(`${api}/sales/daily`).subscribe({
-      next: (s) => this.recentSales.set(s.slice(0, 5)),
+      next: (sales) => this.recentSales.set(sales.slice(0, 5)),
       error: () => {},
       complete: () => this.salesLoading.set(false),
     });
 
-    // Low stock products
+    // Low stock (always available)
     this.http.get<Product[]>(`${api}/inventory/low-stock`).subscribe({
-      next: (p) => this.lowStockProducts.set(p),
+      next: (products) => this.lowStockProducts.set(products),
       error: () => {},
-      complete: () => {},
+      complete: () => this.lowStockLoading.set(false),
     });
 
-    // Active products count
+    // Active products count (always available)
     this.http.get<Product[]>(`${api}/products`).subscribe({
-      next: (p) => this.totalProducts.set(p.length),
+      next: (products) => {
+        const activeCount = products.filter((p) => p.is_active).length;
+        this.totalProducts.set(activeCount);
+      },
       error: () => {},
+      complete: () => this.productsLoading.set(false),
     });
 
-    // Admin-only data
-    if (this.storeCtx.isAdmin()) {
-      // Top selling products
-      this.http.get<BestSellingItem[]>(`${api}/reports/best-selling`, {
-        params: { period: 'monthly', limit: '5' },
-      }).subscribe({
-        next: (items) => this.topSellingProducts.set(items),
-        error: () => {},
-        complete: () => this.topSellingLoading.set(false),
-      });
+    // CONDITIONAL: Admin-only + Reports feature
+    if (this.storeCtx.isAdmin() && hasReports) {
+      // Best selling products
+      this.http
+        .get<BestSellingItem[]>(`${api}/reports/best-selling`, {
+          params: { period: 'monthly', limit: '5' },
+        })
+        .subscribe({
+          next: (items) => this.topSellingProducts.set(items),
+          error: () => {},
+          complete: () => this.topSellingLoading.set(false),
+        });
 
       // Profit report
-      this.http.get<ProfitReport>(`${api}/reports/profit`, { params: { period: 'daily' } })
+      this.http
+        .get<ProfitReport>(`${api}/reports/profit`, { params: { period: 'daily' } })
         .subscribe({
           next: (r) => this.profitReport.set(r),
           error: () => {},
@@ -186,6 +203,11 @@ export class DashboardComponent implements OnInit {
         error: () => {},
         complete: () => this.inventoryLoading.set(false),
       });
+    } else {
+      // Skip API calls, set loading to false immediately
+      this.topSellingLoading.set(false);
+      this.profitLoading.set(false);
+      this.inventoryLoading.set(false);
     }
   }
 

@@ -6,7 +6,7 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 
 ## Current Implementation Status
 
-### ✅ Completed (Phases 1-9)
+### ✅ Completed (Phases 1-9 + Subscription System)
 
 #### Backend Foundation (Phase 1)
 1. **Project Structure**: Complete NestJS backend setup with proper folder structure
@@ -47,6 +47,24 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 - ✅ **Reports & Dashboard**: Sales charts, inventory stats
 - ✅ **Settings page**: Store config, user profile
 - ✅ **UI/UX Modernization**: Login, Reports, Products pages with modern design
+
+#### Subscription System (Feb 14-15, 2026)
+- ✅ **Backend** (Feb 14, 2026):
+  - 3-tier billing (Tindahan ₱799, Negosyo ₱1499, Kadena ₱2999)
+  - Organization → Subscription → SubscriptionPlan entity relationships
+  - SubscriptionGuard, FeatureGateGuard, UsageLimitGuard
+  - @RequireFeature('reports'), @CheckLimit({ resource: 'products' }) decorators
+  - PayMongo integration (GCash, Card payments)
+  - Cron jobs for renewals and trial reminders
+  - Public GET /subscription-plans endpoint
+  - Billing module (upgrade/downgrade/cancel subscription)
+- ✅ **Frontend** (Feb 15, 2026):
+  - SubscriptionService with Angular signals + localStorage persistence
+  - Feature gating: Adaptive sidebar, dashboard, customers page
+  - Upgrade prompts with gradient UI instead of error toasts
+  - Conditional API calls (skip reports APIs for Tindahan plan)
+  - Enhanced error interceptor (402/403 subscription errors)
+  - Subscription models and feature enum
 
 ### 🚧 To Be Implemented (Phase 10 - Testing & Deployment)
 - Unit tests for backend services (Jest)
@@ -98,6 +116,17 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 - **Inventory Reports**: Stock levels, expiring items, best-selling products
 - **Customer Reports**: Outstanding balances, payment history
 - **Low Stock Alerts**: Automatic reorder notifications
+
+### Subscription & Billing
+- **3-Tier Plans**: Tindahan (₱799/mo), Negosyo (₱1499/mo), Kadena (₱2999/mo)
+- **Feature Gating**: Reports, utang management, FIFO inventory, multi-store, receipt customization, export data
+- **Usage Limits**: Products per store, users per store, store count (enforced per plan)
+- **14-Day Trial**: Automatic trial on registration (Tindahan plan)
+- **PayMongo Integration**: GCash and card payment processing
+- **Adaptive Frontend**: Navigation and UI adapt to subscription features
+- **Upgrade Prompts**: Graceful upgrade prompts instead of error messages
+- **Automatic Renewals**: Monthly subscription auto-renewal with retry logic
+- **Trial Reminders**: Email reminders at 3-day, 1-day, and expiry milestones
 
 ## Technology Stack
 

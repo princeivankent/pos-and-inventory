@@ -1,4 +1,5 @@
 import { UserRole } from './enums';
+import { SubscriptionInfo } from './subscription.model';
 
 export interface User {
   id: string;
@@ -49,6 +50,7 @@ export interface LoginResponse {
   };
   stores: StoreAccess[];
   default_store: StoreAccess;
+  subscription?: SubscriptionInfo;
 }
 
 export interface RegisterResponse {
@@ -61,6 +63,7 @@ export interface RegisterResponse {
   };
   stores: StoreAccess[];
   default_store: StoreAccess;
+  subscription?: SubscriptionInfo;
 }
 
 export interface StoreAccess {

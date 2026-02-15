@@ -45,15 +45,17 @@
           />
         </td>
         <td class="text-center actions-cell">
-          <p-button
-            icon="pi pi-file"
-            [rounded]="true"
-            [text]="true"
-            severity="info"
-            pTooltip="View Statement"
-            (onClick)="viewStatement.emit(customer)"
-          />
-          @if (customer.current_balance > 0) {
+          @if (hasUtangFeature) {
+            <p-button
+              icon="pi pi-file"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              pTooltip="View Statement"
+              (onClick)="viewStatement.emit(customer)"
+            />
+          }
+          @if (hasUtangFeature && customer.current_balance > 0) {
             <p-button
               icon="pi pi-wallet"
               [rounded]="true"

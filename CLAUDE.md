@@ -10,7 +10,8 @@ A multi-tenant POS & Inventory Management System for Philippine retail stores wi
 - ✅ Phase 1-8 Complete: Backend foundation + all core modules (Categories, Products, Inventory, Sales, Receipts, Reports, Users, Customers)
 - ✅ Phase 9 Complete: Frontend (Angular 21 + PrimeNG) with all pages scaffolded
 - ✅ UI/UX Modernization Phase 1: Login & Reports pages enhanced with modern design
-- ✅ **Subscription System Complete**: 3-tier billing (Tindahan/Negosyo/Kadena), feature gates, usage limits, PayMongo integration
+- ✅ **Subscription System (Backend) Complete**: 3-tier billing (Tindahan/Negosyo/Kadena), feature gates, usage limits, PayMongo integration
+- ✅ **Subscription System (Frontend) Complete**: Feature gating, adaptive UI, upgrade prompts (Feb 15, 2026)
 - 🚧 Phase 10 In Progress: Testing & Deployment preparation
 
 ## Technology Stack
@@ -345,7 +346,7 @@ feature-name/
 - ✅ Settings page (store config, user profile)
 - ✅ UI/UX Modernization Phase 1 (login + reports with modern design)
 
-**Completed - Subscription System (Feb 14, 2026)**:
+**Completed - Subscription System Backend (Feb 14, 2026)**:
 - ✅ Database entities (Organization, SubscriptionPlan, Subscription, Invoice, Payment, PaymentMethod)
 - ✅ Migration for subscription tables with 3 plan tiers (Tindahan ₱799, Negosyo ₱1499, Kadena ₱2999)
 - ✅ SubscriptionGuard (validates active subscription, backward compatible with legacy stores)
@@ -357,6 +358,44 @@ feature-name/
 - ✅ Billing module (GET/POST /billing/* for subscription management)
 - ✅ Payments module (PaymentGateway interface, MockPaymentService, PaymongoService)
 - ✅ Cron jobs for subscription renewals and trial reminders
+
+**Completed - Subscription System Frontend (Feb 15, 2026)**:
+- ✅ **SubscriptionService** (`core/services/subscription.service.ts`) - Angular signals-based state management with localStorage persistence
+- ✅ **Subscription Models** (`core/models/subscription.model.ts`) - SubscriptionInfo, SubscriptionPlan interfaces, SubscriptionFeature enum
+- ✅ **Auth Integration** - Login/register responses include subscription data, auto-persisted to localStorage, cleared on logout
+- ✅ **Adaptive Sidebar** (`layout/sidebar/sidebar.ts`) - Navigation items filtered by `requiresFeature` property
+- ✅ **Adaptive Dashboard** (`features/dashboard/dashboard.{ts,html,scss}`) - Conditional API calls, upgrade prompts for missing features
+- ✅ **Customer Feature Gating** (`features/customers/*`) - Credit statement/payment buttons hidden when utang_management unavailable
+- ✅ **Enhanced Error Handling** (`core/interceptors/error.interceptor.ts`) - 402/403 errors show "Feature Locked" upgrade prompts
+- ✅ **Upgrade UI Components** - `.upgrade-prompt` and `.upgrade-prompt.compact` styles with gradient backgrounds
+
+**Frontend Subscription Pattern**:
+```typescript
+// 1. Component setup
+private subscriptionService = inject(SubscriptionService);
+hasFeature = this.subscriptionService.hasFeatureSignal('feature_name');
+
+// 2. Conditional API calls
+if (this.subscriptionService.hasFeature('reports')) {
+  this.http.get('/api/reports/sales').subscribe(...);
+} else {
+  this.loading.set(false); // Skip API call
+}
+
+// 3. Template usage
+@if (hasFeature()) {
+  <!-- Feature content -->
+} @else {
+  <div class="upgrade-prompt">
+    <i class="pi pi-lock upgrade-icon"></i>
+    <p class="upgrade-title">Unlock Advanced Features</p>
+    <p class="upgrade-text">Description...</p>
+    <a routerLink="/settings">
+      <p-button label="Upgrade Now" icon="pi pi-arrow-up" />
+    </a>
+  </div>
+}
+```
 
 **To Implement (Phase 10 - Testing & Deployment)**:
 - Unit tests for backend services (Jest)

@@ -8,6 +8,7 @@ import { Customer, CreateCustomerDto, RecordPaymentDto, CreditStatement } from '
 import { CustomerService } from '../../core/services/customer.service';
 import { ToastService } from '../../core/services/toast.service';
 import { StoreContextService } from '../../core/services/store-context.service';
+import { SubscriptionService } from '../../core/services/subscription.service';
 import { PageHeader } from '../../shared/components/page-header/page-header';
 import { CustomerTableComponent } from './components/customer-table/customer-table';
 import { CustomerFormDialogComponent } from './components/customer-form-dialog/customer-form-dialog';
@@ -36,11 +37,15 @@ export class CustomerListComponent implements OnInit {
   private toast = inject(ToastService);
   private confirmService = inject(ConfirmationService);
   storeCtx = inject(StoreContextService);
+  private subscriptionService = inject(SubscriptionService);
 
   customers = signal<Customer[]>([]);
   loading = signal(false);
   saving = signal(false);
   searchQuery = '';
+
+  // Subscription feature check
+  hasUtangFeature = this.subscriptionService.hasFeatureSignal('utang_management');
 
   // Form dialog
   formDialogVisible = false;
