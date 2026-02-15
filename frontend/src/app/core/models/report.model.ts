@@ -1,12 +1,24 @@
+export interface TrendMetadata {
+  value: number;
+  change_amount: number;
+  change_percentage: number;
+  trend: 'up' | 'down' | 'neutral';
+  previous_value: number;
+}
+
 export interface SalesReport {
   period: string;
   start_date: string;
   end_date: string;
   total_sales: number;
+  total_sales_trend?: TrendMetadata;
   total_transactions: number;
+  total_transactions_trend?: TrendMetadata;
   total_tax: number;
+  total_tax_trend?: TrendMetadata;
   total_discount: number;
   net_sales: number;
+  net_sales_trend?: TrendMetadata;
   daily_breakdown?: DailySales[];
 }
 
@@ -48,9 +60,13 @@ export interface ProfitReport {
   start_date: string;
   end_date: string;
   total_revenue: number;
+  total_revenue_trend?: TrendMetadata;
   total_cost: number;
+  total_cost_trend?: TrendMetadata;
   gross_profit: number;
+  gross_profit_trend?: TrendMetadata;
   profit_margin: number;
+  profit_margin_trend?: TrendMetadata;
 }
 
 export interface ReportDateRange {

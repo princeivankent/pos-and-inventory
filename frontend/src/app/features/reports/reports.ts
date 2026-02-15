@@ -11,7 +11,7 @@ import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { environment } from '../../../environments/environment';
-import { SalesReport, InventoryReport, BestSellingItem, ProfitReport, DailySales } from '../../core/models/report.model';
+import { SalesReport, InventoryReport, BestSellingItem, ProfitReport, DailySales, TrendMetadata } from '../../core/models/report.model';
 import { PageHeader } from '../../shared/components/page-header/page-header';
 import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
 
@@ -331,5 +331,47 @@ export class ReportsComponent implements OnInit {
       },
       error: () => this.profitLoading.set(false),
     });
+  }
+
+  // --- Trend helper methods ---
+
+  /**
+   * Get PrimeNG icon class based on trend direction
+   */
+  getTrendIcon(trend?: 'up' | 'down' | 'neutral'): string {
+    if (!trend) return 'pi-minus';
+    return trend === 'up'
+      ? 'pi-arrow-up'
+      : trend === 'down'
+        ? 'pi-arrow-down'
+        : 'pi-minus';
+  }
+
+  /**
+   * Get CSS class for trend styling
+   */
+  getTrendClass(trend?: 'up' | 'down' | 'neutral'): string {
+    if (!trend) return 'trend-neutral';
+    return `trend-${trend}`;
+  }
+
+  /**
+   * Format trend text with percentage and period
+   */
+  formatTrend(trendData?: TrendMetadata, period?: string): string {
+    if (!trendData) return 'No comparison data';
+
+    const periodText =
+      period === 'daily' ? 'day' : period === 'weekly' ? 'week' : period === 'monthly' ? 'month' : 'period';
+
+    const sign = trendData.change_percentage > 0 ? '+' : '';
+    return `${sign}${trendData.change_percentage}% vs last ${periodText}`;
+  }
+
+  /**
+   * Check if trend data exists
+   */
+  hasTrendData(trendData?: TrendMetadata): boolean {
+    return !!trendData;
   }
 }

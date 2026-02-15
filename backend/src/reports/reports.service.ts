@@ -4,6 +4,9 @@ import { Repository, Between } from 'typeorm';
 import { Sale, SaleStatus } from '../database/entities/sale.entity';
 import { SaleItem } from '../database/entities/sale-item.entity';
 import { Product } from '../database/entities/product.entity';
+import { SalesReportDto } from './dto/sales-report.dto';
+import { ProfitReportDto } from './dto/profit-report.dto';
+import { TrendMetadataDto } from './dto/trend-metadata.dto';
 
 @Injectable()
 export class ReportsService {
@@ -16,13 +19,69 @@ export class ReportsService {
     private productRepository: Repository<Product>,
   ) {}
 
-  async getSalesSummary(
-    storeId: string,
-    period: string,
-    date: string,
-  ): Promise<any> {
-    const { startDate, endDate } = this.getDateRange(period, date);
+  /**
+   * Calculate trend metadata by comparing current vs previous period
+   */
+  private calculateTrend(
+    current: number,
+    previous: number,
+    precision = 1,
+  ): TrendMetadataDto {
+    if (previous === 0) {
+      // Edge case: no previous data
+      return {
+        value: current,
+        change_amount: current,
+        change_percentage: current > 0 ? 100 : 0,
+        trend: current > 0 ? 'up' : 'neutral',
+        previous_value: 0,
+      };
+    }
 
+    const changeAmount = current - previous;
+    const changePercentage = (changeAmount / previous) * 100;
+
+    return {
+      value: current,
+      change_amount: Math.round(changeAmount * 100) / 100,
+      change_percentage:
+        Math.round(changePercentage * Math.pow(10, precision)) /
+        Math.pow(10, precision),
+      trend:
+        changePercentage > 0.5 ? 'up' : changePercentage < -0.5 ? 'down' : 'neutral',
+      previous_value: previous,
+    };
+  }
+
+  /**
+   * Calculate previous period date range based on current period
+   */
+  private getPreviousDateRange(
+    period: string,
+    startDate: Date,
+    endDate: Date,
+  ): { previousStart: Date; previousEnd: Date } {
+    const diff = endDate.getTime() - startDate.getTime();
+    const previousEnd = new Date(startDate.getTime() - 1); // Day before current period
+    const previousStart = new Date(previousEnd.getTime() - diff);
+
+    return { previousStart, previousEnd };
+  }
+
+  /**
+   * Get sales summary for a specific date range (reusable for current and previous periods)
+   */
+  private async getSalesSummaryForPeriod(
+    storeId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<{
+    totalSales: number;
+    totalRevenue: number;
+    totalTax: number;
+    totalDiscount: number;
+    netSales: number;
+  }> {
     const sales = await this.saleRepository.find({
       where: {
         store_id: storeId,
@@ -41,21 +100,79 @@ export class ReportsService {
       (sum, s) => sum + Number(s.discount_amount),
       0,
     );
-
     const netSales = totalRevenue - totalTax - totalDiscount;
 
-    // Build daily breakdown
-    const dailyMap = new Map<string, { total_sales: number; transaction_count: number }>();
+    return {
+      totalSales,
+      totalRevenue,
+      totalTax,
+      totalDiscount,
+      netSales,
+    };
+  }
+
+  async getSalesSummary(
+    storeId: string,
+    period: string,
+    date: string,
+  ): Promise<SalesReportDto> {
+    const { startDate, endDate } = this.getDateRange(period, date);
+
+    // Get previous period date range
+    const { previousStart, previousEnd } = this.getPreviousDateRange(
+      period,
+      startDate,
+      endDate,
+    );
+
+    // Fetch current and previous period data in parallel
+    const [current, previous] = await Promise.all([
+      this.getSalesSummaryForPeriod(storeId, startDate, endDate),
+      this.getSalesSummaryForPeriod(storeId, previousStart, previousEnd),
+    ]);
+
+    // Calculate trends
+    const totalSalesTrend = this.calculateTrend(
+      current.totalRevenue,
+      previous.totalRevenue,
+    );
+    const totalTransactionsTrend = this.calculateTrend(
+      current.totalSales,
+      previous.totalSales,
+    );
+    const totalTaxTrend = this.calculateTrend(current.totalTax, previous.totalTax);
+    const netSalesTrend = this.calculateTrend(current.netSales, previous.netSales);
+
+    // Build daily breakdown (keep existing logic)
+    const sales = await this.saleRepository.find({
+      where: {
+        store_id: storeId,
+        sale_date: Between(startDate, endDate),
+        status: SaleStatus.COMPLETED,
+      },
+    });
+
+    const dailyMap = new Map<
+      string,
+      { total_sales: number; transaction_count: number }
+    >();
     for (const sale of sales) {
       const d = new Date(sale.sale_date);
       const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const entry = dailyMap.get(key) || { total_sales: 0, transaction_count: 0 };
+      const entry = dailyMap.get(key) || {
+        total_sales: 0,
+        transaction_count: 0,
+      };
       entry.total_sales += Number(sale.total_amount);
       entry.transaction_count += 1;
       dailyMap.set(key, entry);
     }
 
-    const dailyBreakdown: { date: string; total_sales: number; transaction_count: number }[] = [];
+    const dailyBreakdown: {
+      date: string;
+      total_sales: number;
+      transaction_count: number;
+    }[] = [];
     const cursor = new Date(startDate);
     while (cursor <= endDate) {
       const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`;
@@ -72,11 +189,15 @@ export class ReportsService {
       period,
       start_date: startDate,
       end_date: endDate,
-      total_sales: Math.round(totalRevenue * 100) / 100,
-      total_transactions: totalSales,
-      total_tax: Math.round(totalTax * 100) / 100,
-      total_discount: Math.round(totalDiscount * 100) / 100,
-      net_sales: Math.round(netSales * 100) / 100,
+      total_sales: Math.round(current.totalRevenue * 100) / 100,
+      total_sales_trend: totalSalesTrend,
+      total_transactions: current.totalSales,
+      total_transactions_trend: totalTransactionsTrend,
+      total_tax: Math.round(current.totalTax * 100) / 100,
+      total_tax_trend: totalTaxTrend,
+      net_sales: Math.round(current.netSales * 100) / 100,
+      net_sales_trend: netSalesTrend,
+      total_discount: Math.round(current.totalDiscount * 100) / 100,
       daily_breakdown: dailyBreakdown,
     };
   }
@@ -167,9 +288,17 @@ export class ReportsService {
     storeId: string,
     period: string,
     date: string,
-  ): Promise<any> {
+  ): Promise<ProfitReportDto> {
     const { startDate, endDate } = this.getDateRange(period, date);
 
+    // Get previous period date range
+    const { previousStart, previousEnd } = this.getPreviousDateRange(
+      period,
+      startDate,
+      endDate,
+    );
+
+    // Fetch current period data
     const results = await this.saleItemRepository
       .createQueryBuilder('si')
       .select('SUM(si.subtotal)', 'total_revenue')
@@ -184,11 +313,38 @@ export class ReportsService {
       .andWhere('s.status = :status', { status: SaleStatus.COMPLETED })
       .getRawOne();
 
+    // Fetch previous period data
+    const previousResults = await this.saleItemRepository
+      .createQueryBuilder('si')
+      .select('SUM(si.subtotal)', 'total_revenue')
+      .addSelect('SUM(si.quantity * p.cost_price)', 'total_cost')
+      .innerJoin('si.sale', 's')
+      .innerJoin('si.product', 'p')
+      .where('s.store_id = :storeId', { storeId })
+      .andWhere('s.sale_date BETWEEN :startDate AND :endDate', {
+        startDate: previousStart,
+        endDate: previousEnd,
+      })
+      .andWhere('s.status = :status', { status: SaleStatus.COMPLETED })
+      .getRawOne();
+
     const totalRevenue = Number(results?.total_revenue || 0);
     const totalCost = Number(results?.total_cost || 0);
     const grossProfit = totalRevenue - totalCost;
     const profitMargin =
       totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
+
+    const previousRevenue = Number(previousResults?.total_revenue || 0);
+    const previousCost = Number(previousResults?.total_cost || 0);
+    const previousProfit = previousRevenue - previousCost;
+    const previousMargin =
+      previousRevenue > 0 ? (previousProfit / previousRevenue) * 100 : 0;
+
+    // Calculate trends
+    const totalRevenueTrend = this.calculateTrend(totalRevenue, previousRevenue);
+    const totalCostTrend = this.calculateTrend(totalCost, previousCost);
+    const grossProfitTrend = this.calculateTrend(grossProfit, previousProfit);
+    const profitMarginTrend = this.calculateTrend(profitMargin, previousMargin);
 
     // Get total discounts and taxes for the period
     const salesAgg = await this.saleRepository
@@ -209,9 +365,13 @@ export class ReportsService {
       start_date: startDate,
       end_date: endDate,
       total_revenue: Math.round(totalRevenue * 100) / 100,
+      total_revenue_trend: totalRevenueTrend,
       total_cost: Math.round(totalCost * 100) / 100,
+      total_cost_trend: totalCostTrend,
       gross_profit: Math.round(grossProfit * 100) / 100,
+      gross_profit_trend: grossProfitTrend,
       profit_margin: Math.round(profitMargin * 100) / 100,
+      profit_margin_trend: profitMarginTrend,
       total_discount: Math.round(
         Number(salesAgg?.total_discount || 0) * 100,
       ) / 100,

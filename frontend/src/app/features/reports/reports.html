@@ -36,10 +36,17 @@
                 <span class="stat-label">Total Sales</span>
               </div>
               <span class="stat-value">{{ salesReport()!.total_sales | phpCurrency }}</span>
-              <div class="stat-trend trend-up">
-                <i class="pi pi-arrow-up"></i>
-                <span>12.5% vs last {{ salesPeriod === 'daily' ? 'day' : salesPeriod === 'weekly' ? 'week' : 'month' }}</span>
-              </div>
+              @if (hasTrendData(salesReport()?.total_sales_trend)) {
+                <div [class]="'stat-trend ' + getTrendClass(salesReport()?.total_sales_trend?.trend)">
+                  <i [class]="'pi ' + getTrendIcon(salesReport()?.total_sales_trend?.trend)"></i>
+                  <span>{{ formatTrend(salesReport()?.total_sales_trend, salesPeriod) }}</span>
+                </div>
+              } @else {
+                <div class="stat-trend trend-neutral">
+                  <i class="pi pi-minus"></i>
+                  <span>No comparison data</span>
+                </div>
+              }
             </div>
             <div class="stat-card">
               <div class="stat-header">
@@ -47,10 +54,17 @@
                 <span class="stat-label">Transactions</span>
               </div>
               <span class="stat-value">{{ salesReport()!.total_transactions }}</span>
-              <div class="stat-trend trend-up">
-                <i class="pi pi-arrow-up"></i>
-                <span>8.3% vs last {{ salesPeriod === 'daily' ? 'day' : salesPeriod === 'weekly' ? 'week' : 'month' }}</span>
-              </div>
+              @if (hasTrendData(salesReport()?.total_transactions_trend)) {
+                <div [class]="'stat-trend ' + getTrendClass(salesReport()?.total_transactions_trend?.trend)">
+                  <i [class]="'pi ' + getTrendIcon(salesReport()?.total_transactions_trend?.trend)"></i>
+                  <span>{{ formatTrend(salesReport()?.total_transactions_trend, salesPeriod) }}</span>
+                </div>
+              } @else {
+                <div class="stat-trend trend-neutral">
+                  <i class="pi pi-minus"></i>
+                  <span>No comparison data</span>
+                </div>
+              }
             </div>
             <div class="stat-card">
               <div class="stat-header">
@@ -58,10 +72,17 @@
                 <span class="stat-label">Tax Collected</span>
               </div>
               <span class="stat-value">{{ salesReport()!.total_tax | phpCurrency }}</span>
-              <div class="stat-trend trend-up">
-                <i class="pi pi-arrow-up"></i>
-                <span>12.5% vs last {{ salesPeriod === 'daily' ? 'day' : salesPeriod === 'weekly' ? 'week' : 'month' }}</span>
-              </div>
+              @if (hasTrendData(salesReport()?.total_tax_trend)) {
+                <div [class]="'stat-trend ' + getTrendClass(salesReport()?.total_tax_trend?.trend)">
+                  <i [class]="'pi ' + getTrendIcon(salesReport()?.total_tax_trend?.trend)"></i>
+                  <span>{{ formatTrend(salesReport()?.total_tax_trend, salesPeriod) }}</span>
+                </div>
+              } @else {
+                <div class="stat-trend trend-neutral">
+                  <i class="pi pi-minus"></i>
+                  <span>No comparison data</span>
+                </div>
+              }
             </div>
             <div class="stat-card">
               <div class="stat-header">
@@ -69,10 +90,17 @@
                 <span class="stat-label">Net Sales</span>
               </div>
               <span class="stat-value">{{ salesReport()!.net_sales | phpCurrency }}</span>
-              <div class="stat-trend trend-neutral">
-                <i class="pi pi-minus"></i>
-                <span>0.0% vs last {{ salesPeriod === 'daily' ? 'day' : salesPeriod === 'weekly' ? 'week' : 'month' }}</span>
-              </div>
+              @if (hasTrendData(salesReport()?.net_sales_trend)) {
+                <div [class]="'stat-trend ' + getTrendClass(salesReport()?.net_sales_trend?.trend)">
+                  <i [class]="'pi ' + getTrendIcon(salesReport()?.net_sales_trend?.trend)"></i>
+                  <span>{{ formatTrend(salesReport()?.net_sales_trend, salesPeriod) }}</span>
+                </div>
+              } @else {
+                <div class="stat-trend trend-neutral">
+                  <i class="pi pi-minus"></i>
+                  <span>No comparison data</span>
+                </div>
+              }
             </div>
           </div>
 
@@ -292,10 +320,17 @@
                 <span class="stat-label">Revenue</span>
               </div>
               <span class="stat-value">{{ profitReport()!.total_revenue | phpCurrency }}</span>
-              <div class="stat-trend trend-up">
-                <i class="pi pi-arrow-up"></i>
-                <span>15.2% vs last {{ profitPeriod === 'daily' ? 'day' : profitPeriod === 'weekly' ? 'week' : 'month' }}</span>
-              </div>
+              @if (hasTrendData(profitReport()?.total_revenue_trend)) {
+                <div [class]="'stat-trend ' + getTrendClass(profitReport()?.total_revenue_trend?.trend)">
+                  <i [class]="'pi ' + getTrendIcon(profitReport()?.total_revenue_trend?.trend)"></i>
+                  <span>{{ formatTrend(profitReport()?.total_revenue_trend, profitPeriod) }}</span>
+                </div>
+              } @else {
+                <div class="stat-trend trend-neutral">
+                  <i class="pi pi-minus"></i>
+                  <span>No comparison data</span>
+                </div>
+              }
             </div>
             <div class="stat-card">
               <div class="stat-header">
@@ -303,10 +338,17 @@
                 <span class="stat-label">Cost</span>
               </div>
               <span class="stat-value">{{ profitReport()!.total_cost | phpCurrency }}</span>
-              <div class="stat-trend trend-up">
-                <i class="pi pi-arrow-up"></i>
-                <span>10.5% vs last {{ profitPeriod === 'daily' ? 'day' : profitPeriod === 'weekly' ? 'week' : 'month' }}</span>
-              </div>
+              @if (hasTrendData(profitReport()?.total_cost_trend)) {
+                <div [class]="'stat-trend ' + getTrendClass(profitReport()?.total_cost_trend?.trend)">
+                  <i [class]="'pi ' + getTrendIcon(profitReport()?.total_cost_trend?.trend)"></i>
+                  <span>{{ formatTrend(profitReport()?.total_cost_trend, profitPeriod) }}</span>
+                </div>
+              } @else {
+                <div class="stat-trend trend-neutral">
+                  <i class="pi pi-minus"></i>
+                  <span>No comparison data</span>
+                </div>
+              }
             </div>
             <div class="stat-card">
               <div class="stat-header">
