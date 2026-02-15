@@ -63,7 +63,17 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
-          <tr><td colspan="8" class="text-center text-secondary" style="padding:2rem">No sales found</td></tr>
+          <tr>
+            <td colspan="8" class="empty-state">
+              <div class="empty-content">
+                <i class="pi pi-shopping-cart" style="font-size: 3rem; color: #d1d5db;"></i>
+                <h3>No sales found</h3>
+                <p class="text-secondary">
+                  Sales will appear here when you complete transactions.
+                </p>
+              </div>
+            </td>
+          </tr>
         </ng-template>
       </p-table>
     </div>

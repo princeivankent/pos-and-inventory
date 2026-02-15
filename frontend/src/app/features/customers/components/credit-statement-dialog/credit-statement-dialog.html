@@ -30,45 +30,52 @@
     </div>
 
     <!-- Transaction History -->
-    @if (statement.transactions.length === 0) {
-      <div class="empty-transactions">
-        <i class="pi pi-inbox"></i>
-        <p>No credit transactions yet.</p>
-      </div>
-    } @else {
-      <p-table
-        [value]="statement.transactions"
-        [rows]="10"
-        [paginator]="statement.transactions.length > 10"
-        [rowHover]="true"
-        styleClass="p-datatable-sm"
-      >
-        <ng-template #header>
-          <tr>
-            <th>Date</th>
-            <th>Type</th>
-            <th>Reference</th>
-            <th class="text-right">Amount</th>
-            <th class="text-right">Balance</th>
-          </tr>
-        </ng-template>
-        <ng-template #body let-tx>
-          <tr>
-            <td>{{ tx.date | date:'MMM d, y h:mm a' }}</td>
-            <td>
-              <p-tag
-                [value]="tx.type === 'sale' ? 'Credit Sale' : 'Payment'"
-                [severity]="tx.type === 'sale' ? 'danger' : 'success'"
-              />
-            </td>
-            <td>{{ tx.reference }}</td>
-            <td class="text-right" [class.amount-charge]="tx.type === 'sale'" [class.amount-payment]="tx.type === 'payment'">
-              {{ tx.type === 'sale' ? '+' : '-' }}{{ tx.amount | currency:'PHP':'symbol':'1.2-2' }}
-            </td>
-            <td class="text-right">{{ tx.running_balance | currency:'PHP':'symbol':'1.2-2' }}</td>
-          </tr>
-        </ng-template>
-      </p-table>
-    }
+    <p-table
+      [value]="statement.transactions"
+      [rows]="10"
+      [paginator]="statement.transactions.length > 10"
+      [rowHover]="true"
+      styleClass="p-datatable-sm"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Date</th>
+          <th>Type</th>
+          <th>Reference</th>
+          <th class="text-right">Amount</th>
+          <th class="text-right">Balance</th>
+        </tr>
+      </ng-template>
+      <ng-template #body let-tx>
+        <tr>
+          <td>{{ tx.date | date:'MMM d, y h:mm a' }}</td>
+          <td>
+            <p-tag
+              [value]="tx.type === 'sale' ? 'Credit Sale' : 'Payment'"
+              [severity]="tx.type === 'sale' ? 'danger' : 'success'"
+            />
+          </td>
+          <td>{{ tx.reference }}</td>
+          <td class="text-right" [class.amount-charge]="tx.type === 'sale'" [class.amount-payment]="tx.type === 'payment'">
+            {{ tx.type === 'sale' ? '+' : '-' }}{{ tx.amount | currency:'PHP':'symbol':'1.2-2' }}
+          </td>
+          <td class="text-right">{{ tx.running_balance | currency:'PHP':'symbol':'1.2-2' }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="empty-state">
+            <div class="empty-content">
+              <i class="pi pi-inbox" style="font-size: 3rem; color: #d1d5db;"></i>
+              <h3>No transactions yet</h3>
+              <p class="text-secondary">
+                Credit transactions will appear here.
+              </p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
   }
 </p-dialog>

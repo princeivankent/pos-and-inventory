@@ -1,11 +1,4 @@
-@if (customers.length === 0 && !loading) {
-  <div class="empty-state">
-    <i class="pi pi-users"></i>
-    <h3>No customers found</h3>
-    <p>Get started by adding your first customer.</p>
-  </div>
-} @else {
-  <p-table
+<p-table
     [value]="customers"
     [loading]="loading"
     [paginator]="customers.length > 10"
@@ -86,5 +79,18 @@
         </td>
       </tr>
     </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="empty-state">
+          <div class="empty-content">
+            <i class="pi pi-users" style="font-size: 3rem; color: #d1d5db;"></i>
+            <h3>No customers found</h3>
+            <p class="text-secondary">
+              Get started by adding your first customer.
+            </p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
   </p-table>
-}

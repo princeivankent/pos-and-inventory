@@ -33,7 +33,9 @@
       "Bash(find:*)",
       "Bash(npx tsc:*)",
       "Bash(node scripts/convert-to-multifile.js:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)"
     ]
   }
 }

@@ -37,7 +37,17 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
-          <tr><td colspan="5" class="text-center text-secondary" style="padding:2rem">All products are well stocked!</td></tr>
+          <tr>
+            <td colspan="5" class="empty-state">
+              <div class="empty-content">
+                <i class="pi pi-check-circle" style="font-size: 3rem; color: #10b981;"></i>
+                <h3>All products are well stocked!</h3>
+                <p class="text-secondary">
+                  Products below reorder level will appear here.
+                </p>
+              </div>
+            </td>
+          </tr>
         </ng-template>
       </p-table>
     </div>
