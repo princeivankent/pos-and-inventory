@@ -7,6 +7,8 @@ A comprehensive Point of Sale and Inventory Management System designed for small
 - ✅ **Phases 1-8**: Backend complete (NestJS + TypeORM + PostgreSQL)
 - ✅ **Phase 9**: Frontend complete (Angular 21 + PrimeNG)
 - ✅ **UI/UX Modernization**: Login, Reports, Products, Customers pages
+- ✅ **Subscription System**: 3-tier billing (Tindahan/Negosyo/Kadena), PayMongo integration, feature gates, usage limits
+- ✅ **Billing Pages**: Admin billing dashboard, usage monitoring, plan upgrade/downgrade UI
 - 🚧 **Phase 10**: Testing & Deployment (in progress)
 
 ## Tech Stack
@@ -16,7 +18,8 @@ A comprehensive Point of Sale and Inventory Management System designed for small
 | **Backend** | NestJS, TypeORM, PostgreSQL (Supabase) |
 | **Frontend** | Angular 21, PrimeNG, Angular Signals |
 | **Auth** | Supabase Auth + JWT (7d expiry) |
-| **Database** | 14 entities with multi-tenant isolation via `store_id` |
+| **Database** | 20 entities (14 core + 6 subscription) with multi-tenant isolation via `store_id` |
+| **Billing** | 3-tier subscription system with PayMongo integration |
 
 ## Features
 
@@ -109,42 +112,51 @@ All endpoints (except auth) require `Authorization: Bearer <token>` and `X-Store
 | **Reports** | `GET /api/reports/sales`, `GET /api/reports/inventory`, `GET /api/reports/best-selling` |
 | **Users** | `GET/POST /api/users`, `PATCH/DELETE /api/users/:id` |
 | **Stores** | `GET/PATCH /api/stores/:id` |
+| **Subscription Plans** | `GET /api/subscription-plans` (public) |
+| **Billing** | `GET /api/billing/subscription`, `GET /api/billing/usage`, `POST /api/billing/upgrade`, `POST /api/billing/downgrade`, `POST /api/billing/cancel` |
+| **Payments** | `POST /api/payments/create-intent`, `POST /api/payments/webhook` |
 
 ## Project Structure
 
 ```
 pos-and-inventory/
 ├── backend/src/
-│   ├── auth/           # Supabase + JWT authentication
-│   ├── common/         # Guards, decorators, interceptors, permissions
-│   ├── config/         # Environment, database, Supabase config
-│   ├── database/       # 14 entities + migrations
-│   ├── stores/         # Store CRUD + settings
-│   ├── categories/     # Hierarchical categories
-│   ├── products/       # Products + pricing
-│   ├── inventory/      # FIFO batches + stock movements
-│   ├── sales/          # Atomic transactions + credit
-│   ├── customers/      # Credit management + payments
-│   ├── receipts/       # Receipt generation
-│   ├── reports/        # Sales/inventory reports
-│   └── users/          # User + permission management
+│   ├── auth/               # Supabase + JWT authentication
+│   ├── common/             # Guards, decorators, interceptors, permissions
+│   ├── config/             # Environment, database, Supabase config
+│   ├── database/           # 20 entities + migrations
+│   ├── stores/             # Store CRUD + settings
+│   ├── categories/         # Hierarchical categories
+│   ├── products/           # Products + pricing
+│   ├── inventory/          # FIFO batches + stock movements
+│   ├── sales/              # Atomic transactions + credit
+│   ├── customers/          # Credit management + payments
+│   ├── receipts/           # Receipt generation
+│   ├── reports/            # Sales/inventory reports
+│   ├── users/              # User + permission management
+│   ├── subscription-plans/ # Public plan catalog
+│   ├── billing/            # Subscription management + cron jobs
+│   └── payments/           # PayMongo integration (mock + real)
 ├── frontend/src/app/
 │   ├── core/           # Services, guards, interceptors, models
 │   ├── shared/         # Shared components, pipes
 │   ├── layout/         # Sidebar, layout shell
 │   └── features/       # auth, pos, products, categories, inventory,
-│                       # sales, customers, reports, users, settings, dashboard
-├── CLAUDE.md           # AI development context
-├── ARCHITECTURE.md     # System architecture diagrams
-└── PROJECT_SUMMARY.md  # Comprehensive feature specs
+│                       # sales, customers, reports, users, settings, dashboard, billing
+├── docs/               # Project documentation
+└── CLAUDE.md           # AI development context
 ```
 
 ## Documentation
 
 - **CLAUDE.md** - Development patterns and AI context
-- **ARCHITECTURE.md** - System architecture and flow diagrams
-- **PROJECT_SUMMARY.md** - Comprehensive feature specifications
 - **QUICKSTART.md** - Quick setup guide
+- **docs/architecture.md** - System architecture and flow diagrams
+- **docs/project-summary.md** - Comprehensive feature specifications
+- **docs/subscription-status.md** - Subscription system implementation details
+- **docs/subscription-testing.md** - Testing guide for subscription features
+- **docs/development-checklist.md** - Phase-by-phase implementation checklist
+- **docs/roadmap.md** - Product roadmap and future plans
 
 ## License
 
