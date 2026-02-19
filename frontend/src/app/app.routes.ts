@@ -115,6 +115,12 @@ export const routes: Routes = [
           ),
         canActivate: [adminGuard],
       },
+      {
+        path: 'billing',
+        loadComponent: () =>
+          import('./features/billing/billing').then((m) => m.BillingComponent),
+        canActivate: [adminGuard],
+      },
     ],
   },
   { path: '**', redirectTo: 'dashboard' },

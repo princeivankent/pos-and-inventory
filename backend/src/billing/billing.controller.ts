@@ -31,9 +31,7 @@ export class BillingController {
 
   @Get('subscription')
   getSubscription(@CurrentUser() user: RequestUser) {
-    return this.subscriptionService.getCurrentSubscription(
-      user.organizationId,
-    );
+    return this.subscriptionService.getSubscriptionInfo(user.organizationId);
   }
 
   @Get('usage')

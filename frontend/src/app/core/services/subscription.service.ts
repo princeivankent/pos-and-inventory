@@ -2,7 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { SubscriptionInfo, SubscriptionPlan } from '../models/subscription.model';
+import { SubscriptionInfo, SubscriptionPlan, UsageResponse } from '../models/subscription.model';
 
 @Injectable({
   providedIn: 'root',
@@ -67,6 +67,19 @@ export class SubscriptionService {
     return this.http
       .get<SubscriptionPlan[]>(`${environment.apiUrl}/subscription-plans`)
       .pipe(tap((plans) => this.availablePlans.set(plans)));
+  }
+
+  // Reload subscription from API and update state (after upgrade/downgrade)
+  // GET /billing/subscription returns SubscriptionInfo directly (no wrapper object)
+  refreshSubscription() {
+    return this.http
+      .get<SubscriptionInfo>(`${environment.apiUrl}/billing/subscription`)
+      .pipe(tap((sub) => this.setSubscription(sub)));
+  }
+
+  // Load usage data from API
+  loadUsage() {
+    return this.http.get<UsageResponse>(`${environment.apiUrl}/billing/usage`);
   }
 
   // Clear on logout

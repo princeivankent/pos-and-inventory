@@ -351,15 +351,52 @@ grep "SubscriptionRenewalService" backend/src/billing/billing.module.ts
 
 ---
 
-## What's NOT Implemented (Frontend)
+## ✅ Frontend Billing Pages (Feb 20, 2026)
 
-### 🔜 Frontend Billing Pages:
-- Subscription selection/upgrade UI
-- Payment form integration
-- Usage dashboard
-- Billing history
+All billing UI is now implemented at `/billing` (admin-only route).
 
-### 🔜 Email Notifications:
+| Feature | File | Status |
+|---------|------|--------|
+| Subscription status card (plan, status badge, trial/renewal date) | `features/billing/billing.html` | ✅ |
+| Usage dashboard with progress bars (stores, products, users per store) | `features/billing/billing.html` | ✅ |
+| Plan comparison grid with upgrade/downgrade buttons | `features/billing/billing.html` | ✅ |
+| Upgrade confirmation dialog (price, feature diff, NEW badges) | `features/billing/billing.html` | ✅ |
+| Cancel subscription with confirmation dialog | `features/billing/billing.html` | ✅ |
+| Billing nav item in sidebar (admin only) | `layout/sidebar/sidebar.ts` | ✅ |
+| Payment bypass toggle (`bypassPayment` env flag) | `environments/environment.ts` | ✅ |
+| Payment step placeholder (ready for PayMongo wiring) | `features/billing/billing.ts` | ✅ |
+
+**Payment bypass toggle** (mirrors `BYPASS_PAYMENT` in `backend/.env`):
+- `bypassPayment: true` (default dev) — upgrades directly without payment step
+- `bypassPayment: false` (prod) — shows payment method selection before upgrading
+- When wiring real payments: replace `doUpgrade()` call in `confirmUpgrade()` with PayMongo API call
+
+---
+
+## Bug Fixes Applied (Feb 20, 2026)
+
+Three bugs prevented the billing UI from reflecting plan changes after upgrade:
+
+### Bug 1: `GET /billing/subscription` returned wrong response shape
+- **File**: `backend/src/billing/billing.controller.ts`
+- **Problem**: Called `getCurrentSubscription()` which returns raw TypeORM entity (field names differ from frontend's `SubscriptionInfo` interface: `trial_end` vs `trial_ends_at`, nested `plan.plan_code` vs flat `plan_code`, etc.)
+- **Fix**: Added `getSubscriptionInfo()` method to `billing/subscription.service.ts` returning the correct flat shape; controller now calls this method
+
+### Bug 2: `refreshSubscription()` expected a wrapper that didn't exist
+- **File**: `frontend/src/app/core/services/subscription.service.ts`
+- **Problem**: Was doing `.get<{ subscription: SubscriptionInfo }>()` and reading `.subscription` from the response, but endpoint returns the object directly — so `res.subscription` was always `undefined` and `setSubscription()` was never called
+- **Fix**: Changed to `.get<SubscriptionInfo>()` and `.pipe(tap((sub) => this.setSubscription(sub)))`
+
+### Bug 3: TypeORM `save()` didn't update `plan_id` FK
+- **File**: `backend/src/billing/subscription.service.ts` → `upgradePlan()` and `downgradePlan()`
+- **Problem**: TypeORM resolves the FK column (`plan_id`) from the **in-memory relation object** (`subscription.plan`), not the plain column property. Setting `subscription.plan_id = newPlan.id` was ignored because `subscription.plan` still pointed to the old plan entity
+- **Fix**: Added `subscription.plan = newPlan` alongside the existing `subscription.plan_id = newPlan.id`
+
+---
+
+## Pending
+
+### Email Notifications (not yet implemented)
 - Trial ending emails (cron job exists but no email sending)
 - Payment receipt emails
 - Subscription renewal confirmations
@@ -368,17 +405,17 @@ grep "SubscriptionRenewalService" backend/src/billing/billing.module.ts
 
 ## Testing Status
 
-- ✅ Can test via curl/Postman (see SUBSCRIPTION_TESTING_GUIDE.md)
+- ✅ Can test via curl/Postman (see `docs/subscription-testing.md`)
 - ✅ Backend fully functional
-- ⏳ Frontend integration pending
+- ✅ Frontend billing pages complete
 - ⏳ End-to-end tests pending
 
 ---
 
 ## Conclusion
 
-**ALL 8 PHASES ARE FULLY IMPLEMENTED** 🎉
+**THE ENTIRE SUBSCRIPTION SYSTEM IS COMPLETE** 🎉
 
-The backend subscription system is complete and functional. The only missing piece is the frontend UI for managing subscriptions, but all the API endpoints are ready and working.
+Backend (8 phases) + Frontend (billing pages, feature gating, adaptive UI) are all implemented and working. The remaining work is email notifications and end-to-end tests.
 
-You can start testing immediately using the guide in `SUBSCRIPTION_TESTING_GUIDE.md`.
+See `docs/subscription-testing.md` for hands-on testing procedures.

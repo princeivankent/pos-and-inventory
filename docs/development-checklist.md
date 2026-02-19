@@ -162,6 +162,35 @@ Track your progress as you implement the POS system.
 
 ---
 
+---
+
+## Subscription System (Backend) ✅
+
+- [x] Database entities: Organization, SubscriptionPlan, Subscription, Invoice, Payment, BillingPaymentMethod
+- [x] Migration: Creates subscription tables, seeds 3 plans (Tindahan ₱799, Negosyo ₱1499, Kadena ₱2999)
+- [x] SubscriptionGuard (validates active subscription, backward compatible with legacy stores)
+- [x] FeatureGateGuard + `@RequireFeature` decorator
+- [x] UsageLimitGuard + `@CheckLimit` decorator
+- [x] Guards applied to all controllers
+- [x] Auth flow: register creates org + trial, login returns subscription info
+- [x] Subscription Plans module (`GET /api/subscription-plans` — public)
+- [x] Billing module (subscription CRUD, upgrade/downgrade/cancel with usage validation)
+- [x] Payments module (PaymentGateway interface, MockPaymentService, PaymongoService)
+- [x] Cron jobs: renewal processing, failed payment retry, trial ending reminders
+
+## Subscription System (Frontend) ✅
+
+- [x] SubscriptionService with Angular signals + localStorage persistence
+- [x] Subscription models (SubscriptionInfo, SubscriptionPlan, SubscriptionFeature enum)
+- [x] Auth integration: subscription data returned on login/register, persisted to localStorage
+- [x] Adaptive sidebar: nav items filtered by `requiresFeature` property
+- [x] Adaptive dashboard: skips blocked API calls, shows upgrade prompts
+- [x] Customer feature gating: credit statement/payment buttons hidden on Tindahan
+- [x] Error interceptor: 402/403 feature gate errors show "Feature Locked" toast
+- [x] Billing page (`/billing`, admin-only): subscription status, usage progress bars, plan comparison grid
+- [x] Upgrade dialog: plan review + "NEW" feature badges + payment bypass toggle
+- [x] Downgrade and cancel flows with confirmation dialogs
+
 ## Phase 10: Testing & Deployment ⏳
 
 ### Testing
@@ -181,8 +210,8 @@ Track your progress as you implement the POS system.
 
 ## Phase 11: Future Enhancements ⏳
 
-- [ ] Customer management (credit/utang system)
-- [ ] Credit payments tracking
+- [x] Customer management (credit/utang system) — ✅ completed in Phase 9
+- [x] Credit payments tracking — ✅ completed in Phase 9
 - [ ] Supplier management
 - [ ] Barcode scanning integration
 - [ ] Offline mode / PWA support
@@ -191,7 +220,9 @@ Track your progress as you implement the POS system.
 - [ ] Data export (CSV/Excel)
 - [ ] Multi-device sync
 - [ ] BIR compliance reports
+- [ ] Email notifications (trial ending, payment receipts, renewal confirmations)
+- [ ] PayMongo live integration (set PAYMONGO_SECRET_KEY + set bypassPayment: false)
 
 ---
 
-**Current Status**: Backend Complete ✅ | Frontend Complete ✅ | Testing & Deployment Pending ⏳
+**Current Status**: Backend Complete ✅ | Frontend Complete ✅ | Subscription System Complete ✅ | Testing & Deployment Pending ⏳

@@ -430,6 +430,11 @@ if (this.subscriptionService.hasFeature('reports')) {
 ## Additional Documentation
 
 - `README.md` - Quick start and project overview
-- `ARCHITECTURE.md` - Detailed architecture diagrams and flows
-- `IMPLEMENTATION_GUIDE.md` - Step-by-step module implementation instructions
-- `PROJECT_SUMMARY.md` - Comprehensive feature specifications
+- `docs/architecture.md` - Detailed architecture diagrams and flows
+- `docs/project-summary.md` - Comprehensive feature specifications
+- `docs/subscription-status.md` - Subscription system implementation details and bug fixes
+- `docs/subscription-testing.md` - Testing guide for subscription/billing features
+- `docs/subscription-guide.md` - Implementation guide for the subscription system
+- `docs/development-checklist.md` - Phase-by-phase implementation checklist
+- `docs/roadmap.md` - Product roadmap and future plans
+- `docs/ui-modernization.md` - UI/UX modernization design decisions

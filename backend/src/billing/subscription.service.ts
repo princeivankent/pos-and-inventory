@@ -44,6 +44,33 @@ export class SubscriptionService {
     return subscription;
   }
 
+  // Returns SubscriptionInfo shape expected by the frontend (matches auth login response)
+  async getSubscriptionInfo(organizationId: string) {
+    const subscription = await this.subscriptionRepository.findOne({
+      where: { organization_id: organizationId },
+      relations: ['plan'],
+      order: { created_at: 'DESC' },
+    });
+
+    if (!subscription) {
+      throw new NotFoundException('No subscription found');
+    }
+
+    return {
+      status: subscription.status,
+      plan_code: subscription.plan.plan_code,
+      plan_name: subscription.plan.name,
+      trial_ends_at: subscription.trial_end,
+      current_period_end: subscription.current_period_end,
+      features: subscription.plan.features,
+      usage: {
+        max_stores: subscription.plan.max_stores,
+        max_users_per_store: subscription.plan.max_users_per_store,
+        max_products_per_store: subscription.plan.max_products_per_store,
+      },
+    };
+  }
+
   async getUsage(organizationId: string) {
     const subscription = await this.getCurrentSubscription(organizationId);
     const plan = subscription.plan;
@@ -111,7 +138,10 @@ export class SubscriptionService {
     const now = new Date();
     const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
+    // Set both the FK column and the relation object — TypeORM resolves the FK
+    // from the in-memory relation reference when saving, not the plain column.
     subscription.plan_id = newPlan.id;
+    subscription.plan = newPlan;
     subscription.status = SubscriptionStatus.ACTIVE;
     subscription.current_period_start = now;
     subscription.current_period_end = periodEnd;
@@ -188,6 +218,7 @@ export class SubscriptionService {
     // Downgrade at period end (or immediately if trial)
     if (subscription.status === SubscriptionStatus.TRIAL) {
       subscription.plan_id = newPlan.id;
+      subscription.plan = newPlan;
       await this.subscriptionRepository.save(subscription);
     } else {
       // Schedule downgrade at period end

@@ -1,0 +1,363 @@
+<app-page-header title="Billing & Subscription" subtitle="Manage your plan, monitor usage, and upgrade anytime." />
+
+<div class="page-content billing-page">
+
+  <!-- Status Card -->
+  @if (loading()) {
+    <div class="card status-skeleton">
+      <p-skeleton height="2rem" width="14rem" styleClass="mb-3" />
+      <p-skeleton height="1rem" width="10rem" />
+    </div>
+  } @else if (subscription()) {
+    <div class="card status-card">
+      <div class="status-left">
+        <div class="plan-name">{{ subscription()!.plan_name }}</div>
+        <span class="status-badge {{ getStatusBadgeClass(subscription()!.status) }}">
+          {{ getStatusLabel(subscription()!.status) }}
+        </span>
+      </div>
+      <div class="status-right">
+        @if (isTrialing()) {
+          <div class="expiry-info">
+            <span class="expiry-label">Trial ends in</span>
+            <span class="expiry-value" [class.expiry-urgent]="getDaysRemaining() <= 3">
+              {{ getDaysRemaining() }} day{{ getDaysRemaining() !== 1 ? 's' : '' }}
+            </span>
+            <span class="expiry-date">{{ formatExpiryDate() }}</span>
+          </div>
+        } @else {
+          <div class="expiry-info">
+            <span class="expiry-label">Next renewal</span>
+            <span class="expiry-value">{{ formatExpiryDate() }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Usage Section -->
+  <div class="section-header">
+    <h2 class="section-title">Usage</h2>
+    <p class="section-subtitle">Your current resource usage across all stores.</p>
+  </div>
+
+  @if (loading()) {
+    <div class="usage-grid">
+      @for (i of [1,2]; track i) {
+        <div class="card">
+          <p-skeleton height="1rem" width="8rem" styleClass="mb-4" />
+          <p-skeleton height="0.5rem" styleClass="mb-2" />
+          <p-skeleton height="0.75rem" width="5rem" />
+        </div>
+      }
+    </div>
+  } @else if (usage()) {
+    <div class="usage-grid">
+      <!-- Stores -->
+      <div class="card usage-card">
+        <div class="usage-header">
+          <i class="pi pi-shop usage-icon"></i>
+          <span class="usage-label">Stores</span>
+          <span class="usage-count">
+            {{ usage()!.stores.current }} / {{ formatLimit(usage()!.stores.limit) }}
+          </span>
+        </div>
+        @if (usage()!.stores.limit > 0) {
+          <div class="usage-bar-wrap">
+            <p-progressbar
+              [value]="getUsagePercent(usage()!.stores.current, usage()!.stores.limit)"
+              [styleClass]="'usage-bar usage-bar--' + getUsageBarClass(getUsagePercent(usage()!.stores.current, usage()!.stores.limit))"
+              [showValue]="false" />
+          </div>
+          <div class="usage-pct">{{ getUsagePercent(usage()!.stores.current, usage()!.stores.limit) }}% used</div>
+        } @else {
+          <div class="usage-unlimited">Unlimited</div>
+        }
+      </div>
+
+      <!-- Per-store details -->
+      @for (store of usage()!.store_details; track store.store_id) {
+        <!-- Products -->
+        <div class="card usage-card">
+          <div class="usage-header">
+            <i class="pi pi-box usage-icon"></i>
+            <span class="usage-label">Products — {{ store.store_name }}</span>
+            <span class="usage-count">
+              {{ store.products.current }} / {{ formatLimit(store.products.limit) }}
+            </span>
+          </div>
+          @if (store.products.limit > 0) {
+            <div class="usage-bar-wrap">
+              <p-progressbar
+                [value]="getUsagePercent(store.products.current, store.products.limit)"
+                [styleClass]="'usage-bar usage-bar--' + getUsageBarClass(getUsagePercent(store.products.current, store.products.limit))"
+                [showValue]="false" />
+            </div>
+            <div class="usage-pct">{{ getUsagePercent(store.products.current, store.products.limit) }}% used</div>
+          } @else {
+            <div class="usage-unlimited">Unlimited</div>
+          }
+        </div>
+
+        <!-- Users -->
+        <div class="card usage-card">
+          <div class="usage-header">
+            <i class="pi pi-users usage-icon"></i>
+            <span class="usage-label">Users — {{ store.store_name }}</span>
+            <span class="usage-count">
+              {{ store.users.current }} / {{ formatLimit(store.users.limit) }}
+            </span>
+          </div>
+          @if (store.users.limit > 0) {
+            <div class="usage-bar-wrap">
+              <p-progressbar
+                [value]="getUsagePercent(store.users.current, store.users.limit)"
+                [styleClass]="'usage-bar usage-bar--' + getUsageBarClass(getUsagePercent(store.users.current, store.users.limit))"
+                [showValue]="false" />
+            </div>
+            <div class="usage-pct">{{ getUsagePercent(store.users.current, store.users.limit) }}% used</div>
+          } @else {
+            <div class="usage-unlimited">Unlimited</div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Plan Comparison -->
+  <div class="section-header">
+    <h2 class="section-title">Plans</h2>
+    <p class="section-subtitle">Compare plans and upgrade or downgrade at any time.</p>
+  </div>
+
+  @if (loading()) {
+    <div class="plans-grid">
+      @for (i of [1,2,3]; track i) {
+        <div class="card">
+          <p-skeleton height="1.5rem" width="8rem" styleClass="mb-2" />
+          <p-skeleton height="2rem" width="6rem" styleClass="mb-4" />
+          <p-skeleton height="1rem" styleClass="mb-2" />
+          <p-skeleton height="1rem" styleClass="mb-2" />
+          <p-skeleton height="1rem" />
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="plans-grid">
+      @for (plan of plans(); track plan.id) {
+        <div class="card plan-card" [class.plan-card--current]="getPlanAction(plan) === 'current'">
+          @if (getPlanAction(plan) === 'current') {
+            <div class="plan-current-badge">Current Plan</div>
+          }
+          <div class="plan-header">
+            <h3 class="plan-name-title">{{ plan.name }}</h3>
+            <div class="plan-price">
+              {{ plan.price_php | phpCurrency }}
+              <span class="plan-price-period">/mo</span>
+            </div>
+          </div>
+
+          <ul class="plan-limits">
+            <li>
+              <i class="pi pi-shop"></i>
+              <span>{{ formatLimit(plan.max_stores) }} store{{ plan.max_stores !== 1 ? 's' : '' }}</span>
+            </li>
+            <li>
+              <i class="pi pi-users"></i>
+              <span>{{ formatLimit(plan.max_users_per_store) }} user{{ plan.max_users_per_store !== 1 ? 's' : '' }}/store</span>
+            </li>
+            <li>
+              <i class="pi pi-box"></i>
+              <span>{{ formatLimit(plan.max_products_per_store) }} products/store</span>
+            </li>
+          </ul>
+
+          <ul class="plan-features">
+            @for (feature of getPlanFeatureList(plan); track feature) {
+              <li>
+                <i class="pi pi-check feature-check"></i>
+                <span>{{ feature }}</span>
+              </li>
+            }
+          </ul>
+
+          <div class="plan-action">
+            @if (getPlanAction(plan) === 'current') {
+              <p-button
+                label="Current Plan"
+                [outlined]="true"
+                severity="secondary"
+                styleClass="w-full"
+                [disabled]="true" />
+            } @else if (getPlanAction(plan) === 'upgrade') {
+              <p-button
+                label="Upgrade"
+                icon="pi pi-arrow-up"
+                styleClass="w-full"
+                [loading]="actionLoading()"
+                (onClick)="openUpgradeDialog(plan)" />
+            } @else {
+              <p-button
+                label="Downgrade"
+                icon="pi pi-arrow-down"
+                [outlined]="true"
+                severity="secondary"
+                styleClass="w-full"
+                [loading]="actionLoading()"
+                (onClick)="downgradePlan(plan)" />
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Danger Zone -->
+  @if (!loading() && subscription()?.status !== 'cancelled') {
+    <div class="danger-zone card">
+      <div class="danger-header">
+        <i class="pi pi-exclamation-triangle danger-icon"></i>
+        <div>
+          <h3 class="danger-title">Cancel Subscription</h3>
+          <p class="danger-desc">
+            Your plan will remain active until the end of the current billing period. After that, your account will be downgraded.
+          </p>
+        </div>
+      </div>
+      <p-button
+        label="Cancel Subscription"
+        severity="danger"
+        [outlined]="true"
+        [loading]="actionLoading()"
+        (onClick)="showCancelDialog()" />
+    </div>
+  }
+
+</div>
+
+<!-- Upgrade Confirmation Dialog -->
+<p-dialog
+  [header]="'Upgrade to ' + (selectedUpgradePlan()?.name ?? '')"
+  [modal]="true"
+  [visible]="upgradeDialogVisible()"
+  (visibleChange)="upgradeDialogVisible.set($event)"
+  [style]="{ width: '32rem' }"
+  [draggable]="false">
+
+  @if (selectedUpgradePlan()) {
+    @if (upgradePaymentStep()) {
+      <!-- Payment step: shown when bypassPayment=false -->
+      <div class="payment-step">
+        <div class="payment-step-header">
+          <i class="pi pi-lock payment-step-icon"></i>
+          <div>
+            <p class="payment-step-title">Payment required</p>
+            <p class="payment-step-desc">
+              You'll be charged {{ selectedUpgradePlan()!.price_php | phpCurrency }}/month.
+              Connect a PayMongo payment method to complete your upgrade.
+            </p>
+          </div>
+        </div>
+        <!-- TODO: Replace placeholder with PayMongo payment form -->
+        <!-- Integration points:
+             1. POST /api/payments/create-intent → get payment intent
+             2. For GCash: redirect to checkout_url from payment source
+             3. For Card: collect card details via PayMongo.js
+             4. On payment success webhook: call doUpgrade()
+        -->
+        <div class="payment-methods-placeholder">
+          <div class="payment-method-row">
+            <i class="pi pi-mobile"></i>
+            <span>GCash</span>
+            <span class="payment-coming">Configure PAYMONGO_SECRET_KEY to enable</span>
+          </div>
+          <div class="payment-method-row">
+            <i class="pi pi-credit-card"></i>
+            <span>Credit / Debit Card</span>
+            <span class="payment-coming">Configure PAYMONGO_SECRET_KEY to enable</span>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <!-- Plan review step (default) -->
+      <div class="upgrade-price-row">
+        <div class="upgrade-price-amount">
+          {{ selectedUpgradePlan()!.price_php | phpCurrency }}
+          <span class="upgrade-price-period">/month</span>
+        </div>
+        <span class="upgrade-billing-cycle">Billed monthly</span>
+      </div>
+
+      <div class="upgrade-divider"></div>
+
+      <p class="upgrade-features-label">Everything you'll get</p>
+      <ul class="upgrade-feature-list">
+        @for (feature of getPlanFeatureList(selectedUpgradePlan()!); track feature) {
+          <li class="upgrade-feature-item" [class.upgrade-feature-new]="getNewFeatureSet(selectedUpgradePlan()!).has(feature)">
+            <i class="pi pi-check upgrade-feature-icon"></i>
+            <span>{{ feature }}</span>
+            @if (getNewFeatureSet(selectedUpgradePlan()!).has(feature)) {
+              <span class="upgrade-new-badge">NEW</span>
+            }
+          </li>
+        }
+      </ul>
+
+      <p class="upgrade-note">
+        Your upgrade takes effect immediately. A new 30-day billing cycle starts today.
+      </p>
+    }
+  }
+
+  <ng-template #footer>
+    @if (upgradePaymentStep()) {
+      <p-button
+        label="Back"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="upgradePaymentStep.set(false)" />
+      <p-button
+        label="Pay & Upgrade"
+        icon="pi pi-lock"
+        [loading]="actionLoading()"
+        (onClick)="doUpgrade()" />
+    } @else {
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="upgradeDialogVisible.set(false)" />
+      <p-button
+        [label]="'Upgrade to ' + (selectedUpgradePlan()?.name ?? '')"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        [loading]="actionLoading()"
+        (onClick)="confirmUpgrade()" />
+    }
+  </ng-template>
+</p-dialog>
+
+<!-- Cancel Confirmation Dialog -->
+<p-dialog
+  header="Cancel Subscription?"
+  [modal]="true"
+  [visible]="cancelDialogVisible()"
+  (visibleChange)="cancelDialogVisible.set($event)"
+  [style]="{ width: '28rem' }"
+  [draggable]="false">
+  <p class="cancel-dialog-text">
+    Your subscription will be cancelled at the end of the current billing period. You'll keep access to all features until then.
+  </p>
+  <ng-template #footer>
+    <p-button
+      label="Keep Subscription"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="cancelDialogVisible.set(false)" />
+    <p-button
+      label="Yes, Cancel"
+      severity="danger"
+      [loading]="actionLoading()"
+      (onClick)="cancelSubscription()" />
+  </ng-template>
+</p-dialog>
