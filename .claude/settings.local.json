@@ -35,7 +35,9 @@
       "Bash(node scripts/convert-to-multifile.js:*)",
       "Bash(python3:*)",
       "Bash(git push:*)",
-      "Bash(gh pr create:*)"
+      "Bash(gh pr create:*)",
+      "Bash(echo:*)",
+      "Bash(ls:*)"
     ]
   }
 }

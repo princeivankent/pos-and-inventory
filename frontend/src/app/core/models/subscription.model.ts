@@ -24,6 +24,27 @@ export interface SubscriptionPlan {
   sort_order: number;
 }
 
+export interface StoreUsageDetail {
+  store_id: string;
+  store_name: string;
+  users: { current: number; limit: number };
+  products: { current: number; limit: number };
+}
+
+export interface UsageResponse {
+  subscription: {
+    id: string;
+    status: string;
+    plan_code: string;
+    plan_name: string;
+    trial_end?: string;
+    current_period_end?: string;
+  };
+  stores: { current: number; limit: number };
+  store_details: StoreUsageDetail[];
+  features: Record<string, boolean>;
+}
+
 // Feature enum for type safety
 export enum SubscriptionFeature {
   POS = 'pos',

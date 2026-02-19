@@ -40,6 +40,7 @@ export class SidebarComponent {
     },
     { label: 'Users', icon: 'pi-users', route: '/users', adminOnly: true },
     { label: 'Settings', icon: 'pi-cog', route: '/settings', adminOnly: true },
+    { label: 'Billing', icon: 'pi-credit-card', route: '/billing', adminOnly: true },
   ];
 
   get visibleItems(): NavItem[] {
