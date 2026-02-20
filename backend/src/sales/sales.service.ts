@@ -208,16 +208,17 @@ export class SalesService {
           remaining -= deduct;
         }
 
-        // If no batches existed but product has stock, create a sale item without batch
-        // This handles legacy products that have current_stock but no batches
-        if (remaining > 0 && remaining === item.quantity) {
+        // If batch records are missing, fall back to a non-batch sale item.
+        // This keeps legacy inventory (product stock without full batch history)
+        // sellable while ensuring sale items still match total sold quantity.
+        if (remaining > 0) {
           const saleItem = manager.create(SaleItem, {
             sale_id: savedSale.id,
             product_id: item.product_id,
             batch_id: null,
-            quantity: item.quantity,
+            quantity: remaining,
             unit_price: item.unit_price,
-            subtotal: item.unit_price * item.quantity,
+            subtotal: item.unit_price * remaining,
           });
           await manager.save(SaleItem, saleItem);
         }
