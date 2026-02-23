@@ -208,19 +208,12 @@ export class SalesService {
           remaining -= deduct;
         }
 
-        // If batch records are missing, fall back to a non-batch sale item.
-        // This keeps legacy inventory (product stock without full batch history)
-        // sellable while ensuring sale items still match total sold quantity.
+        // Strict FIFO mode: all sold quantity must be backed by active batches.
+        // Prevents non-batch sale allocations that can break batch-level traceability.
         if (remaining > 0) {
-          const saleItem = manager.create(SaleItem, {
-            sale_id: savedSale.id,
-            product_id: item.product_id,
-            batch_id: null,
-            quantity: remaining,
-            unit_price: item.unit_price,
-            subtotal: item.unit_price * remaining,
-          });
-          await manager.save(SaleItem, saleItem);
+          throw new BadRequestException(
+            `Insufficient FIFO batch quantity for "${product.name}". Available in active batches: ${item.quantity - remaining}, Requested: ${item.quantity}`,
+          );
         }
 
         // Deduct from product current_stock
