@@ -59,6 +59,7 @@ export class InventoryService {
           wholesale_price: product.cost_price,
           retail_price: product.retail_price,
           is_active: true,
+          supplier_id: dto.supplier_id || null,
         });
         batch = await manager.save(InventoryBatch, batch);
 
@@ -140,17 +141,18 @@ export class InventoryService {
   async getMovements(
     storeId: string,
     productId?: string,
+    movementType?: string,
     limit = 50,
     offset = 0,
   ): Promise<{ data: StockMovement[]; total: number }> {
     const where: any = { store_id: storeId };
-    if (productId) {
-      where.batch = { product_id: productId };
+    if (movementType) {
+      where.movement_type = movementType;
     }
 
     const [data, total] = await this.movementRepository.findAndCount({
-      where: { store_id: storeId },
-      relations: ['batch', 'batch.product', 'creator'],
+      where,
+      relations: ['batch', 'batch.product', 'batch.supplier', 'creator'],
       order: { created_at: 'DESC' },
       take: limit,
       skip: offset,

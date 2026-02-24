@@ -53,12 +53,14 @@ export class InventoryController {
   getMovements(
     @CurrentStore() storeId: string,
     @Query('product_id') productId?: string,
+    @Query('movement_type') movementType?: string,
     @Query('limit') limit?: string,
     @Query('offset') offset?: string,
   ) {
     return this.inventoryService.getMovements(
       storeId,
       productId,
+      movementType,
       limit ? parseInt(limit, 10) : 50,
       offset ? parseInt(offset, 10) : 0,
     );

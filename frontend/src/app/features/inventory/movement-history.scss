@@ -1,2 +1,181 @@
-.positive { color: var(--color-success); font-weight: 500; }
-    .negative { color: var(--color-danger); font-weight: 500; }
+/* ── Filter Bar ─────────────────────────────────────── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.type-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.type-chip {
+  padding: 6px 14px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: #9ca3af;
+    color: #374151;
+  }
+
+  &.active {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+  }
+}
+
+.page-size-control {
+  flex-shrink: 0;
+
+  ::ng-deep .page-size-select {
+    min-width: 130px;
+
+    .p-select-label {
+      font-size: 0.8125rem;
+      padding: 6px 12px;
+    }
+  }
+}
+
+/* ── Table ─────────────────────────────────────────── */
+.movements-table {
+  font-size: 0.875rem;
+}
+
+/* Date & Time stacked */
+.cell-date {
+  white-space: nowrap;
+
+  .date {
+    display: block;
+    font-weight: 500;
+    color: #111827;
+    font-size: 0.875rem;
+  }
+
+  .time {
+    display: block;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 1px;
+  }
+}
+
+/* Product name + SKU stacked */
+.cell-product {
+  .product-name {
+    display: block;
+    font-weight: 500;
+    color: #111827;
+  }
+
+  .product-sku {
+    display: block;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 1px;
+    font-family: 'Courier New', monospace;
+  }
+}
+
+/* Quantity */
+.cell-qty {
+  text-align: right;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+}
+
+.qty-positive { color: #16a34a; }
+.qty-negative { color: #dc2626; }
+
+/* Secondary text cells */
+.cell-secondary {
+  color: #6b7280;
+  font-size: 0.8125rem;
+}
+
+.cell-mono {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8125rem;
+}
+
+/* ── Type Badges ────────────────────────────────────── */
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.type-purchase   { background: #dcfce7; color: #15803d; }
+.type-sale       { background: #dbeafe; color: #1d4ed8; }
+.type-return     { background: #fef9c3; color: #a16207; }
+.type-adjustment { background: #f3f4f6; color: #374151; }
+.type-damaged    { background: #fee2e2; color: #b91c1c; }
+.type-expired    { background: #fce7f3; color: #be185d; }
+
+/* ── Empty State ────────────────────────────────────── */
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+
+  .empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+
+    i {
+      font-size: 2.5rem;
+      color: #d1d5db;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.875rem;
+      color: #9ca3af;
+      max-width: 320px;
+    }
+  }
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .page-size-control {
+    width: 100%;
+
+    ::ng-deep .page-size-select {
+      width: 100%;
+    }
+  }
+}

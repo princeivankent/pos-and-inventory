@@ -12,6 +12,7 @@ import { ReceiptsModule } from './receipts/receipts.module';
 import { ReportsModule } from './reports/reports.module';
 import { UsersModule } from './users/users.module';
 import { CustomersModule } from './customers/customers.module';
+import { SuppliersModule } from './suppliers/suppliers.module';
 import { SubscriptionPlansModule } from './subscription-plans/subscription-plans.module';
 import { BillingModule } from './billing/billing.module';
 import { PaymentsModule } from './payments/payments.module';
@@ -32,6 +33,7 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     ReportsModule,
     UsersModule,
     CustomersModule,
+    SuppliersModule,
     SubscriptionPlansModule,
     BillingModule,
     PaymentsModule,

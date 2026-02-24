@@ -1,0 +1,69 @@
+<p-table
+  [value]="suppliers"
+  [loading]="loading"
+  [paginator]="suppliers.length > 10"
+  [rows]="10"
+  [rowHover]="true"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} suppliers"
+  [sortField]="'name'"
+  [sortOrder]="1"
+  styleClass="p-datatable-sm"
+>
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
+      <th>Contact Person</th>
+      <th>Phone</th>
+      <th>Email</th>
+      @if (isAdmin) {
+        <th class="text-center">Actions</th>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-supplier>
+    <tr>
+      <td>
+        <span class="supplier-name">{{ supplier.name }}</span>
+      </td>
+      <td>{{ supplier.contact_person || '—' }}</td>
+      <td>{{ supplier.phone || '—' }}</td>
+      <td>{{ supplier.email || '—' }}</td>
+      @if (isAdmin) {
+        <td class="text-center actions-cell">
+          <p-button
+            icon="pi pi-pencil"
+            [rounded]="true"
+            [text]="true"
+            severity="secondary"
+            pTooltip="Edit"
+            (onClick)="edit.emit(supplier)"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            pTooltip="Deactivate"
+            (onClick)="delete.emit(supplier)"
+          />
+        </td>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td [attr.colspan]="isAdmin ? 5 : 4" class="empty-state">
+        <div class="empty-content">
+          <i class="pi pi-truck" style="font-size: 3rem; color: #d1d5db;"></i>
+          <h3>No suppliers found</h3>
+          <p class="text-secondary">
+            Add your first supplier to start tracking inventory sources.
+          </p>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

@@ -103,6 +103,21 @@
           <p-inputNumber [(ngModel)]="stockInForm.unit_cost" [min]="0" [minFractionDigits]="2" [maxFractionDigits]="2" styleClass="w-full" placeholder="Leave blank to use product cost price" />
         </div>
         <div class="field">
+          <label>Supplier (optional)</label>
+          <p-select
+            [(ngModel)]="stockInForm.supplier_id"
+            [options]="suppliers()"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Select a supplier"
+            styleClass="w-full"
+            [filter]="true"
+            [showClear]="true"
+            appendTo="body"
+            [loading]="suppliersLoading()"
+          />
+        </div>
+        <div class="field">
           <label>Notes</label>
           <input pInputText [(ngModel)]="stockInForm.notes" class="w-full" placeholder="e.g. Purchase from supplier" />
         </div>
