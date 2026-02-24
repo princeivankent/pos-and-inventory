@@ -65,7 +65,7 @@ Track your progress as you implement the POS system.
 - [x] receipts.controller.ts (TenantGuard + RolesGuard)
 - [x] Receipt data endpoint (`GET /api/receipts/:saleId`)
 - [x] PDF receipt endpoint (`GET /api/receipts/:saleId/pdf`)
-- [x] Thermal-printer-friendly format (80mm width)
+- [x] Thermal-printer-friendly receipt layout (80mm width, PDF/browser print path)
 - [x] Includes: store info, TIN, items, totals, cashier, payment info
 - [x] Custom receipt header/footer from store.settings
 
@@ -225,4 +225,4 @@ Track your progress as you implement the POS system.
 
 ---
 
-**Current Status**: Backend Complete ✅ | Frontend Complete ✅ | Subscription System Complete ✅ | Testing & Deployment Pending ⏳
+**Current Status**: Core backend/frontend and subscription system are complete ✅ | Supplier module, thermal printer hardware integration, low-stock automation, and testing/deployment are pending ⏳

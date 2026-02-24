@@ -2,15 +2,16 @@
 
 ## Stage Assessment: PRE-LAUNCH
 
-The system has no live users yet. The core backend and frontend are ~92% complete. The primary task (running a store with POS, inventory, and sales) is mostly functional. The focus must be on **completing the core loop** before anything else.
+The system has no live users yet. The primary task (running a store with POS, inventory, and sales) is functional. The focus is now **closing the remaining deployment blockers** before launch.
 
 **Core loop checklist:**
 - [x] Can users ring up sales? (POS interface complete)
 - [x] Is inventory tracked accurately? (FIFO batch system working)
 - [x] Can users view sales and reports? (Dashboard + reports functional)
-- [ ] Can users manage customer credit ("utang")? **GAP - critical for Philippine retail**
+- [x] Can users manage customer credit ("utang")? (Customer CRUD + statement + payments + POS credit flow implemented)
 - [ ] Can users manage suppliers? **GAP - needed for inventory receiving**
 - [ ] Does the system work on real POS hardware? **GAP - thermal printing not wired up**
+- [~] Are low-stock alerts automated? **PARTIAL - low-stock views exist, cron/notification automation missing**
 
 ---
 
@@ -22,21 +23,21 @@ These are **High Impact, Low Effort** items that close gaps in the fundamental v
 
 #### 1.1 Customer Credit Management ("Utang")
 
-**Recommendation:** Build Now
+**Recommendation:** Completed (Keep Stable)
 
 | Attribute | Value |
 |-----------|-------|
-| Impact | High - Credit sales are a daily reality in Philippine sari-sari stores. Without this, the system doesn't match how stores actually operate. |
-| Effort | Low - Entities (`Customer`, `CreditPayment`) already exist. Need CRUD module + integration into sales flow. |
+| Impact | High - Credit sales are a daily reality in Philippine sari-sari stores. |
+| Effort | Completed - Core implementation is already in place. |
 | Category | Core Feature |
-| Stage Fit | Yes - Directly completes the core loop |
+| Stage Fit | Completed |
 
-**What to build:**
+**What is implemented:**
 - Customer CRUD module (controller, service, DTOs)
-- Credit limit validation in sales flow (reject if over limit)
-- Credit payment recording and balance tracking
+- Credit limit validation in sales flow
+- Credit payment recording and customer balance tracking
 - Customer balance statement view in frontend
-- Customer selection during POS checkout (for credit sales)
+- Customer selection during POS checkout (credit and partial payment)
 
 **What NOT to build yet:**
 - SMS/email reminders for overdue balances
@@ -124,6 +125,7 @@ These are **High Impact, Medium Effort** items needed before real users can adop
 | Impact | Medium - Prevents stockouts, which directly affect store revenue. |
 | Effort | Low - Entity exists. Need a cron job + dashboard notification. |
 | Category | Retention |
+| Current Status | Partial - low-stock endpoint and UI are live; automation is not. |
 
 **What to build:**
 - NestJS cron job to check stock levels against thresholds
@@ -220,18 +222,19 @@ These are either **Low Impact**, **High Effort**, or solve problems that don't e
 
 | Priority | Item | Impact | Effort | Category |
 |----------|------|--------|--------|----------|
-| 1 | Customer Credit ("Utang") | High | Low | Core |
-| 2 | Supplier Management | High | Low | Core |
-| 3 | Thermal Printer Integration | High | Low | Core |
-| 4 | E2E Testing & Bug Fixes | High | Medium | Retention |
-| 5 | Low-Stock Alert Automation | Medium | Low | Retention |
-| 6 | Data Seeding & Onboarding | High | Low | Core |
+| 1 | Supplier Management | High | Low | Core |
+| 2 | Thermal Printer Integration | High | Low | Core |
+| 3 | E2E Testing & Bug Fixes | High | Medium | Retention |
+| 4 | Low-Stock Alert Automation (finish) | Medium | Low | Retention |
+| 5 | Data Seeding & Onboarding | High | Low | Core |
+| 6 | Customer Credit ("Utang") - stabilization only | High | Low | Core |
 | --- | **LAUNCH GATE** | --- | --- | --- |
 | 7 | Returns & Refunds | Medium | Medium | Core |
 | 8 | Expense Tracking | Medium | Medium | Monetization |
 | 9 | Barcode Scanning | Medium | Low | Core |
 
-**Items 1-6** complete the core loop and make the system deployable.
+**Items 1-5** complete the core loop and make the system deployable.
+**Item 6** is monitoring/stabilization for an already implemented core feature.
 **Items 7-9** are validated post-launch based on real user feedback.
 **Everything else** stays off the roadmap until there's proven demand.
 

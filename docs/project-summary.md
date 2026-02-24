@@ -2,11 +2,11 @@
 
 ## Overview
 
-This is a comprehensive Multi-Tenant Point of Sale and Inventory Management System designed specifically for small retail stores in the Philippines. The system features batch-based inventory tracking with FIFO (First In, First Out) logic, customer credit management (utang), flexible pricing (wholesale/retail), and built-in 12% VAT calculation.
+This is a comprehensive Multi-Tenant Point of Sale and Inventory Management System designed specifically for small retail stores in the Philippines. The system features batch-based inventory tracking with FIFO (First In, First Out) logic, customer credit management (utang), flexible pricing (cost/retail), and built-in 12% VAT calculation.
 
 ## Current Implementation Status
 
-### ✅ Completed (Phases 1-9 + Subscription System)
+### ✅ Completed (Core Modules + Subscription System)
 
 #### Backend Foundation (Phase 1)
 1. **Project Structure**: Complete NestJS backend setup with proper folder structure
@@ -32,8 +32,8 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 - ✅ **Inventory module**: FIFO batch management, stock movements, low stock alerts
 - ✅ **Sales module**: Atomic transactions, FIFO deduction, credit/partial payment validation
 - ✅ **Customers module**: CRUD, credit limits, utang tracking, credit statements, payment recording
-- ✅ **Receipts module**: Thermal printer support, BIR compliance
-- ✅ **Reports module**: Sales, inventory, customer statements
+- ✅ **Receipts module**: Receipt data + PDF generation endpoints
+- ✅ **Reports module**: Sales, inventory, best-selling, profit
 - ✅ **Users module**: Store assignment, role management, permissions
 
 #### Frontend Application (Phase 9)
@@ -66,7 +66,10 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
   - Enhanced error interceptor (402/403 subscription errors)
   - Subscription models and feature enum
 
-### 🚧 To Be Implemented (Phase 10 - Testing & Deployment)
+### 🚧 Still Pending Before Launch
+- Supplier management module (backend + frontend CRUD)
+- Thermal printer hardware integration (ESC/POS)
+- Low-stock automation (cron + notification flow)
 - Unit tests for backend services (Jest)
 - E2E tests for critical flows (sales, inventory, credit)
 - Frontend unit tests (Jasmine/Karma)
@@ -97,8 +100,8 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 - **Fixed 12% VAT**: Philippine tax compliance (configurable per store)
 - **Flexible Pricing**: Retail/cost prices per product
 - **Discounts**: Fixed amount or percentage, per-item or whole-sale
-- **Returns/Refunds**: Full support with inventory restocking and credit reversal
-- **Receipt Generation**: PDF and thermal printer support (BIR compliant)
+- **Returns/Void Workflow**: Admin void with inventory restocking and credit balance reversal
+- **Receipt Generation**: PDF endpoint + browser print preview (thermal hardware integration pending)
 - **Customer Selection**: Search and attach customers to sales
 - **Order Hold/Recall**: Hold current cart, recall later
 
@@ -114,8 +117,8 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 ### Reporting & Alerts
 - **Sales Reports**: Daily, monthly, custom date ranges
 - **Inventory Reports**: Stock levels, expiring items, best-selling products
-- **Customer Reports**: Outstanding balances, payment history
-- **Low Stock Alerts**: Automatic reorder notifications
+- **Customer Credit Statements**: Outstanding balances and payment history in Customers module
+- **Low Stock Alerts**: Dashboard and inventory low-stock views based on reorder levels
 
 ### Subscription & Billing
 - **3-Tier Plans**: Tindahan (₱799/mo), Negosyo (₱1499/mo), Kadena (₱2999/mo)
@@ -244,6 +247,6 @@ Proprietary - All rights reserved
 ---
 
 **Project Created**: February 5, 2026
-**Last Updated**: February 13, 2026
+**Last Updated**: February 24, 2026
 **Version**: 2.0.0 (Full Stack - Backend + Frontend Complete)
-**Status**: Phases 1-9 Complete, Phase 10 (Testing & Deployment) Pending
+**Status**: Core POS + Inventory + Credit complete; supplier management, thermal printer integration, low-stock automation, and testing/deployment are pending.

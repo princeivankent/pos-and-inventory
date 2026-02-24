@@ -32,8 +32,8 @@ After login, you'll see the dashboard with today's sales summary and low stock a
 
 ### Printing Receipts
 - After completing a sale, a receipt preview is shown.
-- Click **Print** to send it to your thermal printer (80mm format).
-- Receipts can also be downloaded as PDF.
+- Click **Print** to open the browser print dialog from the receipt preview.
+- PDF receipt data is available via backend receipt endpoints.
 - Receipts include store info, TIN, itemized totals, and VAT breakdown.
 
 ---
@@ -43,7 +43,7 @@ After login, you'll see the dashboard with today's sales summary and low stock a
 ### Adding Stock
 1. Go to **Inventory** from the sidebar.
 2. Click **Stock In** and select the product.
-3. Enter the quantity, cost price, and purchase date.
+3. Enter the quantity, optional unit cost, and notes.
 4. Each stock-in creates a batch for FIFO tracking.
 
 ### Stock Adjustments

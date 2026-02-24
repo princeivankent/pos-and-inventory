@@ -327,7 +327,9 @@
    └──────────────────────────────────────┘
 ```
 
-## Return/Refund Flow
+## Return/Refund Flow (Planned, Not Implemented)
+
+This flow is a target design and not yet implemented as a dedicated module.
 
 ```
 1. Return Request
@@ -457,7 +459,9 @@ Example:
   Result: 50 + 30 + 20 = 100 ✓
 ```
 
-## Alert Generation Cron Job
+## Alert Generation Cron Job (Planned, Not Implemented)
+
+Current implementation provides low-stock query endpoints and UI views. Automated alert generation is planned.
 
 ```
 Daily at 6:00 AM
