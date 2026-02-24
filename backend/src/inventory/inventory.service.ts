@@ -84,7 +84,7 @@ export class InventoryService {
         });
 
         let remaining = dto.quantity;
-        batch = batches[0]; // Use first batch for movement reference
+        const firstBatch = batches[0];
 
         for (const b of batches) {
           if (remaining <= 0) break;
@@ -97,6 +97,13 @@ export class InventoryService {
           remaining -= deduct;
         }
 
+        if (!firstBatch || remaining > 0) {
+          throw new BadRequestException(
+            `Insufficient FIFO batch quantity. Available in active batches: ${dto.quantity - remaining}, Requested: ${dto.quantity}`,
+          );
+        }
+
+        batch = firstBatch; // Use first batch for movement reference
         product.current_stock = Number(product.current_stock) - dto.quantity;
         movementType = MovementType.ADJUSTMENT;
       }
