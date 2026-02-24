@@ -2,6 +2,8 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
@@ -20,6 +22,8 @@ import { SupplierFormDialogComponent } from './components/supplier-form-dialog/s
     FormsModule,
     ButtonModule,
     InputTextModule,
+    IconFieldModule,
+    InputIconModule,
     SelectModule,
     ConfirmDialogModule,
     PageHeader,

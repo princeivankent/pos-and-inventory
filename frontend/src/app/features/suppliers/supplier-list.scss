@@ -12,12 +12,13 @@
   flex: 1;
   max-width: 360px;
 
-  .p-input-icon-left {
+  p-iconfield,
+  ::ng-deep .p-iconfield {
     width: 100%;
+  }
 
-    input {
-      width: 100%;
-    }
+  input {
+    width: 100%;
   }
 }
 

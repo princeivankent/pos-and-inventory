@@ -7,8 +7,8 @@
 <!-- Filter Bar -->
 <div class="filter-bar">
   <div class="search-section">
-    <span class="p-input-icon-left">
-      <i class="pi pi-search"></i>
+    <p-iconfield>
+      <p-inputicon styleClass="pi pi-search" />
       <input
         pInputText
         type="text"
@@ -16,7 +16,7 @@
         (input)="onSearch()"
         placeholder="Search by name or phone..."
       />
-    </span>
+    </p-iconfield>
   </div>
 
   <div class="page-size-control">
