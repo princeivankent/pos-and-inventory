@@ -1,14 +1,15 @@
 <p-table
     [value]="customers"
     [loading]="loading"
-    [paginator]="customers.length > 10"
-    [rows]="10"
-    [rowHover]="true"
+    [paginator]="true"
+    [rows]="15"
+    [rowsPerPageOptions]="[15, 30, 50]"
     [showCurrentPageReport]="true"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} customers"
+    currentPageReportTemplate="Showing {first}–{last} of {totalRecords} customers"
     [sortField]="'name'"
     [sortOrder]="1"
-    styleClass="p-datatable-sm"
+    styleClass="enhanced-table"
+    dataKey="id"
   >
     <ng-template #header>
       <tr>
@@ -20,7 +21,7 @@
       </tr>
     </ng-template>
     <ng-template #body let-customer>
-      <tr>
+      <tr class="table-row">
         <td>
           <div class="customer-name">
             <span class="name">{{ customer.name }}</span>

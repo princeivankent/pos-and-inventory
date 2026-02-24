@@ -4,7 +4,6 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { SelectModule } from 'primeng/select';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { StockMovement } from '../../core/models/inventory.model';
@@ -18,7 +17,7 @@ interface TypeFilter {
 @Component({
   selector: 'app-movement-history',
   standalone: true,
-  imports: [CommonModule, DatePipe, RouterLink, FormsModule, TableModule, ButtonModule, SelectModule, PageHeader],
+  imports: [CommonModule, DatePipe, RouterLink, FormsModule, TableModule, ButtonModule, PageHeader],
   templateUrl: './movement-history.html',
   styleUrls: ['./movement-history.scss'],
 })
@@ -30,7 +29,6 @@ export class MovementHistoryComponent implements OnInit {
   totalRecords = signal(0);
 
   activeTypeFilter: string | null = null;
-  pageSize = 20;
 
   typeFilters: TypeFilter[] = [
     { label: 'All', value: null },
@@ -42,27 +40,17 @@ export class MovementHistoryComponent implements OnInit {
     { label: 'Expired', value: 'expired' },
   ];
 
-  pageSizeOptions = [
-    { label: '10 / page', value: 10 },
-    { label: '20 / page', value: 20 },
-    { label: '50 / page', value: 50 },
-  ];
-
   ngOnInit() {
-    this.load(0, this.pageSize);
+    this.load(0, 15);
   }
 
   onPageChange(event: any) {
-    this.load(event.first ?? 0, event.rows ?? this.pageSize);
+    this.load(event.first ?? 0, event.rows ?? 15);
   }
 
   setTypeFilter(value: string | null) {
     this.activeTypeFilter = value;
-    this.load(0, this.pageSize);
-  }
-
-  onPageSizeChange() {
-    this.load(0, this.pageSize);
+    this.load(0, 15);
   }
 
   load(offset: number, limit: number) {

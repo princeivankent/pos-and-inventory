@@ -2,13 +2,14 @@
   [value]="suppliers"
   [loading]="loading"
   [paginator]="true"
-  [rows]="pageSize"
+  [rows]="15"
+  [rowsPerPageOptions]="[15, 30, 50]"
   [rowHover]="true"
   [showCurrentPageReport]="true"
   currentPageReportTemplate="Showing {first}–{last} of {totalRecords} suppliers"
   [sortField]="'name'"
   [sortOrder]="1"
-  styleClass="p-datatable-sm suppliers-table"
+  styleClass="enhanced-table"
   dataKey="id"
 >
   <ng-template #header>
@@ -25,7 +26,7 @@
   </ng-template>
 
   <ng-template #body let-supplier>
-    <tr>
+    <tr class="table-row">
       <td>
         <span class="supplier-name">{{ supplier.name }}</span>
       </td>
@@ -39,7 +40,7 @@
             icon="pi pi-pencil"
             [rounded]="true"
             [text]="true"
-            severity="secondary"
+            severity="info"
             pTooltip="Edit"
             (onClick)="edit.emit(supplier)"
           />
@@ -60,9 +61,11 @@
     <tr>
       <td [attr.colspan]="isAdmin ? 6 : 5" class="empty-state">
         <div class="empty-content">
-          <i class="pi pi-truck"></i>
+          <i class="pi pi-truck" style="font-size: 3rem; color: #d1d5db;"></i>
           <h3>No suppliers found</h3>
-          <p>Add your first supplier to start tracking inventory sources.</p>
+          <p class="text-secondary">
+            Add your first supplier to start tracking inventory sources.
+          </p>
         </div>
       </td>
     </tr>

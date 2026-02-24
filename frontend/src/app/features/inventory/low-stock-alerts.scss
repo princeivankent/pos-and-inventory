@@ -1,1 +1,7 @@
-// Component styles
+:host ::ng-deep .enhanced-table .table-row {
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: #f9fafb !important;
+  }
+}

@@ -1,11 +1,6 @@
 /* ── Filter Bar ─────────────────────────────────────── */
 .filter-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
   margin-bottom: 16px;
-  flex-wrap: wrap;
 }
 
 .type-filters {
@@ -37,22 +32,13 @@
   }
 }
 
-.page-size-control {
-  flex-shrink: 0;
-
-  ::ng-deep .page-size-select {
-    min-width: 130px;
-
-    .p-select-label {
-      font-size: 0.8125rem;
-      padding: 6px 12px;
-    }
-  }
-}
-
 /* ── Table ─────────────────────────────────────────── */
-.movements-table {
-  font-size: 0.875rem;
+:host ::ng-deep .enhanced-table .table-row {
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: #f9fafb !important;
+  }
 }
 
 /* Date & Time stacked */
@@ -166,16 +152,7 @@
 
 /* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 768px) {
-  .filter-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .page-size-control {
-    width: 100%;
-
-    ::ng-deep .page-size-select {
-      width: 100%;
-    }
+  .type-filters {
+    gap: 6px;
   }
 }

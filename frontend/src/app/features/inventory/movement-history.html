@@ -17,17 +17,6 @@
       </button>
     }
   </div>
-
-  <div class="page-size-control">
-    <p-select
-      [(ngModel)]="pageSize"
-      [options]="pageSizeOptions"
-      optionLabel="label"
-      optionValue="value"
-      (onChange)="onPageSizeChange()"
-      styleClass="page-size-select"
-    />
-  </div>
 </div>
 
 <!-- Table -->
@@ -35,7 +24,8 @@
   <p-table
     [value]="movements()"
     [paginator]="true"
-    [rows]="pageSize"
+    [rows]="15"
+    [rowsPerPageOptions]="[15, 30, 50]"
     [loading]="loading()"
     [lazy]="true"
     [totalRecords]="totalRecords()"
@@ -43,7 +33,7 @@
     [showCurrentPageReport]="true"
     currentPageReportTemplate="Showing {first}–{last} of {totalRecords} movements"
     dataKey="id"
-    styleClass="p-datatable-sm movements-table"
+    styleClass="enhanced-table"
   >
     <ng-template pTemplate="header">
       <tr>
@@ -59,7 +49,7 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-m>
-      <tr>
+      <tr class="table-row">
         <!-- Date & Time -->
         <td class="cell-date">
           <span class="date">{{ m.created_at | date:'MMM d, y' }}</span>

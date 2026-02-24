@@ -4,30 +4,18 @@
   }
 </app-page-header>
 
-<!-- Filter Bar -->
-<div class="filter-bar">
-  <div class="search-section">
-    <p-iconfield>
-      <p-inputicon styleClass="pi pi-search" />
-      <input
-        pInputText
-        type="text"
-        [(ngModel)]="searchQuery"
-        (input)="onSearch()"
-        placeholder="Search by name or phone..."
-      />
-    </p-iconfield>
-  </div>
-
-  <div class="page-size-control">
-    <p-select
-      [(ngModel)]="pageSize"
-      [options]="pageSizeOptions"
-      optionLabel="label"
-      optionValue="value"
-      styleClass="page-size-select"
+<!-- Search Bar -->
+<div class="search-bar">
+  <p-iconfield>
+    <p-inputicon styleClass="pi pi-search" />
+    <input
+      pInputText
+      type="text"
+      [(ngModel)]="searchQuery"
+      (input)="onSearch()"
+      placeholder="Search by name or phone..."
     />
-  </div>
+  </p-iconfield>
 </div>
 
 <!-- Supplier Table -->
@@ -36,7 +24,6 @@
     [suppliers]="suppliers()"
     [loading]="loading()"
     [isAdmin]="storeCtx.isAdmin()"
-    [pageSize]="pageSize"
     (edit)="editSupplier($event)"
     (delete)="confirmDeactivate($event)"
   />

@@ -16,7 +16,6 @@ export class SupplierTableComponent {
   @Input() suppliers: Supplier[] = [];
   @Input() loading = false;
   @Input() isAdmin = false;
-  @Input() pageSize = 20;
 
   @Output() edit = new EventEmitter<Supplier>();
   @Output() delete = new EventEmitter<Supplier>();

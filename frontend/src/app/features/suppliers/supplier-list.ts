@@ -4,7 +4,6 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
-import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { Supplier, CreateSupplierDto } from '../../core/models/supplier.model';
@@ -24,7 +23,6 @@ import { SupplierFormDialogComponent } from './components/supplier-form-dialog/s
     InputTextModule,
     IconFieldModule,
     InputIconModule,
-    SelectModule,
     ConfirmDialogModule,
     PageHeader,
     SupplierTableComponent,
@@ -43,13 +41,6 @@ export class SupplierListComponent implements OnInit {
   loading = signal(false);
   saving = signal(false);
   searchQuery = '';
-  pageSize = 20;
-
-  pageSizeOptions = [
-    { label: '10 / page', value: 10 },
-    { label: '20 / page', value: 20 },
-    { label: '50 / page', value: 50 },
-  ];
 
   formDialogVisible = false;
   editMode = false;

@@ -1,15 +1,5 @@
-/* ── Filter Bar ─────────────────────────────────────── */
-.filter-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+.search-bar {
   margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.search-section {
-  flex: 1;
   max-width: 360px;
 
   p-iconfield,
@@ -22,36 +12,8 @@
   }
 }
 
-.page-size-control {
-  flex-shrink: 0;
-
-  ::ng-deep .page-size-select {
-    min-width: 130px;
-
-    .p-select-label {
-      font-size: 0.8125rem;
-      padding: 6px 12px;
-    }
-  }
-}
-
-/* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 768px) {
-  .filter-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .search-section {
+  .search-bar {
     max-width: 100%;
-    width: 100%;
-  }
-
-  .page-size-control {
-    width: 100%;
-
-    ::ng-deep .page-size-select {
-      width: 100%;
-    }
   }
 }
