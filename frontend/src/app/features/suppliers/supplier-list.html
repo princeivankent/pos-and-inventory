@@ -4,8 +4,8 @@
   }
 </app-page-header>
 
-<!-- Search -->
-<div class="page-controls">
+<!-- Filter Bar -->
+<div class="filter-bar">
   <div class="search-section">
     <span class="p-input-icon-left">
       <i class="pi pi-search"></i>
@@ -15,9 +15,18 @@
         [(ngModel)]="searchQuery"
         (input)="onSearch()"
         placeholder="Search by name or phone..."
-        class="w-full"
       />
     </span>
+  </div>
+
+  <div class="page-size-control">
+    <p-select
+      [(ngModel)]="pageSize"
+      [options]="pageSizeOptions"
+      optionLabel="label"
+      optionValue="value"
+      styleClass="page-size-select"
+    />
   </div>
 </div>
 
@@ -27,6 +36,7 @@
     [suppliers]="suppliers()"
     [loading]="loading()"
     [isAdmin]="storeCtx.isAdmin()"
+    [pageSize]="pageSize"
     (edit)="editSupplier($event)"
     (delete)="confirmDeactivate($event)"
   />

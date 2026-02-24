@@ -1,35 +1,67 @@
+.suppliers-table {
+  font-size: 0.875rem;
+}
+
+/* Supplier name — primary emphasis */
 .supplier-name {
   font-weight: 600;
   color: #111827;
 }
 
-.text-center {
-  text-align: center;
+/* Secondary text cells */
+.cell-secondary {
+  color: #6b7280;
+  font-size: 0.8125rem;
 }
 
+/* Monospace for phone numbers */
+.cell-mono {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8125rem;
+}
+
+/* Truncate long addresses */
+.cell-address {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Actions */
 .actions-cell {
+  text-align: center;
   white-space: nowrap;
 }
 
+/* ── Empty State ────────────────────────────────────── */
 .empty-state {
-  padding: 3rem 1rem;
+  padding: 48px 24px;
   text-align: center;
 
   .empty-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
+    gap: 12px;
+
+    i {
+      font-size: 2.5rem;
+      color: #d1d5db;
+    }
 
     h3 {
       margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
       color: #374151;
-      font-size: 1.125rem;
     }
 
-    .text-secondary {
+    p {
       margin: 0;
-      color: #6b7280;
+      font-size: 0.875rem;
+      color: #9ca3af;
+      max-width: 300px;
     }
   }
 }

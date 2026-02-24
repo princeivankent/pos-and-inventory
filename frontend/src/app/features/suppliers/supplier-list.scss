@@ -1,13 +1,16 @@
-.page-controls {
+/* ── Filter Bar ─────────────────────────────────────── */
+.filter-bar {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .search-section {
-  width: 100%;
-  max-width: 400px;
+  flex: 1;
+  max-width: 360px;
 
   .p-input-icon-left {
     width: 100%;
@@ -18,8 +21,36 @@
   }
 }
 
+.page-size-control {
+  flex-shrink: 0;
+
+  ::ng-deep .page-size-select {
+    min-width: 130px;
+
+    .p-select-label {
+      font-size: 0.8125rem;
+      padding: 6px 12px;
+    }
+  }
+}
+
+/* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .search-section {
     max-width: 100%;
+    width: 100%;
+  }
+
+  .page-size-control {
+    width: 100%;
+
+    ::ng-deep .page-size-select {
+      width: 100%;
+    }
   }
 }

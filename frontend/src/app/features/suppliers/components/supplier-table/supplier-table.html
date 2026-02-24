@@ -1,23 +1,25 @@
 <p-table
   [value]="suppliers"
   [loading]="loading"
-  [paginator]="suppliers.length > 10"
-  [rows]="10"
+  [paginator]="true"
+  [rows]="pageSize"
   [rowHover]="true"
   [showCurrentPageReport]="true"
-  currentPageReportTemplate="Showing {first} to {last} of {totalRecords} suppliers"
+  currentPageReportTemplate="Showing {first}–{last} of {totalRecords} suppliers"
   [sortField]="'name'"
   [sortOrder]="1"
-  styleClass="p-datatable-sm"
+  styleClass="p-datatable-sm suppliers-table"
+  dataKey="id"
 >
   <ng-template #header>
     <tr>
       <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
       <th>Contact Person</th>
-      <th>Phone</th>
+      <th style="width: 150px">Phone</th>
       <th>Email</th>
+      <th style="width: 120px">Address</th>
       @if (isAdmin) {
-        <th class="text-center">Actions</th>
+        <th style="width: 88px; text-align: center">Actions</th>
       }
     </tr>
   </ng-template>
@@ -27,11 +29,12 @@
       <td>
         <span class="supplier-name">{{ supplier.name }}</span>
       </td>
-      <td>{{ supplier.contact_person || '—' }}</td>
-      <td>{{ supplier.phone || '—' }}</td>
-      <td>{{ supplier.email || '—' }}</td>
+      <td class="cell-secondary">{{ supplier.contact_person || '—' }}</td>
+      <td class="cell-secondary cell-mono">{{ supplier.phone || '—' }}</td>
+      <td class="cell-secondary">{{ supplier.email || '—' }}</td>
+      <td class="cell-secondary cell-address">{{ supplier.address || '—' }}</td>
       @if (isAdmin) {
-        <td class="text-center actions-cell">
+        <td class="actions-cell">
           <p-button
             icon="pi pi-pencil"
             [rounded]="true"
@@ -55,13 +58,11 @@
 
   <ng-template pTemplate="emptymessage">
     <tr>
-      <td [attr.colspan]="isAdmin ? 5 : 4" class="empty-state">
+      <td [attr.colspan]="isAdmin ? 6 : 5" class="empty-state">
         <div class="empty-content">
-          <i class="pi pi-truck" style="font-size: 3rem; color: #d1d5db;"></i>
+          <i class="pi pi-truck"></i>
           <h3>No suppliers found</h3>
-          <p class="text-secondary">
-            Add your first supplier to start tracking inventory sources.
-          </p>
+          <p>Add your first supplier to start tracking inventory sources.</p>
         </div>
       </td>
     </tr>
