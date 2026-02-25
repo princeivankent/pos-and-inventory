@@ -355,3 +355,14 @@ The implementation is production-ready and sets a strong foundation for Phase 2 
 **Lines Changed:** ~400
 **New Components:** 0 (used existing PrimeNG components)
 **Build Status:** ✅ Successful
+
+---
+
+## POS Cost Transparency Pattern (Added Feb 2026)
+
+- Replaced noisy per-item FIFO badges with one cart-level informational note.
+- Note text: `FIFO supplier cost basis applies to N item(s). Selling prices are unchanged.`
+- Added on-demand per-item info tooltip (small info icon) for affected cart lines to show detailed FIFO vs product-cost breakdown.
+- Added dashboard help tooltips on key labels (sales, transactions, low stock, profit/inventory metrics) to guide new users.
+- Goal: prevent cashier/admin confusion when latest stock-in cost is different from the batch currently being consumed by FIFO.
+- Data source: `GET /api/products` now includes optional `next_fifo_unit_cost` and `next_fifo_purchase_date` from the oldest active batch.
