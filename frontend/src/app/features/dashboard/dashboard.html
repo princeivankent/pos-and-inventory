@@ -40,7 +40,7 @@
             <i class="pi pi-wallet"></i>
           </div>
           <div class="stat-content">
-            <span class="stat-label">Today's Sales</span>
+            <span class="stat-label">Today's Sales <i class="pi pi-question-circle label-help" pTooltip="Total completed sales amount for today, including tax." tooltipPosition="top" appendTo="body"></i></span>
             <span class="stat-value">{{ salesReport()?.total_sales ?? 0 | phpCurrency }}</span>
           </div>
         }
@@ -62,7 +62,7 @@
             <i class="pi pi-receipt"></i>
           </div>
           <div class="stat-content">
-            <span class="stat-label">Transactions</span>
+            <span class="stat-label">Transactions <i class="pi pi-question-circle label-help" pTooltip="Number of completed sales transactions recorded today." tooltipPosition="top" appendTo="body"></i></span>
             <span class="stat-value">{{ salesReport()?.total_transactions ?? 0 }}</span>
           </div>
         }
@@ -79,7 +79,7 @@
             <i class="pi pi-exclamation-triangle"></i>
           </div>
           <div class="stat-content">
-            <span class="stat-label">Low Stock Items</span>
+            <span class="stat-label">Low Stock Items <i class="pi pi-question-circle label-help" pTooltip="Products where current stock is at or below reorder level." tooltipPosition="top" appendTo="body"></i></span>
             <span class="stat-value">{{ lowStockProducts().length }}</span>
           </div>
         }
@@ -96,7 +96,7 @@
             <i class="pi pi-box"></i>
           </div>
           <div class="stat-content">
-            <span class="stat-label">Active Products</span>
+            <span class="stat-label">Active Products <i class="pi pi-question-circle label-help" pTooltip="Products currently active and available for selling." tooltipPosition="top" appendTo="body"></i></span>
             <span class="stat-value">{{ totalProducts() }}</span>
           </div>
         }
@@ -274,7 +274,7 @@
         <!-- Today's Profit -->
         <div class="card">
           <div class="card-header">
-            <h3>💰 Today's Profit</h3>
+            <h3>💰 Today's Profit <i class="pi pi-question-circle label-help" pTooltip="Profit uses FIFO supplier-cost basis from sold batches, not just latest product cost." tooltipPosition="top" appendTo="body"></i></h3>
           </div>
 
           @if (profitLoading()) {
@@ -297,22 +297,22 @@
           } @else {
             <div class="profit-grid">
               <div class="profit-stat">
-                <span class="profit-label">Revenue</span>
+                <span class="profit-label">Revenue <i class="pi pi-question-circle label-help" pTooltip="Sum of item subtotals sold today before tax." tooltipPosition="top" appendTo="body"></i></span>
                 <span class="profit-value">{{ profitReport()?.total_revenue ?? 0 | phpCurrency }}</span>
               </div>
               <div class="profit-stat">
-                <span class="profit-label">Cost</span>
+                <span class="profit-label">Cost <i class="pi pi-question-circle label-help" pTooltip="COGS from FIFO supplier batch costs used by sold items." tooltipPosition="top" appendTo="body"></i></span>
                 <span class="profit-value">{{ profitReport()?.total_cost ?? 0 | phpCurrency }}</span>
               </div>
               <div class="profit-stat">
-                <span class="profit-label">Gross Profit</span>
+                <span class="profit-label">Gross Profit <i class="pi pi-question-circle label-help" pTooltip="Revenue minus FIFO-based cost." tooltipPosition="top" appendTo="body"></i></span>
                 <span class="profit-value" [class.profit-positive]="(profitReport()?.gross_profit ?? 0) >= 0"
                   [class.profit-negative]="(profitReport()?.gross_profit ?? 0) < 0">
                   {{ profitReport()?.gross_profit ?? 0 | phpCurrency }}
                 </span>
               </div>
               <div class="profit-stat">
-                <span class="profit-label">Margin</span>
+                <span class="profit-label">Margin <i class="pi pi-question-circle label-help" pTooltip="Gross profit divided by revenue." tooltipPosition="top" appendTo="body"></i></span>
                 <span class="profit-value" [class.profit-positive]="(profitReport()?.profit_margin ?? 0) >= 0"
                   [class.profit-negative]="(profitReport()?.profit_margin ?? 0) < 0">
                   {{ (profitReport()?.profit_margin ?? 0) | number:'1.1-1' }}%
@@ -325,7 +325,7 @@
         <!-- Inventory Snapshot -->
         <div class="card">
           <div class="card-header">
-            <h3>📦 Inventory Snapshot</h3>
+            <h3>📦 Inventory Snapshot <i class="pi pi-question-circle label-help" pTooltip="Inventory values are based on active FIFO batch costs." tooltipPosition="top" appendTo="body"></i></h3>
           </div>
 
           @if (inventoryLoading()) {
@@ -348,15 +348,15 @@
           } @else {
             <div class="profit-grid">
               <div class="profit-stat">
-                <span class="profit-label">Stock Value</span>
+                <span class="profit-label">Stock Value <i class="pi pi-question-circle label-help" pTooltip="Total value of active stock using batch unit costs." tooltipPosition="top" appendTo="body"></i></span>
                 <span class="profit-value">{{ inventoryReport()?.total_stock_value ?? 0 | phpCurrency }}</span>
               </div>
               <div class="profit-stat">
-                <span class="profit-label">Total Products</span>
+                <span class="profit-label">Total Products <i class="pi pi-question-circle label-help" pTooltip="Count of active products in this store." tooltipPosition="top" appendTo="body"></i></span>
                 <span class="profit-value">{{ inventoryReport()?.total_products ?? 0 }}</span>
               </div>
               <div class="profit-stat">
-                <span class="profit-label">Low Stock</span>
+                <span class="profit-label">Low Stock <i class="pi pi-question-circle label-help" pTooltip="Products at or below reorder level." tooltipPosition="top" appendTo="body"></i></span>
                 <span class="profit-value">
                   <app-status-badge
                     [label]="(inventoryReport()?.low_stock_count ?? 0).toString()"
@@ -365,7 +365,7 @@
                 </span>
               </div>
               <div class="profit-stat">
-                <span class="profit-label">Out of Stock</span>
+                <span class="profit-label">Out of Stock <i class="pi pi-question-circle label-help" pTooltip="Products with zero available stock." tooltipPosition="top" appendTo="body"></i></span>
                 <span class="profit-value">
                   <app-status-badge
                     [label]="(inventoryReport()?.out_of_stock_count ?? 0).toString()"

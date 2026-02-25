@@ -47,22 +47,27 @@ export class InventoryService {
       let movementType: MovementType;
 
       if (dto.type === AdjustmentType.STOCK_IN) {
+        const effectiveUnitCost = dto.unit_cost ?? product.cost_price;
+
         // Create new batch for stock-in
         batch = manager.create(InventoryBatch, {
           product_id: dto.product_id,
           store_id: storeId,
           batch_number: `ADJ-${Date.now()}`,
           purchase_date: new Date(),
-          unit_cost: dto.unit_cost || product.cost_price,
+          unit_cost: effectiveUnitCost,
           initial_quantity: dto.quantity,
           current_quantity: dto.quantity,
-          wholesale_price: product.cost_price,
+          wholesale_price: effectiveUnitCost,
           retail_price: product.retail_price,
           is_active: true,
           supplier_id: dto.supplier_id || null,
         });
         batch = await manager.save(InventoryBatch, batch);
 
+        if (dto.unit_cost != null) {
+          product.cost_price = dto.unit_cost;
+        }
         product.current_stock = Number(product.current_stock) + dto.quantity;
         movementType = MovementType.PURCHASE;
       } else {
@@ -81,7 +86,7 @@ export class InventoryService {
             is_active: true,
             current_quantity: MoreThan(0),
           },
-          order: { purchase_date: 'ASC' },
+          order: { purchase_date: 'ASC', created_at: 'ASC' },
         });
 
         let remaining = dto.quantity;
