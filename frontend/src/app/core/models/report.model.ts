@@ -59,6 +59,9 @@ export interface ProfitReport {
   period: string;
   start_date: string;
   end_date: string;
+  costing_method?: string;
+  legacy_fallback_rows?: number;
+  warnings?: string[];
   total_revenue: number;
   total_revenue_trend?: TrendMetadata;
   total_cost: number;
@@ -67,6 +70,9 @@ export interface ProfitReport {
   gross_profit_trend?: TrendMetadata;
   profit_margin: number;
   profit_margin_trend?: TrendMetadata;
+  total_discount?: number;
+  total_tax?: number;
+  total_transactions?: number;
 }
 
 export interface ReportDateRange {

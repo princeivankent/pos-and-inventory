@@ -8,9 +8,15 @@
       <p-table
         [value]="products()"
         [loading]="loading()"
+        [paginator]="true"
+        [rows]="15"
+        [rowsPerPageOptions]="[15, 30, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first}–{last} of {totalRecords} products"
         dataKey="id"
         [sortField]="'current_stock'"
         [sortOrder]="1"
+        styleClass="enhanced-table"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -22,7 +28,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-p>
-          <tr>
+          <tr class="table-row">
             <td class="font-medium">{{ p.name }}</td>
             <td>{{ p.sku }}</td>
             <td style="text-align:right">{{ p.current_stock }} {{ p.unit }}</td>

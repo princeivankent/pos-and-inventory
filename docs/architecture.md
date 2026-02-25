@@ -539,3 +539,16 @@ This architecture ensures:
 - **Data Integrity**: FIFO logic and transactional operations
 - **Performance**: Proper indexing and query optimization
 - **Maintainability**: Clean separation of concerns
+
+## Costing and Valuation Notes (2026-02-24)
+
+- `sale_items` now includes `unit_cost_snapshot` and `cogs_subtotal`.
+- During sale creation, each FIFO-allocated sale item stores batch cost snapshots for historical COGS.
+- Profit report costing priority:
+  1. `sale_items.cogs_subtotal`
+  2. `sale_items.quantity * inventory_batches.unit_cost`
+  3. `sale_items.quantity * products.cost_price`
+- Profit report returns `costing_method`, `legacy_fallback_rows`, and `warnings` for transparency on legacy data.
+- Inventory valuation now uses active batch value (`current_quantity * unit_cost`) instead of product master cost.
+- Stock-in with provided `unit_cost` auto-updates `products.cost_price`; retail price remains manual.
+- FIFO batch selection is deterministic: order by `purchase_date`, then `created_at` for same-day batches.

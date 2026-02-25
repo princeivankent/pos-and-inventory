@@ -10,6 +10,8 @@ import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
 import { Product } from '../../core/models/product.model';
+import { Supplier } from '../../core/models/supplier.model';
+import { SupplierService } from '../../core/services/supplier.service';
 import { ToastService } from '../../core/services/toast.service';
 import { StoreContextService } from '../../core/services/store-context.service';
 import { PageHeader } from '../../shared/components/page-header/page-header';
@@ -28,16 +30,19 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
 })
 export class InventoryOverviewComponent implements OnInit {
   private http = inject(HttpClient);
+  private supplierService = inject(SupplierService);
   private toast = inject(ToastService);
   storeCtx = inject(StoreContextService);
 
   products = signal<Product[]>([]);
+  suppliers = signal<Supplier[]>([]);
+  suppliersLoading = signal(false);
   loading = signal(false);
   saving = signal(false);
 
   // Stock In dialog
   stockInVisible = false;
-  stockInForm = { product_id: '', quantity: 1, unit_cost: null as number | null, notes: '' };
+  stockInForm = { product_id: '', quantity: 1, unit_cost: null as number | null, notes: '', supplier_id: null as string | null };
 
   // Stock Out / Adjust dialog
   adjustVisible = false;
@@ -66,8 +71,18 @@ export class InventoryOverviewComponent implements OnInit {
       quantity: 1,
       unit_cost: null,
       notes: '',
+      supplier_id: null,
     };
     this.stockInVisible = true;
+    this.loadSuppliers();
+  }
+
+  loadSuppliers() {
+    this.suppliersLoading.set(true);
+    this.supplierService.getAll().subscribe({
+      next: (s) => { this.suppliers.set(s); this.suppliersLoading.set(false); },
+      error: () => this.suppliersLoading.set(false),
+    });
   }
 
   applyStockIn() {
@@ -84,6 +99,9 @@ export class InventoryOverviewComponent implements OnInit {
     };
     if (this.stockInForm.unit_cost != null) {
       payload.unit_cost = this.stockInForm.unit_cost;
+    }
+    if (this.stockInForm.supplier_id) {
+      payload.supplier_id = this.stockInForm.supplier_id;
     }
     this.http.post(`${environment.apiUrl}/inventory/adjust`, payload).subscribe({
       next: () => {

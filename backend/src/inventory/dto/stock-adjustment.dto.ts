@@ -34,4 +34,8 @@ export class StockAdjustmentDto {
   @IsString()
   @IsOptional()
   notes?: string;
+
+  @IsUUID()
+  @IsOptional()
+  supplier_id?: string;
 }

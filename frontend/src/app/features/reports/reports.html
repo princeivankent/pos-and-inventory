@@ -313,6 +313,14 @@
             }
           </div>
         } @else if (profitReport()) {
+          @if ((profitReport()!.legacy_fallback_rows ?? 0) > 0) {
+            <div class="fallback-warning">
+              <i class="pi pi-exclamation-triangle"></i>
+              <span>
+                {{ profitReport()!.warnings?.[0] ?? 'Some sale items used fallback costing due to missing cost snapshots.' }}
+              </span>
+            </div>
+          }
           <div class="stats-grid">
             <div class="stat-card">
               <div class="stat-header">

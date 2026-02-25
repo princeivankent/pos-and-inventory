@@ -37,7 +37,10 @@
       "Bash(git push:*)",
       "Bash(gh pr create:*)",
       "Bash(echo:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(cd C:\\\\Users\\\\prince-asus\\\\Projects\\\\pos-and-inventory:*)",
+      "WebFetch(domain:support.dealpos.com)",
+      "WebFetch(domain:www.magestore.com)"
     ]
   }
 }

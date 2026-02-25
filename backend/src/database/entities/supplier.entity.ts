@@ -18,4 +18,7 @@ export class Supplier extends TenantBaseEntity {
 
   @Column({ type: 'text', nullable: true })
   address: string;
+
+  @Column({ type: 'boolean', default: true })
+  is_active: boolean;
 }

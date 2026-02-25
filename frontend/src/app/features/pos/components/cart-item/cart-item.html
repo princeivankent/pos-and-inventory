@@ -1,6 +1,20 @@
 <div class="cart-item">
   <div class="item-left">
-    <span class="item-name">{{ item.product.name }}</span>
+    <div class="item-title-row">
+      <span class="item-name">{{ item.product.name }}</span>
+      @if (showFifoInfo()) {
+        <button
+          type="button"
+          class="fifo-help-btn"
+          [pTooltip]="getFifoTooltip()"
+          tooltipPosition="top"
+          [escape]="false"
+          appendTo="body"
+        >
+          <i class="pi pi-info-circle"></i>
+        </button>
+      }
+    </div>
     <span class="item-price">{{ item.unit_price | phpCurrency }}</span>
   </div>
   <div class="item-center">

@@ -12,6 +12,12 @@
   flex-direction: column;
   gap: 0.125rem;
 }
+.item-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
 .item-name {
   font-size: 0.8125rem;
   font-weight: 500;
@@ -23,6 +29,23 @@
 .item-price {
   font-size: 0.6875rem;
   color: var(--text-secondary);
+}
+.fifo-help-btn {
+  width: 16px;
+  height: 16px;
+  border: none;
+  background: transparent;
+  color: #8a5600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: help;
+  flex-shrink: 0;
+
+  i {
+    font-size: 0.75rem;
+  }
 }
 .item-center {
   display: flex;

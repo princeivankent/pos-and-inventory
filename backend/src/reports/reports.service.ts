@@ -4,6 +4,7 @@ import { Repository, Between } from 'typeorm';
 import { Sale, SaleStatus } from '../database/entities/sale.entity';
 import { SaleItem } from '../database/entities/sale-item.entity';
 import { Product } from '../database/entities/product.entity';
+import { InventoryBatch } from '../database/entities/inventory-batch.entity';
 import { SalesReportDto } from './dto/sales-report.dto';
 import { ProfitReportDto } from './dto/profit-report.dto';
 import { TrendMetadataDto } from './dto/trend-metadata.dto';
@@ -17,6 +18,8 @@ export class ReportsService {
     private saleItemRepository: Repository<SaleItem>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(InventoryBatch)
+    private batchRepository: Repository<InventoryBatch>,
   ) {}
 
   /**
@@ -108,6 +111,63 @@ export class ReportsService {
       totalTax,
       totalDiscount,
       netSales,
+    };
+  }
+
+  private round2(value: number): number {
+    return Math.round(value * 100) / 100;
+  }
+
+  private async getProfitSummaryForPeriod(
+    storeId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<{
+    totalRevenue: number;
+    totalCost: number;
+    fallbackRows: number;
+  }> {
+    const result = await this.saleItemRepository
+      .createQueryBuilder('si')
+      .select('SUM(si.subtotal)', 'total_revenue')
+      .addSelect(
+        `
+          SUM(
+            CASE
+              WHEN si.cogs_subtotal IS NOT NULL THEN si.cogs_subtotal
+              WHEN b.unit_cost IS NOT NULL THEN si.quantity * b.unit_cost
+              ELSE si.quantity * p.cost_price
+            END
+          )
+        `,
+        'total_cost',
+      )
+      .addSelect(
+        `
+          SUM(
+            CASE
+              WHEN si.cogs_subtotal IS NULL THEN 1
+              ELSE 0
+            END
+          )
+        `,
+        'fallback_rows',
+      )
+      .innerJoin('si.sale', 's')
+      .innerJoin('si.product', 'p')
+      .leftJoin('si.batch', 'b')
+      .where('s.store_id = :storeId', { storeId })
+      .andWhere('s.sale_date BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .andWhere('s.status = :status', { status: SaleStatus.COMPLETED })
+      .getRawOne();
+
+    return {
+      totalRevenue: Number(result?.total_revenue || 0),
+      totalCost: Number(result?.total_cost || 0),
+      fallbackRows: Number(result?.fallback_rows || 0),
     };
   }
 
@@ -209,11 +269,25 @@ export class ReportsService {
       order: { name: 'ASC' },
     });
 
+    const productStockValuesRaw = await this.batchRepository
+      .createQueryBuilder('b')
+      .select('b.product_id', 'product_id')
+      .addSelect('SUM(b.current_quantity * b.unit_cost)', 'stock_value')
+      .where('b.store_id = :storeId', { storeId })
+      .andWhere('b.is_active = true')
+      .andWhere('b.current_quantity > 0')
+      .groupBy('b.product_id')
+      .getRawMany();
+
+    const productStockValues = new Map<string, number>();
+    for (const row of productStockValuesRaw) {
+      productStockValues.set(row.product_id, Number(row.stock_value || 0));
+    }
+
     const totalProducts = products.length;
-    const totalStockValue = products.reduce(
-      (sum, p) => sum + Number(p.cost_price) * Number(p.current_stock),
-      0,
-    );
+    const totalStockValue = products.reduce((sum, p) => {
+      return sum + Number(productStockValues.get(p.id) || 0);
+    }, 0);
     const totalRetailValue = products.reduce(
       (sum, p) => sum + Number(p.retail_price) * Number(p.current_stock),
       0,
@@ -227,12 +301,12 @@ export class ReportsService {
 
     return {
       total_products: totalProducts,
-      total_stock_value: Math.round(totalStockValue * 100) / 100,
-      total_retail_value: Math.round(totalRetailValue * 100) / 100,
+      total_stock_value: this.round2(totalStockValue),
+      total_retail_value: this.round2(totalRetailValue),
       low_stock_count: lowStockCount,
       out_of_stock_count: outOfStockCount,
       products: products.map((p) => ({
-        id: p.id,
+        product_id: p.id,
         name: p.name,
         sku: p.sku,
         category: p.category?.name,
@@ -240,7 +314,7 @@ export class ReportsService {
         reorder_level: Number(p.reorder_level),
         cost_price: Number(p.cost_price),
         retail_price: Number(p.retail_price),
-        stock_value: Math.round(Number(p.cost_price) * Number(p.current_stock) * 100) / 100,
+        stock_value: this.round2(Number(productStockValues.get(p.id) || 0)),
       })),
     };
   }
@@ -298,44 +372,19 @@ export class ReportsService {
       endDate,
     );
 
-    // Fetch current period data
-    const results = await this.saleItemRepository
-      .createQueryBuilder('si')
-      .select('SUM(si.subtotal)', 'total_revenue')
-      .addSelect('SUM(si.quantity * p.cost_price)', 'total_cost')
-      .innerJoin('si.sale', 's')
-      .innerJoin('si.product', 'p')
-      .where('s.store_id = :storeId', { storeId })
-      .andWhere('s.sale_date BETWEEN :startDate AND :endDate', {
-        startDate,
-        endDate,
-      })
-      .andWhere('s.status = :status', { status: SaleStatus.COMPLETED })
-      .getRawOne();
+    const [current, previous] = await Promise.all([
+      this.getProfitSummaryForPeriod(storeId, startDate, endDate),
+      this.getProfitSummaryForPeriod(storeId, previousStart, previousEnd),
+    ]);
 
-    // Fetch previous period data
-    const previousResults = await this.saleItemRepository
-      .createQueryBuilder('si')
-      .select('SUM(si.subtotal)', 'total_revenue')
-      .addSelect('SUM(si.quantity * p.cost_price)', 'total_cost')
-      .innerJoin('si.sale', 's')
-      .innerJoin('si.product', 'p')
-      .where('s.store_id = :storeId', { storeId })
-      .andWhere('s.sale_date BETWEEN :startDate AND :endDate', {
-        startDate: previousStart,
-        endDate: previousEnd,
-      })
-      .andWhere('s.status = :status', { status: SaleStatus.COMPLETED })
-      .getRawOne();
-
-    const totalRevenue = Number(results?.total_revenue || 0);
-    const totalCost = Number(results?.total_cost || 0);
+    const totalRevenue = current.totalRevenue;
+    const totalCost = current.totalCost;
     const grossProfit = totalRevenue - totalCost;
     const profitMargin =
       totalRevenue > 0 ? (grossProfit / totalRevenue) * 100 : 0;
 
-    const previousRevenue = Number(previousResults?.total_revenue || 0);
-    const previousCost = Number(previousResults?.total_cost || 0);
+    const previousRevenue = previous.totalRevenue;
+    const previousCost = previous.totalCost;
     const previousProfit = previousRevenue - previousCost;
     const previousMargin =
       previousRevenue > 0 ? (previousProfit / previousRevenue) * 100 : 0;
@@ -360,22 +409,30 @@ export class ReportsService {
       .andWhere('s.status = :status', { status: SaleStatus.COMPLETED })
       .getRawOne();
 
+    const warnings: string[] = [];
+    if (current.fallbackRows > 0) {
+      warnings.push(
+        `${current.fallbackRows} sale item(s) used fallback costing due to missing cost snapshots.`,
+      );
+    }
+
     return {
       period,
       start_date: startDate,
       end_date: endDate,
-      total_revenue: Math.round(totalRevenue * 100) / 100,
+      costing_method: 'fifo_snapshot_with_legacy_fallback',
+      legacy_fallback_rows: current.fallbackRows,
+      warnings,
+      total_revenue: this.round2(totalRevenue),
       total_revenue_trend: totalRevenueTrend,
-      total_cost: Math.round(totalCost * 100) / 100,
+      total_cost: this.round2(totalCost),
       total_cost_trend: totalCostTrend,
-      gross_profit: Math.round(grossProfit * 100) / 100,
+      gross_profit: this.round2(grossProfit),
       gross_profit_trend: grossProfitTrend,
-      profit_margin: Math.round(profitMargin * 100) / 100,
+      profit_margin: this.round2(profitMargin),
       profit_margin_trend: profitMarginTrend,
-      total_discount: Math.round(
-        Number(salesAgg?.total_discount || 0) * 100,
-      ) / 100,
-      total_tax: Math.round(Number(salesAgg?.total_tax || 0) * 100) / 100,
+      total_discount: this.round2(Number(salesAgg?.total_discount || 0)),
+      total_tax: this.round2(Number(salesAgg?.total_tax || 0)),
       total_transactions: Number(salesAgg?.total_transactions || 0),
     };
   }

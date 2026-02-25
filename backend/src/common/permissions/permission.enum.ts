@@ -27,6 +27,10 @@ export enum Permission {
 
   // Stores
   STORES_MANAGE = 'stores:manage',
+
+  // Suppliers
+  SUPPLIERS_VIEW = 'suppliers:view',
+  SUPPLIERS_MANAGE = 'suppliers:manage',
 }
 
 export const ALL_PERMISSIONS = Object.values(Permission);
@@ -58,4 +62,6 @@ export const PERMISSION_DESCRIPTIONS: Record<Permission, string> = {
     'Create, update, and delete customers and manage credit',
   [Permission.USERS_MANAGE]: 'Add, remove, and update users and permissions',
   [Permission.STORES_MANAGE]: 'Update store settings and configuration',
+  [Permission.SUPPLIERS_VIEW]: 'View supplier information',
+  [Permission.SUPPLIERS_MANAGE]: 'Create, update, and deactivate suppliers',
 };

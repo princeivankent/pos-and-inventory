@@ -4,6 +4,9 @@ export class ProfitReportDto {
   period: string;
   start_date: Date;
   end_date: Date;
+  costing_method: string;
+  legacy_fallback_rows: number;
+  warnings: string[];
   total_revenue: number;
   total_revenue_trend?: TrendMetadataDto;
   total_cost: number;

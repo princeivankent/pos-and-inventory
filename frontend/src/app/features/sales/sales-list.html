@@ -15,11 +15,15 @@
       <p-table
         [value]="sales()"
         [paginator]="true"
-        [rows]="20"
+        [rows]="15"
+        [rowsPerPageOptions]="[15, 30, 50]"
         [loading]="loading()"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first}–{last} of {totalRecords} sales"
         dataKey="id"
         [sortField]="'sale_date'"
         [sortOrder]="-1"
+        styleClass="enhanced-table"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -34,7 +38,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-sale>
-          <tr>
+          <tr class="table-row">
             <td class="font-medium">{{ sale.sale_number }}</td>
             <td>{{ sale.sale_date | date:'MMM d, y h:mm a' }}</td>
             <td>{{ sale.cashier?.full_name ?? '-' }}</td>

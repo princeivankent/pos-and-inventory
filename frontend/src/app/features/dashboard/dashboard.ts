@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 import { Skeleton } from 'primeng/skeleton';
 import { UIChart } from 'primeng/chart';
 import { environment } from '../../../environments/environment';
@@ -28,6 +29,7 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
     DatePipe,
     DecimalPipe,
     ButtonModule,
+    TooltipModule,
     Skeleton,
     UIChart,
     PhpCurrencyPipe,
