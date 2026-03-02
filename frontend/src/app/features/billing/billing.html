@@ -204,7 +204,7 @@
                 severity="secondary"
                 styleClass="w-full"
                 [loading]="actionLoading()"
-                (onClick)="downgradePlan(plan)" />
+                (onClick)="openDowngradeDialog(plan)" />
             }
           </div>
         </div>
@@ -258,13 +258,7 @@
             </p>
           </div>
         </div>
-        <!-- TODO: Replace placeholder with PayMongo payment form -->
-        <!-- Integration points:
-             1. POST /api/payments/create-intent → get payment intent
-             2. For GCash: redirect to checkout_url from payment source
-             3. For Card: collect card details via PayMongo.js
-             4. On payment success webhook: call doUpgrade()
-        -->
+        <!-- Checkout handoff placeholder. Use checkout_url from /payments/intents to complete payment. -->
         <div class="payment-methods-placeholder">
           <div class="payment-method-row">
             <i class="pi pi-mobile"></i>
@@ -320,7 +314,7 @@
         label="Pay & Upgrade"
         icon="pi pi-lock"
         [loading]="actionLoading()"
-        (onClick)="doUpgrade()" />
+        (onClick)="doUpgrade(latestPaymentId())" />
     } @else {
       <p-button
         label="Cancel"
@@ -334,6 +328,35 @@
         [loading]="actionLoading()"
         (onClick)="confirmUpgrade()" />
     }
+  </ng-template>
+</p-dialog>
+
+<!-- Downgrade Confirmation Dialog -->
+<p-dialog
+  [header]="'Downgrade to ' + (selectedDowngradePlan()?.name ?? '') + '?'"
+  [modal]="true"
+  [visible]="downgradeDialogVisible()"
+  (visibleChange)="downgradeDialogVisible.set($event)"
+  [style]="{ width: '28rem' }"
+  [draggable]="false">
+  <p class="cancel-dialog-text">
+    You are about to downgrade your subscription.
+    @if (selectedDowngradePlan()) {
+      New plan: <strong>{{ selectedDowngradePlan()!.name }}</strong>.
+    }
+    This may restrict features and limits immediately or at period end depending on your current status.
+  </p>
+  <ng-template #footer>
+    <p-button
+      label="Keep Current Plan"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="downgradeDialogVisible.set(false)" />
+    <p-button
+      label="Yes, Downgrade"
+      severity="danger"
+      [loading]="actionLoading()"
+      (onClick)="confirmDowngrade()" />
   </ng-template>
 </p-dialog>
 

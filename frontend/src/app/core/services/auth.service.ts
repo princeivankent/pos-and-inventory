@@ -23,7 +23,7 @@ export class AuthService {
   private router = inject(Router);
   private subscriptionService = inject(SubscriptionService);
 
-  currentUser = signal<{ id: string; email: string; full_name: string } | null>(
+  currentUser = signal<{ id: string; email: string; full_name: string; is_platform_admin?: boolean } | null>(
     this.loadUser()
   );
   stores = signal<StoreAccess[]>(this.loadStores());

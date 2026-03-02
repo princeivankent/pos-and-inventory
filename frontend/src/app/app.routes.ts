@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/role.guard';
+import { platformAdminGuard } from './core/guards/platform-admin.guard';
 
 export const routes: Routes = [
   {
@@ -128,6 +129,14 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/billing/billing').then((m) => m.BillingComponent),
         canActivate: [adminGuard],
+      },
+      {
+        path: 'platform/subscriptions',
+        loadComponent: () =>
+          import('./features/platform/subscriptions/platform-subscriptions').then(
+            (m) => m.PlatformSubscriptionsComponent
+          ),
+        canActivate: [platformAdminGuard],
       },
     ],
   },

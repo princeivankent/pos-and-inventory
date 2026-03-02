@@ -1,0 +1,96 @@
+<app-page-header
+  title="Platform Subscriptions"
+  subtitle="Monitor all customer organizations and manage billing states."
+/>
+
+<div class="page-content">
+  <div class="card filters">
+    <input
+      type="text"
+      [ngModel]="search()"
+      (ngModelChange)="search.set($event)"
+      placeholder="Search org name or email"
+      class="field"
+    />
+    <select [ngModel]="status()" (ngModelChange)="status.set($event)" class="field">
+      <option value="">All statuses</option>
+      <option value="trial">Trial</option>
+      <option value="active">Active</option>
+      <option value="past_due">Past due</option>
+      <option value="suspended">Suspended</option>
+      <option value="cancelled">Cancelled</option>
+      <option value="expired">Expired</option>
+    </select>
+    <button type="button" class="btn" (click)="load()">Apply Filters</button>
+  </div>
+
+  <div class="card table-wrap">
+    @if (loading()) {
+      <p>Loading subscriptions...</p>
+    } @else if (items().length === 0) {
+      <p>No subscriptions found.</p>
+    } @else {
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Organization</th>
+            <th>Plan</th>
+            <th>Status</th>
+            <th>Renewal</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of items(); track item.id) {
+            <tr>
+              <td>
+                <div class="org-name">{{ item.organization.name }}</div>
+                <div class="org-email">{{ item.organization.billing_email || 'No billing email' }}</div>
+              </td>
+              <td>{{ item.plan.name }}</td>
+              <td><span class="status status--{{ item.status }}">{{ item.status }}</span></td>
+              <td>{{ item.current_period_end ? (item.current_period_end | date: 'mediumDate') : '—' }}</td>
+              <td class="actions">
+                @if (item.status !== 'suspended') {
+                  <button type="button" class="btn btn-danger" (click)="openActionDialog(item, 'suspend')">Suspend</button>
+                } @else {
+                  <button type="button" class="btn" (click)="openActionDialog(item, 'reactivate')">Reactivate</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>
+
+<p-dialog
+  [header]="pendingAction() === 'suspend' ? 'Suspend Subscription?' : 'Reactivate Subscription?'"
+  [modal]="true"
+  [visible]="actionDialogVisible()"
+  (visibleChange)="actionDialogVisible.set($event)"
+  [style]="{ width: '28rem' }"
+  [draggable]="false">
+  @if (selectedItem()) {
+    <p class="cancel-dialog-text">
+      @if (pendingAction() === 'suspend') {
+        Suspend <strong>{{ selectedItem()!.organization.name }}</strong> now? This will block access based on subscription checks.
+      } @else {
+        Reactivate <strong>{{ selectedItem()!.organization.name }}</strong> now?
+      }
+    </p>
+  }
+  <ng-template #footer>
+    <p-button
+      label="Cancel"
+      severity="secondary"
+      [outlined]="true"
+      (onClick)="actionDialogVisible.set(false)" />
+    <p-button
+      [label]="pendingAction() === 'suspend' ? 'Yes, Suspend' : 'Yes, Reactivate'"
+      [severity]="pendingAction() === 'suspend' ? 'danger' : 'info'"
+      [loading]="actionLoading()"
+      (onClick)="confirmAction()" />
+  </ng-template>
+</p-dialog>

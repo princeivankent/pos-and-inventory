@@ -47,6 +47,7 @@ export interface LoginResponse {
     id: string;
     email: string;
     full_name: string;
+    is_platform_admin?: boolean;
   };
   stores: StoreAccess[];
   default_store: StoreAccess;
@@ -60,6 +61,7 @@ export interface RegisterResponse {
     id: string;
     email: string;
     full_name: string;
+    is_platform_admin?: boolean;
   };
   stores: StoreAccess[];
   default_store: StoreAccess;

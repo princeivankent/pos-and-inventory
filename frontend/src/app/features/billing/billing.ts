@@ -35,8 +35,11 @@ export class BillingComponent implements OnInit {
   loading = signal(true);
   actionLoading = signal(false);
   cancelDialogVisible = signal(false);
+  downgradeDialogVisible = signal(false);
   upgradeDialogVisible = signal(false);
   selectedUpgradePlan = signal<SubscriptionPlan | null>(null);
+  selectedDowngradePlan = signal<SubscriptionPlan | null>(null);
+  latestPaymentId = signal<string | null>(null);
   // Payment bypass toggle — reads from environment (mirrors backend BYPASS_PAYMENT)
   readonly bypassPayment = environment.bypassPayment;
   upgradePaymentStep = signal(false);
@@ -166,20 +169,19 @@ export class BillingComponent implements OnInit {
   // When bypassPayment=false (prod): shows payment step first.
   confirmUpgrade() {
     if (this.bypassPayment) {
-      this.doUpgrade();
+      this.doUpgrade(null);
     } else {
-      this.upgradePaymentStep.set(true);
+      this.startUpgradePayment();
     }
   }
 
   // Called from payment step after payment is collected (or directly when bypassed).
-  // TODO: When bypassPayment=false, call POST /payments/create-intent first, then doUpgrade() on success.
-  doUpgrade() {
+  doUpgrade(paymentId: string | null) {
     const plan = this.selectedUpgradePlan();
     if (!plan) return;
     this.upgradeDialogVisible.set(false);
     this.actionLoading.set(true);
-    this.http.post(`${environment.apiUrl}/billing/upgrade`, { plan_id: plan.id }).subscribe({
+    this.http.post(`${environment.apiUrl}/billing/upgrade`, { plan_id: plan.id, payment_id: paymentId ?? undefined }).subscribe({
       next: () => {
         this.subscriptionService.refreshSubscription().subscribe(() => {
           this.toast.success('Plan upgraded', `You are now on the ${plan.name} plan.`);
@@ -194,7 +196,50 @@ export class BillingComponent implements OnInit {
     });
   }
 
-  downgradePlan(plan: SubscriptionPlan) {
+  private startUpgradePayment() {
+    const plan = this.selectedUpgradePlan();
+    if (!plan) return;
+
+    this.actionLoading.set(true);
+    this.http
+      .post<{ payment_id: string; requires_action: boolean; payment_intent: { checkout_url?: string } }>(
+        `${environment.apiUrl}/payments/intents`,
+        { plan_id: plan.id },
+      )
+      .subscribe({
+        next: (res) => {
+          this.actionLoading.set(false);
+          this.latestPaymentId.set(res.payment_id);
+
+          if (res.requires_action) {
+            this.upgradePaymentStep.set(true);
+            this.toast.info(
+              'Payment action required',
+              res.payment_intent?.checkout_url
+                ? 'Use the provided checkout URL to complete payment, then click Pay & Upgrade.'
+                : 'Complete payment first, then click Pay & Upgrade.',
+            );
+            return;
+          }
+
+          this.doUpgrade(res.payment_id);
+        },
+        error: (err) => {
+          this.actionLoading.set(false);
+          this.toast.error('Failed to start payment', err?.error?.message ?? 'Please try again.');
+        },
+      });
+  }
+
+  openDowngradeDialog(plan: SubscriptionPlan) {
+    this.selectedDowngradePlan.set(plan);
+    this.downgradeDialogVisible.set(true);
+  }
+
+  confirmDowngrade() {
+    const plan = this.selectedDowngradePlan();
+    if (!plan) return;
+    this.downgradeDialogVisible.set(false);
     this.actionLoading.set(true);
     this.http.post(`${environment.apiUrl}/billing/downgrade`, { plan_id: plan.id }).subscribe({
       next: () => {

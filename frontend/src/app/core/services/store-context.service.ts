@@ -18,6 +18,7 @@ export class StoreContextService {
   storeId = computed(() => this.activeStore()?.id ?? '');
   currentRole = computed(() => this.activeStore()?.role ?? UserRole.CASHIER);
   isAdmin = computed(() => this.currentRole() === UserRole.ADMIN);
+  isPlatformAdmin = computed(() => this.auth.currentUser()?.is_platform_admin === true);
 
   initializeStore() {
     const stores = this.auth.stores();

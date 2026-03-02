@@ -9,6 +9,7 @@ interface NavItem {
   icon: string;
   route: string;
   adminOnly?: boolean;
+  platformOnly?: boolean;
   requiresFeature?: string;
 }
 
@@ -42,14 +43,22 @@ export class SidebarComponent {
     { label: 'Users', icon: 'pi-users', route: '/users', adminOnly: true },
     { label: 'Settings', icon: 'pi-cog', route: '/settings', adminOnly: true },
     { label: 'Billing', icon: 'pi-credit-card', route: '/billing', adminOnly: true },
+    {
+      label: 'Platform Billing',
+      icon: 'pi-building-columns',
+      route: '/platform/subscriptions',
+      platformOnly: true,
+    },
   ];
 
   get visibleItems(): NavItem[] {
     const isAdmin = this.storeContext.isAdmin();
+    const isPlatformAdmin = this.storeContext.isPlatformAdmin();
 
     return this.navItems.filter((item) => {
       // Check role requirement
       if (item.adminOnly && !isAdmin) return false;
+      if (item.platformOnly && !isPlatformAdmin) return false;
 
       // Check feature requirement
       if (item.requiresFeature) {
