@@ -31,6 +31,18 @@ export class SaleItem extends BaseEntity {
   })
   subtotal: number;
 
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, nullable: true,
+    transformer: { to: (value: number) => value, from: (value: string) => (value == null ? null : parseFloat(value)) },
+  })
+  unit_cost_snapshot: number | null;
+
+  @Column({
+    type: 'decimal', precision: 10, scale: 2, nullable: true,
+    transformer: { to: (value: number) => value, from: (value: string) => (value == null ? null : parseFloat(value)) },
+  })
+  cogs_subtotal: number | null;
+
   @ManyToOne(() => Sale)
   @JoinColumn({ name: 'sale_id' })
   sale: Sale;

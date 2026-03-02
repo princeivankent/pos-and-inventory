@@ -88,6 +88,14 @@
           <span>TOTAL</span>
           <span>{{ cart.total() | phpCurrency }}</span>
         </div>
+        @if (getFifoMismatchCount() > 0) {
+          <div class="fifo-cost-note">
+            <i class="pi pi-info-circle"></i>
+            <span>
+              FIFO supplier cost basis applies to {{ getFifoMismatchCount() }} item(s). Selling prices are unchanged.
+            </span>
+          </div>
+        }
       </div>
 
       <div class="payment-methods">

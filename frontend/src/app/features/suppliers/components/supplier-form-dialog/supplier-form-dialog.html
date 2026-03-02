@@ -1,0 +1,56 @@
+<p-dialog
+  [header]="editMode ? 'Edit Supplier' : 'New Supplier'"
+  [visible]="visible"
+  (visibleChange)="onHide()"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [closable]="true"
+>
+  <div class="form-grid">
+    <!-- Basic Information -->
+    <div class="form-section">
+      <h4>Basic Information</h4>
+
+      <div class="field">
+        <label for="supplier-name">Name *</label>
+        <input pInputText id="supplier-name" [(ngModel)]="form.name" placeholder="Supplier name" class="w-full" />
+      </div>
+
+      <div class="field">
+        <label for="contact-person">Contact Person</label>
+        <input pInputText id="contact-person" [(ngModel)]="form.contact_person" placeholder="e.g. Juan dela Cruz" class="w-full" />
+      </div>
+    </div>
+
+    <!-- Contact Details -->
+    <div class="form-section">
+      <h4>Contact Details</h4>
+
+      <div class="field">
+        <label for="supplier-phone">Phone</label>
+        <input pInputText id="supplier-phone" [(ngModel)]="form.phone" placeholder="09XX-XXX-XXXX" class="w-full" />
+      </div>
+
+      <div class="field">
+        <label for="supplier-email">Email</label>
+        <input pInputText id="supplier-email" [(ngModel)]="form.email" placeholder="supplier@example.com" class="w-full" />
+      </div>
+
+      <div class="field">
+        <label for="supplier-address">Address</label>
+        <textarea pTextarea id="supplier-address" [(ngModel)]="form.address" placeholder="Supplier address" [rows]="2" class="w-full"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="onHide()" />
+    <p-button
+      [label]="editMode ? 'Update' : 'Create'"
+      icon="pi pi-check"
+      (onClick)="save.emit()"
+      [disabled]="!isValid || saving"
+      [loading]="saving"
+    />
+  </ng-template>
+</p-dialog>

@@ -45,6 +45,7 @@ After login, you'll see the dashboard with today's sales summary and low stock a
 2. Click **Stock In** and select the product.
 3. Enter the quantity, optional unit cost, and notes.
 4. Each stock-in creates a batch for FIFO tracking.
+5. If you provide a unit cost, the product's cost price is automatically updated to that latest purchase cost.
 
 ### Stock Adjustments
 - Use **Stock Out** for manual deductions (damages, losses).
@@ -77,6 +78,11 @@ Access **Reports** from the sidebar to view:
 - **Best-Selling Products** - Top products by quantity sold.
 - **Profit Report** - Revenue vs cost breakdown.
 - **Inventory Report** - Current stock levels and valuations.
+
+### Profit and Costing Notes
+- Profit uses historical FIFO batch cost for new sales (based on batch allocations at sale time).
+- Older records without historical snapshots may use fallback costing and show a warning in the Profit tab.
+- Keep selling price decisions deliberate: retail price is not auto-changed when supplier cost changes.
 
 ---
 
@@ -115,4 +121,5 @@ Go to **Settings** to configure:
 - Check **Low Stock Alerts** at the start of each day.
 - Review the **Daily Sales** report before closing the register.
 - Keep product cost prices updated for accurate profit reports.
+- Use stock-in unit cost when supplier prices change to keep valuation and profit analytics accurate.
 - VAT is automatically calculated based on your store's tax settings.

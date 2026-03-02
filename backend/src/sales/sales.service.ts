@@ -166,7 +166,7 @@ export class SalesService {
             is_active: true,
             current_quantity: MoreThan(0),
           },
-          order: { purchase_date: 'ASC' },
+          order: { purchase_date: 'ASC', created_at: 'ASC' },
         });
 
         let remaining = item.quantity;
@@ -183,6 +183,8 @@ export class SalesService {
             quantity: deduct,
             unit_price: item.unit_price,
             subtotal: item.unit_price * deduct,
+            unit_cost_snapshot: Number(batch.unit_cost),
+            cogs_subtotal: Math.round(Number(batch.unit_cost) * deduct * 100) / 100,
           });
           await manager.save(SaleItem, saleItem);
 

@@ -1,0 +1,73 @@
+<p-table
+  [value]="suppliers"
+  [loading]="loading"
+  [paginator]="true"
+  [rows]="15"
+  [rowsPerPageOptions]="[15, 30, 50]"
+  [rowHover]="true"
+  [showCurrentPageReport]="true"
+  currentPageReportTemplate="Showing {first}–{last} of {totalRecords} suppliers"
+  [sortField]="'name'"
+  [sortOrder]="1"
+  styleClass="enhanced-table"
+  dataKey="id"
+>
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="name">Name <p-sortIcon field="name" /></th>
+      <th>Contact Person</th>
+      <th style="width: 150px">Phone</th>
+      <th>Email</th>
+      <th style="width: 120px">Address</th>
+      @if (isAdmin) {
+        <th style="width: 88px; text-align: center">Actions</th>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template #body let-supplier>
+    <tr class="table-row">
+      <td>
+        <span class="supplier-name">{{ supplier.name }}</span>
+      </td>
+      <td class="cell-secondary">{{ supplier.contact_person || '—' }}</td>
+      <td class="cell-secondary cell-mono">{{ supplier.phone || '—' }}</td>
+      <td class="cell-secondary">{{ supplier.email || '—' }}</td>
+      <td class="cell-secondary cell-address">{{ supplier.address || '—' }}</td>
+      @if (isAdmin) {
+        <td class="actions-cell">
+          <p-button
+            icon="pi pi-pencil"
+            [rounded]="true"
+            [text]="true"
+            severity="info"
+            pTooltip="Edit"
+            (onClick)="edit.emit(supplier)"
+          />
+          <p-button
+            icon="pi pi-trash"
+            [rounded]="true"
+            [text]="true"
+            severity="danger"
+            pTooltip="Deactivate"
+            (onClick)="delete.emit(supplier)"
+          />
+        </td>
+      }
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="emptymessage">
+    <tr>
+      <td [attr.colspan]="isAdmin ? 6 : 5" class="empty-state">
+        <div class="empty-content">
+          <i class="pi pi-truck" style="font-size: 3rem; color: #d1d5db;"></i>
+          <h3>No suppliers found</h3>
+          <p class="text-secondary">
+            Add your first supplier to start tracking inventory sources.
+          </p>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

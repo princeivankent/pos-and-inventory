@@ -1,3 +1,11 @@
+:host ::ng-deep .enhanced-table .table-row {
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: #f9fafb !important;
+  }
+}
+
 .form-grid { display: flex; flex-direction: column; gap: 1rem; }
     .field { display: flex; flex-direction: column; gap: 0.375rem; label { font-size: 0.875rem; font-weight: 500; } }
     .w-full { width: 100%; }

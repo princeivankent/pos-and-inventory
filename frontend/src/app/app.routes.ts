@@ -85,6 +85,14 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'suppliers',
+        loadComponent: () =>
+          import('./features/suppliers/supplier-list').then(
+            (m) => m.SupplierListComponent
+          ),
+        canActivate: [adminGuard],
+      },
+      {
         path: 'sales/:id',
         loadComponent: () =>
           import('./features/sales/sale-detail').then(

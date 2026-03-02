@@ -13,6 +13,8 @@ export interface Product {
   has_expiry: boolean;
   retail_price: number;
   cost_price: number;
+  next_fifo_unit_cost?: number | null;
+  next_fifo_purchase_date?: string | null;
   current_stock: number;
   is_active: boolean;
   created_at: string;

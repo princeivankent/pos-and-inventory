@@ -1,0 +1,57 @@
+:host ::ng-deep .enhanced-table .table-row {
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: #f9fafb !important;
+  }
+}
+
+.supplier-name {
+  font-weight: 500;
+  color: #111827;
+}
+
+.cell-secondary {
+  color: #6b7280;
+  font-size: 0.8125rem;
+}
+
+.cell-mono {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8125rem;
+}
+
+.cell-address {
+  max-width: 160px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actions-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+
+  .empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+
+    h3 {
+      margin: 0;
+      color: #374151;
+      font-size: 1.125rem;
+    }
+
+    .text-secondary {
+      margin: 0;
+      color: #6b7280;
+    }
+  }
+}

@@ -1,4 +1,12 @@
 :host ::ng-deep .date-input { width: 160px; }
+
+:host ::ng-deep .enhanced-table .table-row {
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: #f9fafb !important;
+  }
+}
     .sale-detail {
       display: flex;
       flex-direction: column;

@@ -14,11 +14,15 @@
       <p-table
         [value]="products()"
         [paginator]="true"
-        [rows]="20"
+        [rows]="15"
+        [rowsPerPageOptions]="[15, 30, 50]"
         [loading]="loading()"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first}–{last} of {totalRecords} products"
         dataKey="id"
         [sortField]="'name'"
         [sortOrder]="1"
+        styleClass="enhanced-table"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -34,7 +38,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-p>
-          <tr>
+          <tr class="table-row">
             <td class="font-medium">{{ p.name }}</td>
             <td>{{ p.sku }}</td>
             <td style="text-align:right">{{ p.current_stock }} {{ p.unit }}</td>
@@ -101,6 +105,21 @@
         <div class="field">
           <label>Unit Cost (optional)</label>
           <p-inputNumber [(ngModel)]="stockInForm.unit_cost" [min]="0" [minFractionDigits]="2" [maxFractionDigits]="2" styleClass="w-full" placeholder="Leave blank to use product cost price" />
+        </div>
+        <div class="field">
+          <label>Supplier (optional)</label>
+          <p-select
+            [(ngModel)]="stockInForm.supplier_id"
+            [options]="suppliers()"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Select a supplier"
+            styleClass="w-full"
+            [filter]="true"
+            [showClear]="true"
+            appendTo="body"
+            [loading]="suppliersLoading()"
+          />
         </div>
         <div class="field">
           <label>Notes</label>

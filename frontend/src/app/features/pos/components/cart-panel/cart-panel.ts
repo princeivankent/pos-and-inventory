@@ -33,4 +33,16 @@ export class CartPanelComponent {
   removeDiscount() {
     this.cart.discountAmount.set(0);
   }
+
+  private hasValue(value: number | null | undefined): value is number {
+    return value != null && !Number.isNaN(value);
+  }
+
+  getFifoMismatchCount(): number {
+    return this.cart.items().filter((item) => {
+      const fifo = item.product.next_fifo_unit_cost;
+      const current = item.product.cost_price;
+      return this.hasValue(fifo) && Math.abs(Number(fifo) - Number(current)) > 0.009;
+    }).length;
+  }
 }

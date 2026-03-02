@@ -1,0 +1,41 @@
+<app-page-header title="Suppliers" subtitle="Manage your product suppliers">
+  @if (storeCtx.isAdmin()) {
+    <p-button label="Add Supplier" icon="pi pi-plus" (onClick)="openNew()" />
+  }
+</app-page-header>
+
+<!-- Search Bar -->
+<div class="search-bar">
+  <p-iconfield>
+    <p-inputicon styleClass="pi pi-search" />
+    <input
+      pInputText
+      type="text"
+      [(ngModel)]="searchQuery"
+      (input)="onSearch()"
+      placeholder="Search by name or phone..."
+    />
+  </p-iconfield>
+</div>
+
+<!-- Supplier Table -->
+<div class="card">
+  <app-supplier-table
+    [suppliers]="suppliers()"
+    [loading]="loading()"
+    [isAdmin]="storeCtx.isAdmin()"
+    (edit)="editSupplier($event)"
+    (delete)="confirmDeactivate($event)"
+  />
+</div>
+
+<!-- Form Dialog -->
+<app-supplier-form-dialog
+  [(visible)]="formDialogVisible"
+  [editMode]="editMode"
+  [form]="form"
+  [saving]="saving()"
+  (save)="saveSupplier()"
+/>
+
+<p-confirmDialog />

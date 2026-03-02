@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository, ILike, MoreThan } from 'typeorm';
 import { Product } from '../database/entities/product.entity';
+import { InventoryBatch } from '../database/entities/inventory-batch.entity';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
@@ -10,7 +11,36 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(InventoryBatch)
+    private batchRepository: Repository<InventoryBatch>,
   ) {}
+
+  private async getNextFifoCostByProductId(
+    storeId: string,
+  ): Promise<Map<string, { unitCost: number; purchaseDate: Date }>> {
+    const nextFifoMap = new Map<string, { unitCost: number; purchaseDate: Date }>();
+    const batches = await this.batchRepository.find({
+      where: {
+        store_id: storeId,
+        is_active: true,
+        current_quantity: MoreThan(0),
+      },
+      order: {
+        purchase_date: 'ASC',
+        created_at: 'ASC',
+      },
+    });
+
+    for (const batch of batches) {
+      if (!nextFifoMap.has(batch.product_id)) {
+        nextFifoMap.set(batch.product_id, {
+          unitCost: Number(batch.unit_cost),
+          purchaseDate: new Date(batch.purchase_date),
+        });
+      }
+    }
+    return nextFifoMap;
+  }
 
   async create(
     createProductDto: CreateProductDto,
@@ -31,15 +61,24 @@ export class ProductsService {
     if (categoryId) {
       where.category_id = categoryId;
     }
-    return await this.productRepository.find({
+    const products = await this.productRepository.find({
       where,
       relations: ['category'],
       order: { name: 'ASC' },
     });
+    const nextFifoMap = await this.getNextFifoCostByProductId(storeId);
+    return products.map((product) => {
+      const fifo = nextFifoMap.get(product.id);
+      return {
+        ...product,
+        next_fifo_unit_cost: fifo?.unitCost ?? null,
+        next_fifo_purchase_date: fifo?.purchaseDate ?? null,
+      } as Product;
+    });
   }
 
   async search(storeId: string, query: string): Promise<Product[]> {
-    return await this.productRepository.find({
+    const products = await this.productRepository.find({
       where: [
         { store_id: storeId, name: ILike(`%${query}%`), is_active: true },
         { store_id: storeId, sku: ILike(`%${query}%`), is_active: true },
@@ -47,6 +86,15 @@ export class ProductsService {
       ],
       relations: ['category'],
       order: { name: 'ASC' },
+    });
+    const nextFifoMap = await this.getNextFifoCostByProductId(storeId);
+    return products.map((product) => {
+      const fifo = nextFifoMap.get(product.id);
+      return {
+        ...product,
+        next_fifo_unit_cost: fifo?.unitCost ?? null,
+        next_fifo_purchase_date: fifo?.purchaseDate ?? null,
+      } as Product;
     });
   }
 

@@ -55,6 +55,13 @@
     }
     .stat-content { display: flex; flex-direction: column; gap: 2px; }
     .stat-label { font-size: 0.8125rem; color: var(--text-secondary); }
+    .label-help {
+      font-size: 0.72rem;
+      margin-left: 0.22rem;
+      color: var(--text-tertiary);
+      cursor: help;
+      vertical-align: middle;
+    }
     .stat-value { font-size: 1.375rem; font-weight: 700; color: var(--text-primary); }
 
     .chart-section {
