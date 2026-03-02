@@ -403,6 +403,39 @@ Three bugs prevented the billing UI from reflecting plan changes after upgrade:
 
 ---
 
+## Production Hardening Updates (Mar 2, 2026)
+
+### Added
+- ✅ Backend env validation (`backend/src/config/env.validation.ts`)
+  - Enforces required core env vars
+  - Blocks production boot if `BYPASS_PAYMENT=true`
+  - Requires `PAYMONGO_SECRET_KEY` and `PAYMONGO_WEBHOOK_SECRET` in production
+- ✅ Expanded `.env.example` with billing keys and `FRONTEND_URL`
+- ✅ Platform admin capability:
+  - `users.is_platform_admin` column (migration `1707800000000-AddPlatformAdminAndBillingAudit.ts`)
+  - `PlatformAdminGuard` for non-tenant admin endpoints
+  - Admin APIs:
+    - `GET /api/admin/subscriptions`
+    - `GET /api/admin/subscriptions/:organizationId`
+    - `GET /api/admin/invoices`
+    - `GET /api/admin/payments`
+    - `POST /api/admin/subscriptions/:organizationId/suspend`
+    - `POST /api/admin/subscriptions/:organizationId/reactivate`
+    - `POST /api/admin/subscriptions/:organizationId/change-plan`
+  - Frontend page: `/platform/subscriptions`
+- ✅ Billing audit log table/entity (`billing_audit_logs`) for platform-admin actions
+- ✅ Upgrade payment flow hardening:
+  - New endpoint `POST /api/payments/intents` creates invoice + payment intent for upgrades
+  - `POST /api/billing/upgrade` now accepts optional `payment_id` and enforces successful matching payment when `BYPASS_PAYMENT=false`
+- ✅ Webhook idempotency guard:
+  - Tracks processed event IDs in payment metadata to avoid duplicate webhook side effects
+
+### Notes
+- Frontend payment step currently supports payment-intent creation and upgrade verification path.
+- Full hosted checkout/card UX wiring to PayMongo client SDK remains a follow-up task.
+
+---
+
 ## Testing Status
 
 - ✅ Can test via curl/Postman (see `docs/subscription-testing.md`)

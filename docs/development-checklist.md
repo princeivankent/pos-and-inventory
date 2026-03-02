@@ -228,7 +228,17 @@ Track your progress as you implement the POS system.
 - [ ] Frontend deployment (Vercel)
 - [ ] Run migrations on production DB
 - [ ] Production environment variables
-- [ ] CI/CD pipeline (GitHub Actions — test + build + deploy)
+- [x] CI pipeline (GitHub Actions — backend/frontend build + test on push/PR)
+- [ ] CD pipeline (deploy automation)
+
+### Production Hardening (Mar 2, 2026)
+- [x] Startup env validation (required vars + production payment safety checks)
+- [x] Expanded backend `.env.example` for billing/payment keys
+- [x] Platform admin foundation (`users.is_platform_admin` + JWT payload propagation)
+- [x] Platform billing admin APIs (`/api/admin/subscriptions`, `/api/admin/invoices`, `/api/admin/payments`)
+- [x] Platform billing admin page (`/platform/subscriptions`)
+- [x] Payment-intent upgrade flow (`POST /api/payments/intents` + `payment_id` verification in `POST /api/billing/upgrade`)
+- [x] Webhook event idempotency guard (dedupe via processed event IDs)
 
 ---
 
