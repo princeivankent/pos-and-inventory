@@ -72,3 +72,47 @@ Notes:
 2. Add integration tests for inventory stock-out FIFO edge cases.
 3. Add CI workflow step to run `test`, `test:e2e`, and `test:integration` (with test DB service).
 4. Start frontend feature-level component tests for billing and sales pages.
+
+---
+
+## Frontend Testing (Phase 10 — Core Layer)
+
+### Infrastructure
+
+| Item | Status |
+|---|---|
+| Install `vitest` + `@vitest/coverage-v8` | [x] Done |
+| `tsconfig.spec.json` — `"types": ["vitest/globals"]` | [x] Already present |
+| `angular.json` — `test` architect target with `@angular/build:unit-test` | [x] Done |
+
+### Core Layer Test Files
+
+| File | Status |
+|---|---|
+| `src/app/shared/pipes/php-currency.pipe.spec.ts` | [x] 9 tests |
+| `src/app/features/pos/services/cart.service.spec.ts` | [x] 34 tests |
+| `src/app/core/guards/auth.guard.spec.ts` | [x] 2 tests |
+| `src/app/core/guards/role.guard.spec.ts` | [x] 2 tests |
+| `src/app/core/interceptors/auth.interceptor.spec.ts` | [x] 3 tests |
+| `src/app/core/interceptors/tenant.interceptor.spec.ts` | [x] 4 tests |
+| `src/app/core/interceptors/error.interceptor.spec.ts` | [x] 12 tests |
+| `src/app/core/services/subscription.service.spec.ts` | [x] 23 tests |
+| `src/app/core/services/store-context.service.spec.ts` | [x] 15 tests |
+| `src/app/core/services/auth.service.spec.ts` | [x] 16 tests |
+
+### Feature Layer Tests (Future)
+
+| File | Status |
+|---|---|
+| Dashboard component tests | [ ] |
+| POS component tests | [ ] |
+| Customers component tests | [ ] |
+| Products component tests | [ ] |
+
+### How To Run (Frontend)
+
+```bash
+cd frontend
+npm run test                        # run all spec files
+npm run test -- --reporter=verbose  # verbose output per test
+```
