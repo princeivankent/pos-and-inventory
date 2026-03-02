@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Post,
@@ -15,6 +16,7 @@ import { UserRole } from '../database/entities/user-store.entity';
 import { RequestUser } from '../common/interfaces/request-with-user.interface';
 import { PaymentsService } from './payments.service';
 import { SubscriptionGuard } from '../common/guards/subscription.guard';
+import { CreateUpgradeIntentDto } from './dto/create-upgrade-intent.dto';
 
 @Controller('payments')
 @UseGuards(AuthGuard('jwt'), TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard)
@@ -35,6 +37,14 @@ export class PaymentsController {
   @Post('invoices/:id/pay')
   payInvoice(@Param('id') id: string) {
     return this.paymentsService.payInvoice(id);
+  }
+
+  @Post('intents')
+  createUpgradeIntent(
+    @Body() dto: CreateUpgradeIntentDto,
+    @CurrentUser() user: RequestUser,
+  ) {
+    return this.paymentsService.createUpgradePaymentIntent(user.organizationId, dto.plan_id);
   }
 
   @Get('methods')

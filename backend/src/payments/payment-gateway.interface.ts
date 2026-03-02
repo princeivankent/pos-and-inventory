@@ -17,6 +17,7 @@ export interface PaymentIntentResult {
 
 export interface WebhookEvent {
   type: string;
+  eventId?: string;
   data: {
     id: string;
     attributes: Record<string, any>;

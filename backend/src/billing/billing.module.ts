@@ -11,6 +11,7 @@ import { Organization } from '../database/entities/organization.entity';
 import { Store } from '../database/entities/store.entity';
 import { UserStore } from '../database/entities/user-store.entity';
 import { Product } from '../database/entities/product.entity';
+import { Payment } from '../database/entities/payment.entity';
 import { SubscriptionGuardModule } from '../common/guards/subscription-guard.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { SubscriptionGuardModule } from '../common/guards/subscription-guard.mod
       Store,
       UserStore,
       Product,
+      Payment,
     ]),
     SubscriptionGuardModule,
     ScheduleModule.forRoot(),

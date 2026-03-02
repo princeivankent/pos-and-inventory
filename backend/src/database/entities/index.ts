@@ -18,3 +18,4 @@ export * from './subscription.entity';
 export * from './invoice.entity';
 export * from './payment.entity';
 export * from './payment-method.entity';
+export * from './billing-audit-log.entity';

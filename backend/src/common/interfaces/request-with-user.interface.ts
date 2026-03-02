@@ -20,6 +20,7 @@ export interface SubscriptionContext {
 export interface RequestUser {
   userId: string;
   email: string;
+  isPlatformAdmin?: boolean;
   storeId?: string;
   role?: string;
   permissions?: string[];

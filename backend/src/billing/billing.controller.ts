@@ -47,6 +47,7 @@ export class BillingController {
     return this.subscriptionService.upgradePlan(
       user.organizationId,
       dto.plan_id,
+      dto.payment_id,
     );
   }
 

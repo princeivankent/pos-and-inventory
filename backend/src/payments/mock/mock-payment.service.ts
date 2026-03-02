@@ -52,6 +52,7 @@ export class MockPaymentService implements PaymentGateway {
   parseWebhookEvent(payload: any): WebhookEvent {
     return {
       type: payload.type || 'payment.paid',
+      eventId: payload.event_id || `mock_evt_${uuidv4()}`,
       data: {
         id: payload.data?.id || `mock_${uuidv4()}`,
         attributes: payload.data?.attributes || {},

@@ -101,11 +101,13 @@ export class PaymongoService implements PaymentGateway {
   }
 
   parseWebhookEvent(payload: any): WebhookEvent {
+    const paymentData = payload.data?.attributes?.data;
     return {
       type: payload.data?.attributes?.type || payload.type,
+      eventId: payload.data?.id,
       data: {
-        id: payload.data?.id,
-        attributes: payload.data?.attributes?.data?.attributes || {},
+        id: paymentData?.id,
+        attributes: paymentData?.attributes || {},
       },
     };
   }

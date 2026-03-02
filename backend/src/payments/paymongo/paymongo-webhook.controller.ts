@@ -49,10 +49,10 @@ export class PaymongoWebhookController {
 
     switch (event.type) {
       case 'payment.paid':
-        await this.handlePaymentPaid(event.data);
+        await this.handlePaymentPaid(event.data, event.eventId);
         break;
       case 'payment.failed':
-        await this.handlePaymentFailed(event.data);
+        await this.handlePaymentFailed(event.data, event.eventId);
         break;
       default:
         this.logger.log(`Unhandled webhook event type: ${event.type}`);
@@ -61,7 +61,10 @@ export class PaymongoWebhookController {
     return { received: true };
   }
 
-  private async handlePaymentPaid(data: { id: string; attributes: Record<string, any> }) {
+  private async handlePaymentPaid(
+    data: { id: string; attributes: Record<string, any> },
+    eventId?: string,
+  ) {
     const payment = await this.paymentRepository.findOne({
       where: { gateway_payment_id: data.id },
     });
@@ -70,8 +73,13 @@ export class PaymongoWebhookController {
       this.logger.warn(`Payment not found for gateway ID: ${data.id}`);
       return;
     }
+    if (this.isAlreadyProcessed(payment, eventId)) {
+      this.logger.log(`Skipping duplicate payment.paid event ${eventId} for payment ${payment.id}`);
+      return;
+    }
 
     payment.status = PaymentStatus.SUCCEEDED;
+    payment.metadata = this.addProcessedEvent(payment.metadata, eventId);
     await this.paymentRepository.save(payment);
 
     // Update invoice if linked
@@ -102,7 +110,10 @@ export class PaymongoWebhookController {
     }
   }
 
-  private async handlePaymentFailed(data: { id: string; attributes: Record<string, any> }) {
+  private async handlePaymentFailed(
+    data: { id: string; attributes: Record<string, any> },
+    eventId?: string,
+  ) {
     const payment = await this.paymentRepository.findOne({
       where: { gateway_payment_id: data.id },
     });
@@ -111,9 +122,16 @@ export class PaymongoWebhookController {
       this.logger.warn(`Payment not found for gateway ID: ${data.id}`);
       return;
     }
+    if (this.isAlreadyProcessed(payment, eventId)) {
+      this.logger.log(`Skipping duplicate payment.failed event ${eventId} for payment ${payment.id}`);
+      return;
+    }
 
     payment.status = PaymentStatus.FAILED;
-    payment.metadata = { ...payment.metadata, failure_reason: data.attributes.last_payment_error };
+    payment.metadata = this.addProcessedEvent(
+      { ...payment.metadata, failure_reason: data.attributes.last_payment_error },
+      eventId,
+    );
     await this.paymentRepository.save(payment);
 
     // Update invoice
@@ -122,5 +140,21 @@ export class PaymongoWebhookController {
         status: InvoiceStatus.FAILED,
       });
     }
+  }
+
+  private isAlreadyProcessed(payment: Payment, eventId?: string) {
+    if (!eventId) return false;
+    const processed = (payment.metadata?.processed_events ?? []) as string[];
+    return processed.includes(eventId);
+  }
+
+  private addProcessedEvent(metadata: Record<string, any>, eventId?: string) {
+    if (!eventId) return metadata ?? {};
+    const processed = new Set<string>((metadata?.processed_events ?? []) as string[]);
+    processed.add(eventId);
+    return {
+      ...(metadata ?? {}),
+      processed_events: Array.from(processed),
+    };
   }
 }

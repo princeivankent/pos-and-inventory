@@ -68,6 +68,7 @@ export class AuthService {
       email,
       full_name,
       is_active: true,
+      is_platform_admin: false,
     });
 
     await this.userRepository.save(user);
@@ -114,7 +115,7 @@ export class AuthService {
     }
 
     // Sign our own JWT
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, is_platform_admin: user.is_platform_admin };
     const access_token = this.jwtService.sign(payload);
 
     const stores = [
@@ -134,6 +135,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
+        is_platform_admin: user.is_platform_admin,
       },
       stores,
       default_store: stores[0],
@@ -186,7 +188,7 @@ export class AuthService {
       validUserStores.find((us) => us.is_default) || validUserStores[0];
 
     // Sign our own JWT so passport-jwt can verify it with JWT_SECRET
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, is_platform_admin: user.is_platform_admin };
     const access_token = this.jwtService.sign(payload);
 
     // Get subscription info from default store's organization
@@ -199,6 +201,7 @@ export class AuthService {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
+        is_platform_admin: user.is_platform_admin,
       },
       stores: validUserStores.map((us) => ({
         id: us.store_id,

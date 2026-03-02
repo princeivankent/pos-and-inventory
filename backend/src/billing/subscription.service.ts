@@ -6,16 +6,19 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
 import { Subscription, SubscriptionStatus } from '../database/entities/subscription.entity';
 import { SubscriptionPlan } from '../database/entities/subscription-plan.entity';
 import { Organization } from '../database/entities/organization.entity';
 import { Store } from '../database/entities/store.entity';
 import { UserStore } from '../database/entities/user-store.entity';
 import { Product } from '../database/entities/product.entity';
+import { Payment, PaymentStatus } from '../database/entities/payment.entity';
 
 @Injectable()
 export class SubscriptionService {
   constructor(
+    private configService: ConfigService,
     @InjectRepository(Subscription)
     private subscriptionRepository: Repository<Subscription>,
     @InjectRepository(SubscriptionPlan)
@@ -28,6 +31,8 @@ export class SubscriptionService {
     private userStoreRepository: Repository<UserStore>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(Payment)
+    private paymentRepository: Repository<Payment>,
   ) {}
 
   async getCurrentSubscription(organizationId: string) {
@@ -118,7 +123,7 @@ export class SubscriptionService {
     };
   }
 
-  async upgradePlan(organizationId: string, newPlanId: string) {
+  async upgradePlan(organizationId: string, newPlanId: string, paymentId?: string) {
     const subscription = await this.getCurrentSubscription(organizationId);
     const newPlan = await this.planRepository.findOne({
       where: { id: newPlanId, is_active: true },
@@ -132,6 +137,14 @@ export class SubscriptionService {
       throw new BadRequestException(
         'Cannot upgrade to a lower or same tier plan. Use downgrade instead.',
       );
+    }
+
+    const bypassPayment = this.configService.get<string>('BYPASS_PAYMENT', 'true') === 'true';
+    if (!bypassPayment) {
+      if (!paymentId) {
+        throw new BadRequestException('payment_id is required when BYPASS_PAYMENT=false');
+      }
+      await this.validateSuccessfulUpgradePayment(organizationId, newPlanId, paymentId);
     }
 
     // Upgrade immediately
@@ -160,6 +173,33 @@ export class SubscriptionService {
         current_period_end: subscription.current_period_end,
       },
     };
+  }
+
+  private async validateSuccessfulUpgradePayment(
+    organizationId: string,
+    planId: string,
+    paymentId: string,
+  ) {
+    const payment = await this.paymentRepository.findOne({
+      where: { id: paymentId, organization_id: organizationId },
+      relations: ['invoice'],
+    });
+
+    if (!payment) {
+      throw new NotFoundException('Payment not found');
+    }
+    if (payment.status !== PaymentStatus.SUCCEEDED) {
+      throw new BadRequestException('Payment is not successful yet');
+    }
+    if (payment.metadata?.target_plan_id !== planId) {
+      throw new BadRequestException('Payment does not match selected target plan');
+    }
+
+    const maxAgeMs = 30 * 60 * 1000;
+    const paymentAge = Date.now() - new Date(payment.created_at).getTime();
+    if (paymentAge > maxAgeMs) {
+      throw new BadRequestException('Payment is too old. Please start a new upgrade payment.');
+    }
   }
 
   async downgradePlan(organizationId: string, newPlanId: string) {

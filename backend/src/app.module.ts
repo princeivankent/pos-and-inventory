@@ -16,6 +16,7 @@ import { SuppliersModule } from './suppliers/suppliers.module';
 import { SubscriptionPlansModule } from './subscription-plans/subscription-plans.module';
 import { BillingModule } from './billing/billing.module';
 import { PaymentsModule } from './payments/payments.module';
+import { AdminSubscriptionsModule } from './admin-subscriptions/admin-subscriptions.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { ValidationPipe } from './common/pipes/validation.pipe';
 
@@ -37,6 +38,7 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     SubscriptionPlansModule,
     BillingModule,
     PaymentsModule,
+    AdminSubscriptionsModule,
   ],
   providers: [
     {

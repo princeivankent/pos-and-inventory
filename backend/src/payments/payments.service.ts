@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PAYMENT_GATEWAY, PaymentGateway } from './payment-gateway.interface';
@@ -21,6 +21,8 @@ export class PaymentsService {
     private paymentMethodRepository: Repository<BillingPaymentMethod>,
     @InjectRepository(Subscription)
     private subscriptionRepository: Repository<Subscription>,
+    @InjectRepository(SubscriptionPlan)
+    private planRepository: Repository<SubscriptionPlan>,
   ) {}
 
   async createInvoice(
@@ -119,5 +121,70 @@ export class PaymentsService {
     return this.paymentMethodRepository.find({
       where: { organization_id: organizationId, is_active: true },
     });
+  }
+
+  async createUpgradePaymentIntent(organizationId: string, planId: string) {
+    const subscription = await this.subscriptionRepository.findOne({
+      where: { organization_id: organizationId },
+      relations: ['plan'],
+      order: { created_at: 'DESC' },
+    });
+    if (!subscription) {
+      throw new NotFoundException('No subscription found');
+    }
+
+    const targetPlan = await this.planRepository.findOne({
+      where: { id: planId, is_active: true },
+    });
+    if (!targetPlan) {
+      throw new NotFoundException('Target plan not found');
+    }
+
+    if (targetPlan.sort_order <= subscription.plan.sort_order) {
+      throw new BadRequestException('Target plan must be higher than current plan');
+    }
+
+    const now = new Date();
+    const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const invoice = await this.createInvoice(organizationId, targetPlan, now, periodEnd);
+
+    const totalAmount = invoice.amount + invoice.tax_amount;
+    const paymentIntent = await this.paymentGateway.createPaymentIntent({
+      amount: totalAmount,
+      currency: invoice.currency,
+      description: `Plan upgrade to ${targetPlan.name}`,
+      metadata: {
+        organization_id: organizationId,
+        invoice_id: invoice.id,
+        target_plan_id: targetPlan.id,
+      },
+    });
+
+    const payment = this.paymentRepository.create({
+      organization_id: organizationId,
+      invoice_id: invoice.id,
+      amount: totalAmount,
+      currency: invoice.currency,
+      status: paymentIntent.status === 'succeeded' ? PaymentStatus.SUCCEEDED : PaymentStatus.PENDING,
+      payment_method: 'gateway',
+      gateway_payment_id: paymentIntent.id,
+      metadata: {
+        target_plan_id: targetPlan.id,
+      },
+    });
+    await this.paymentRepository.save(payment);
+
+    if (payment.status === PaymentStatus.SUCCEEDED) {
+      invoice.status = InvoiceStatus.PAID;
+      invoice.paid_at = new Date();
+    }
+    await this.invoiceRepository.save(invoice);
+
+    return {
+      payment_id: payment.id,
+      invoice_id: invoice.id,
+      payment_intent: paymentIntent,
+      requires_action: payment.status !== PaymentStatus.SUCCEEDED,
+    };
   }
 }
