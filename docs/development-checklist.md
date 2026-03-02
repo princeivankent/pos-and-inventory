@@ -193,18 +193,42 @@ Track your progress as you implement the POS system.
 
 ## Phase 10: Testing & Deployment ⏳
 
-### Testing
-- [ ] Unit tests for backend services
-- [ ] Integration tests (multi-tenant isolation, sale transactions)
-- [ ] E2E tests (registration to first sale)
-- [ ] Frontend component tests
+### Backend Testing ✅
+- [x] Unit tests for backend services (tenant.guard, sales.service)
+- [x] E2E tests — registration to first sale happy path
+- [x] Integration tests scaffold (DB-backed SalesService with real TypeORM)
+- [ ] Additional integration tests: voidSale stock restoration + credit balance reversal
+- [ ] Additional integration tests: inventory stock-out FIFO edge cases
+
+### Frontend Testing — Infrastructure ✅
+- [x] Install `vitest` + `@vitest/coverage-v8`
+- [x] `tsconfig.spec.json` — `"types": ["vitest/globals"]`
+- [x] `angular.json` — `test` architect target (`@angular/build:unit-test` + vitest runner)
+
+### Frontend Testing — Core Layer ✅ (120 tests, all green)
+- [x] `php-currency.pipe.spec.ts` — null/NaN/number/string edge cases (9 tests)
+- [x] `cart.service.spec.ts` — add/remove/quantity/hold/recall/clear/computed signals (34 tests)
+- [x] `auth.guard.spec.ts` — authenticated/unauthenticated redirect (2 tests)
+- [x] `role.guard.spec.ts` — ADMIN pass-through / CASHIER redirect (2 tests)
+- [x] `auth.interceptor.spec.ts` — token present/absent header injection (3 tests)
+- [x] `tenant.interceptor.spec.ts` — storeId present/absent/skip-paths (4 tests)
+- [x] `error.interceptor.spec.ts` — 401/402/403/404/0/default toast cases (12 tests)
+- [x] `subscription.service.spec.ts` — signals, localStorage, hasFeature, HTTP calls (23 tests)
+- [x] `store-context.service.spec.ts` — initializeStore, switchStore, isAdmin (15 tests)
+- [x] `auth.service.spec.ts` — login/register/logout localStorage + subscription integration (16 tests)
+
+### Frontend Testing — Feature Layer (Future)
+- [ ] Dashboard component tests
+- [ ] POS component tests
+- [ ] Customers component tests
+- [ ] Products component tests
 
 ### Deployment
-- [ ] Backend deployment (Railway or similar)
-- [ ] Frontend deployment (Vercel or Firebase Hosting)
+- [ ] Backend deployment (Railway)
+- [ ] Frontend deployment (Vercel)
 - [ ] Run migrations on production DB
 - [ ] Production environment variables
-- [ ] CI/CD pipeline setup
+- [ ] CI/CD pipeline (GitHub Actions — test + build + deploy)
 
 ---
 
