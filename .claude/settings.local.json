@@ -41,7 +41,11 @@
       "Bash(cd C:\\\\Users\\\\prince-asus\\\\Projects\\\\pos-and-inventory:*)",
       "WebFetch(domain:support.dealpos.com)",
       "WebFetch(domain:www.magestore.com)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "WebFetch(domain:squareup.com)",
+      "WebFetch(domain:help.shopify.com)",
+      "Bash(xargs grep:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }
