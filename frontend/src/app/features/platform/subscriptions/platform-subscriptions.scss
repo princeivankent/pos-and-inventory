@@ -1,84 +1,65 @@
-.filters {
-  display: grid;
-  grid-template-columns: 1fr 220px 140px;
+.filter-bar {
+  display: flex;
   gap: 0.75rem;
+  align-items: center;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
+
+  p-iconfield,
+  ::ng-deep .p-iconfield {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  p-select {
+    width: 180px;
+  }
 }
 
-.field {
-  border: 1px solid #d9d9d9;
-  border-radius: 0.5rem;
-  padding: 0.6rem 0.75rem;
-}
+:host ::ng-deep .enhanced-table .table-row {
+  transition: background-color 0.15s;
 
-.btn {
-  border: 1px solid #c5d2ff;
-  background: #eef3ff;
-  color: #1a3f9a;
-  border-radius: 0.5rem;
-  padding: 0.55rem 0.75rem;
-  cursor: pointer;
-}
-
-.btn-danger {
-  border-color: #f3b8b8;
-  background: #fff1f1;
-  color: #a32929;
-}
-
-.table-wrap {
-  overflow-x: auto;
-}
-
-.table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  padding: 0.7rem;
-  border-bottom: 1px solid #efefef;
-  text-align: left;
+  &:hover {
+    background: #f9fafb !important;
+  }
 }
 
 .org-name {
-  font-weight: 600;
+  font-weight: 500;
+  color: #111827;
 }
 
-.org-email {
-  font-size: 0.82rem;
-  color: #666;
+.cell-secondary {
+  color: #6b7280;
+  font-size: 0.8125rem;
 }
 
-.status {
-  text-transform: capitalize;
-  font-size: 0.8rem;
-  padding: 0.2rem 0.45rem;
-  border-radius: 999px;
-  background: #eef0f4;
-}
-
-.status--active,
-.status--trial {
-  background: #e7f8ee;
-  color: #1b7040;
-}
-
-.status--past_due,
-.status--suspended {
-  background: #fff3df;
-  color: #865200;
-}
-
-.status--cancelled,
-.status--expired {
-  background: #f2f2f2;
-  color: #555;
-}
-
-.actions {
+.actions-cell {
+  text-align: center;
   white-space: nowrap;
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+
+  .empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+
+    h3 {
+      margin: 0;
+      color: #374151;
+      font-size: 1.125rem;
+    }
+
+    .text-secondary {
+      margin: 0;
+      color: #6b7280;
+    }
+  }
 }
 
 .cancel-dialog-text {
@@ -86,8 +67,13 @@ td {
   line-height: 1.45;
 }
 
-@media (max-width: 900px) {
-  .filters {
-    grid-template-columns: 1fr;
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+
+    p-select {
+      width: 100%;
+    }
   }
 }
