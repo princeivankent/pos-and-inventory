@@ -9,7 +9,7 @@ The system has no live users yet. The primary task (running a store with POS, in
 - [x] Is inventory tracked accurately? (FIFO batch system working)
 - [x] Can users view sales and reports? (Dashboard + reports functional)
 - [x] Can users manage customer credit ("utang")? (Customer CRUD + statement + payments + POS credit flow implemented)
-- [ ] Can users manage suppliers? **GAP - needed for inventory receiving**
+- [x] Can users manage suppliers? (Supplier Management complete Feb 25, 2026)
 - [ ] Does the system work on real POS hardware? **GAP - thermal printing not wired up**
 - [~] Are low-stock alerts automated? **PARTIAL - low-stock views exist, cron/notification automation missing**
 
@@ -48,18 +48,18 @@ These are **High Impact, Low Effort** items that close gaps in the fundamental v
 
 #### 1.2 Supplier Management
 
-**Recommendation:** Build Now
+**Recommendation:** Complete ✅
 
 | Attribute | Value |
 |-----------|-------|
 | Impact | High - Stores need to track where inventory comes from. Required for proper inventory receiving workflow. |
-| Effort | Low - Entity already exists. Standard CRUD following established pattern. |
+| Effort | Completed — Full CRUD with frontend and inventory integration. |
 | Category | Core Feature |
-| Stage Fit | Yes - Completes inventory management loop |
+| Stage Fit | Completed (Feb 25, 2026) |
 
-**What to build:**
+**What was built:**
 - Supplier CRUD module (controller, service, DTOs)
-- Link suppliers to inventory batches on stock-in
+- Linked suppliers to inventory batches on stock-in
 - Supplier list/detail pages in frontend
 
 **What NOT to build yet:**
@@ -222,7 +222,7 @@ These are either **Low Impact**, **High Effort**, or solve problems that don't e
 
 | Priority | Item | Impact | Effort | Category |
 |----------|------|--------|--------|----------|
-| 1 | Supplier Management | High | Low | Core |
+| ~~1~~ | ~~Supplier Management~~ ✅ | High | Low | Core |
 | 2 | Thermal Printer Integration | High | Low | Core |
 | 3 | E2E Testing & Bug Fixes | High | Medium | Retention |
 | 4 | Low-Stock Alert Automation (finish) | Medium | Low | Retention |
@@ -233,7 +233,7 @@ These are either **Low Impact**, **High Effort**, or solve problems that don't e
 | 8 | Expense Tracking | Medium | Medium | Monetization |
 | 9 | Barcode Scanning | Medium | Low | Core |
 
-**Items 1-5** complete the core loop and make the system deployable.
+**Items 2-5** complete the core loop and make the system deployable (Item 1 done).
 **Item 6** is monitoring/stabilization for an already implemented core feature.
 **Items 7-9** are validated post-launch based on real user feedback.
 **Everything else** stays off the roadmap until there's proven demand.

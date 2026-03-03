@@ -33,6 +33,7 @@ Frontend (`frontend/`):
 - Backend uses Jest with `*.spec.ts` naming (`backend/package.json` Jest config).
 - Place backend unit tests next to source or under `backend/test/` for integration/e2e.
 - Frontend tests should live as `*.spec.ts` beside components/services.
+- Frontend uses Vitest (not Karma/Jasmine) — 120 tests passing across core layer.
 - Prioritize coverage for multi-tenant isolation, billing/feature gates, and sales transaction flows.
 
 ## Commit & Pull Request Guidelines
@@ -48,3 +49,33 @@ Frontend (`frontend/`):
 - Never commit secrets; keep `.env` local (`backend/.env.example` as template).
 - Validate `DATABASE_URL`, Supabase keys, JWT settings, and `FRONTEND_URL` before running migrations or deployments.
 - For tenant-protected endpoints, ensure `Authorization` and `X-Store-Id` headers are handled end-to-end.
+
+## Subscription & Feature Gating
+
+All tenant controllers use the full guard chain:
+```typescript
+@UseGuards(AuthGuard('jwt'), TenantGuard, SubscriptionGuard, RolesGuard, PermissionsGuard, FeatureGateGuard, UsageLimitGuard)
+```
+
+Use decorators for feature gates and limits:
+- `@RequireFeature('reports')` — gated to Negosyo+ plans
+- `@RequireFeature('utang_management')` — gated to Negosyo+ plans
+- `@CheckLimit({ resource: 'products' })` — enforces plan resource limits
+
+Frontend feature gating: use `SubscriptionService.hasFeatureSignal('feature_name')` for template signals,
+and `hasFeature('feature_name')` before making API calls.
+
+## Table Design Standard
+
+All PrimeNG tables follow the Products page pattern:
+- `styleClass="enhanced-table"` on `<p-table>`
+- `class="table-row"` on `<tr>` body rows
+- `[rowsPerPageOptions]="[15, 30, 50]"` — no separate page-size selector
+- `[showCurrentPageReport]="true"` + `"Showing {first}–{last} of {totalRecords} X"` template
+- Search: use `<p-iconfield>` + `<p-inputicon styleClass="pi pi-search" />` (NOT deprecated `span.p-input-icon-left`)
+
+## Documentation Workflow
+- Before creating or modifying code, always read the `docs/` directory to understand the current project status and existing plans.
+- After making changes, update relevant files in `docs/` when needed so documentation stays aligned with implementation.
+- Only add necessary documentation items; do not add unnecessary or redundant entries.
+- Supplier Management details are documented in `docs/features/supplier-management.md`.

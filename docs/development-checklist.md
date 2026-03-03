@@ -242,11 +242,24 @@ Track your progress as you implement the POS system.
 
 ---
 
+## Supplier Management ✅ (Feb 25, 2026)
+
+- [x] Migration: `1707600000000-AddSupplierIsActive.ts` adds `is_active` to suppliers
+- [x] `suppliers.module.ts`, `suppliers.service.ts`, `suppliers.controller.ts`
+- [x] DTOs: `create-supplier.dto.ts`, `update-supplier.dto.ts`
+- [x] Permissions: `SUPPLIERS_VIEW`, `SUPPLIERS_MANAGE` (admin-only)
+- [x] Inventory integration: stock-in dialog accepts optional `supplier_id`
+- [x] Movements include `batch.supplier` relation + optional `movement_type` filter
+- [x] Frontend: `features/suppliers/` (supplier-list, supplier-table, supplier-form-dialog)
+- [x] Route `/suppliers`, sidebar between Customers and Reports
+
+---
+
 ## Phase 11: Future Enhancements ⏳
 
 - [x] Customer management (credit/utang system) — ✅ completed in Phase 9
 - [x] Credit payments tracking — ✅ completed in Phase 9
-- [ ] Supplier management
+- [x] Supplier management
 - [ ] Barcode scanning integration
 - [ ] Offline mode / PWA support
 - [ ] Low stock alert cron jobs
@@ -259,4 +272,4 @@ Track your progress as you implement the POS system.
 
 ---
 
-**Current Status**: Core backend/frontend and subscription system are complete ✅ | Supplier module, thermal printer hardware integration, low-stock automation, and testing/deployment are pending ⏳
+**Current Status**: Core backend/frontend, subscription system, and supplier management are complete ✅ | Thermal printer hardware integration, low-stock automation, deployment, and remaining integration tests are pending ⏳

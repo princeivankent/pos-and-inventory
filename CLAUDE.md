@@ -12,6 +12,8 @@ A multi-tenant POS & Inventory Management System for Philippine retail stores wi
 - ✅ UI/UX Modernization Phase 1: Login & Reports pages enhanced with modern design
 - ✅ **Subscription System (Backend) Complete**: 3-tier billing (Tindahan/Negosyo/Kadena), feature gates, usage limits, PayMongo integration
 - ✅ **Subscription System (Frontend) Complete**: Feature gating, adaptive UI, upgrade prompts (Feb 15, 2026)
+- ✅ **Supplier Management Complete**: Full CRUD, inventory batch linking, frontend pages (Feb 25, 2026)
+- ✅ **Production Hardening Complete**: Env validation, platform admin APIs, payment-intent flow, webhook idempotency (Mar 2, 2026)
 - 🚧 Phase 10 In Progress: Testing & Deployment preparation
 
 ## Technology Stack
@@ -19,7 +21,7 @@ A multi-tenant POS & Inventory Management System for Philippine retail stores wi
 - **Backend**: NestJS + TypeORM + PostgreSQL (Supabase)
 - **Authentication**: Supabase Auth + JWT (7d expiration)
 - **Frontend**: Angular 21 + PrimeNG (standalone components)
-- **Database**: 20 entities (14 core + 6 subscription) with multi-tenant isolation via `store_id`
+- **Database**: 21 entities (14 core + 6 subscription + 1 supplier) with multi-tenant isolation via `store_id`
 - **Billing**: 3-tier subscription system with PayMongo integration
 - **UI/UX**: Modern design system with gradients, animations, and responsive layouts
 
@@ -64,9 +66,7 @@ npm run build                 # Production build to dist/ (670 kB)
 npm run build:dev            # Development build
 
 # Testing
-npm run test                  # Run unit tests with Karma
-npm run test:watch           # Run tests in watch mode
-npm run e2e                  # Run end-to-end tests
+npm run test                  # Run unit tests with Vitest
 
 # Code Quality
 npm run lint                  # Run ESLint
@@ -294,11 +294,11 @@ Reverse the sale transaction:
 - **Auth**: `auth/` (Supabase + JWT integration)
 - **Common**: `common/` (guards, decorators, interceptors, filters)
 - **Config**: `config/` (environment, database, Supabase)
-- **Modules**: `stores/`, `categories/`, `products/`, `inventory/`, `sales/`, `customers/`, `receipts/`, `reports/`, `users/`
+- **Modules**: `stores/`, `categories/`, `products/`, `inventory/`, `sales/`, `customers/`, `receipts/`, `reports/`, `users/`, `suppliers/`
 
 **Frontend Source**: `frontend/src/`
 - **App**: `app/` (standalone components, Angular 21)
-- **Features**: `app/features/` (auth, pos, products, inventory, sales, customers, reports, dashboard, settings)
+- **Features**: `app/features/` (auth, pos, products, inventory, sales, customers, reports, dashboard, settings, suppliers)
 - **Core**: `app/core/` (services, guards, interceptors)
 - **Shared**: `app/shared/` (components, directives, pipes)
 - **Assets**: `assets/` (images, styles, i18n)
@@ -369,6 +369,24 @@ feature-name/
 - ✅ **Enhanced Error Handling** (`core/interceptors/error.interceptor.ts`) - 402/403 errors show "Feature Locked" upgrade prompts
 - ✅ **Upgrade UI Components** - `.upgrade-prompt` and `.upgrade-prompt.compact` styles with gradient backgrounds
 
+**Completed - Supplier Management (Feb 25, 2026)**:
+- ✅ Suppliers module (`backend/src/suppliers/`) — CRUD, soft-delete, permissions
+- ✅ Migration `1707600000000-AddSupplierIsActive.ts` adds `is_active` column
+- ✅ Permissions: `SUPPLIERS_VIEW`, `SUPPLIERS_MANAGE` (admin-only, no feature gate)
+- ✅ Inventory batch stock-in links optional `supplier_id`
+- ✅ Stock movements include supplier name via batch relation
+- ✅ Frontend: `features/suppliers/` — supplier-list, supplier-table, supplier-form-dialog
+- ✅ Route `/suppliers` (adminGuard), sidebar between Customers and Reports
+
+**Completed - Production Hardening (Mar 2, 2026)**:
+- ✅ Startup env validation (required vars + production payment safety checks)
+- ✅ Expanded backend `.env.example` for billing/payment keys
+- ✅ Platform admin foundation (`users.is_platform_admin` + JWT payload propagation)
+- ✅ Platform billing admin APIs (`/api/admin/subscriptions`, `/api/admin/invoices`, `/api/admin/payments`)
+- ✅ Platform billing admin page (`/platform/subscriptions`)
+- ✅ Payment-intent upgrade flow (`POST /api/payments/intents` + `payment_id` verification in upgrade)
+- ✅ Webhook event idempotency guard (dedupe via processed event IDs)
+
 **Frontend Subscription Pattern**:
 ```typescript
 // 1. Component setup
@@ -397,15 +415,16 @@ if (this.subscriptionService.hasFeature('reports')) {
 }
 ```
 
-**To Implement (Phase 10 - Testing & Deployment)**:
-- Unit tests for backend services (Jest)
-- E2E tests for critical flows (sales, inventory)
-- Frontend unit tests (Jasmine/Karma)
-- Integration tests (API + database)
-- Performance optimization (lazy loading, caching)
-- Production deployment setup (Vercel + Supabase)
-- CI/CD pipeline (GitHub Actions)
-- User documentation and training materials
+**To Implement (Remaining - Deployment Focus)**:
+- Deployment: Backend (Railway), Frontend (Vercel), run migrations on production DB
+- CD pipeline (auto-deploy on main branch)
+- Thermal printer ESC/POS integration (wiring up installed `escpos`/`escpos-usb` deps)
+- Additional integration tests: voidSale + FIFO edge cases
+- Low-stock alert cron job + dashboard notifications
+- Data seeding & onboarding flow (sample categories, first-run wizard)
+- Frontend feature layer tests (Dashboard, POS, Customers, Products)
+- Email notifications (trial ending, payment receipts, renewal confirmations)
+- PayMongo live key configuration (`PAYMONGO_SECRET_KEY` + `BYPASS_PAYMENT=false`)
 
 **UI/UX Modernization Standards**:
 - Modern gradient backgrounds (linear-gradient with brand colors)
