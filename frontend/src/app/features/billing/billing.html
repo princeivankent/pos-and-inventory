@@ -52,8 +52,8 @@
       }
     </div>
   } @else if (usage()) {
-    <div class="usage-grid">
-      <!-- Stores -->
+    <!-- Stores overview — global metric, compact standalone row -->
+    <div class="usage-overview">
       <div class="card usage-card">
         <div class="usage-header">
           <i class="pi pi-shop usage-icon"></i>
@@ -74,54 +74,59 @@
           <div class="usage-unlimited">Unlimited</div>
         }
       </div>
-
-      <!-- Per-store details -->
-      @for (store of usage()!.store_details; track store.store_id) {
-        <!-- Products -->
-        <div class="card usage-card">
-          <div class="usage-header">
-            <i class="pi pi-box usage-icon"></i>
-            <span class="usage-label">Products — {{ store.store_name }}</span>
-            <span class="usage-count">
-              {{ store.products.current }} / {{ formatLimit(store.products.limit) }}
-            </span>
-          </div>
-          @if (store.products.limit > 0) {
-            <div class="usage-bar-wrap">
-              <p-progressbar
-                [value]="getUsagePercent(store.products.current, store.products.limit)"
-                [styleClass]="'usage-bar usage-bar--' + getUsageBarClass(getUsagePercent(store.products.current, store.products.limit))"
-                [showValue]="false" />
-            </div>
-            <div class="usage-pct">{{ getUsagePercent(store.products.current, store.products.limit) }}% used</div>
-          } @else {
-            <div class="usage-unlimited">Unlimited</div>
-          }
-        </div>
-
-        <!-- Users -->
-        <div class="card usage-card">
-          <div class="usage-header">
-            <i class="pi pi-users usage-icon"></i>
-            <span class="usage-label">Users — {{ store.store_name }}</span>
-            <span class="usage-count">
-              {{ store.users.current }} / {{ formatLimit(store.users.limit) }}
-            </span>
-          </div>
-          @if (store.users.limit > 0) {
-            <div class="usage-bar-wrap">
-              <p-progressbar
-                [value]="getUsagePercent(store.users.current, store.users.limit)"
-                [styleClass]="'usage-bar usage-bar--' + getUsageBarClass(getUsagePercent(store.users.current, store.users.limit))"
-                [showValue]="false" />
-            </div>
-            <div class="usage-pct">{{ getUsagePercent(store.users.current, store.users.limit) }}% used</div>
-          } @else {
-            <div class="usage-unlimited">Unlimited</div>
-          }
-        </div>
-      }
     </div>
+
+    <!-- Per-store metrics — one card per store, Products + Users grouped inside -->
+    @if (usage()!.store_details.length > 0) {
+      <div class="store-cards-grid">
+        @for (store of usage()!.store_details; track store.store_id) {
+          <div class="card store-usage-card">
+            <div class="store-card-header">
+              <i class="pi pi-building store-card-icon"></i>
+              <span class="store-card-name">{{ store.store_name }}</span>
+            </div>
+
+            <div class="store-metric">
+              <div class="store-metric-header">
+                <i class="pi pi-box store-metric-icon"></i>
+                <span class="store-metric-label">Products</span>
+                <span class="store-metric-count">{{ store.products.current }} / {{ formatLimit(store.products.limit) }}</span>
+              </div>
+              @if (store.products.limit > 0) {
+                <div class="usage-bar-wrap">
+                  <p-progressbar
+                    [value]="getUsagePercent(store.products.current, store.products.limit)"
+                    [styleClass]="'usage-bar usage-bar--' + getUsageBarClass(getUsagePercent(store.products.current, store.products.limit))"
+                    [showValue]="false" />
+                </div>
+                <div class="usage-pct">{{ getUsagePercent(store.products.current, store.products.limit) }}% used</div>
+              } @else {
+                <div class="usage-unlimited">Unlimited</div>
+              }
+            </div>
+
+            <div class="store-metric">
+              <div class="store-metric-header">
+                <i class="pi pi-users store-metric-icon"></i>
+                <span class="store-metric-label">Users</span>
+                <span class="store-metric-count">{{ store.users.current }} / {{ formatLimit(store.users.limit) }}</span>
+              </div>
+              @if (store.users.limit > 0) {
+                <div class="usage-bar-wrap">
+                  <p-progressbar
+                    [value]="getUsagePercent(store.users.current, store.users.limit)"
+                    [styleClass]="'usage-bar usage-bar--' + getUsageBarClass(getUsagePercent(store.users.current, store.users.limit))"
+                    [showValue]="false" />
+                </div>
+                <div class="usage-pct">{{ getUsagePercent(store.users.current, store.users.limit) }}% used</div>
+              } @else {
+                <div class="usage-unlimited">Unlimited</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
   }
 
   <!-- Plan Comparison -->

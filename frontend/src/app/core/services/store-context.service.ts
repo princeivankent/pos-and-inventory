@@ -31,7 +31,7 @@ export class StoreContextService {
   switchStore(storeId: string) {
     return this.http
       .post<SwitchStoreResponse>(`${environment.apiUrl}/auth/switch-store`, {
-        store_id: storeId,
+        storeId,
       })
       .pipe(
         tap((res) => {

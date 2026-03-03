@@ -78,6 +78,12 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  addStore(store: StoreAccess) {
+    const updated = [...this.stores(), store];
+    localStorage.setItem(STORES_KEY, JSON.stringify(updated));
+    this.stores.set(updated);
+  }
+
   getToken(): string | null {
     return localStorage.getItem(TOKEN_KEY);
   }

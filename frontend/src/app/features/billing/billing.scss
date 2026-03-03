@@ -110,77 +110,71 @@
   margin: 0;
 }
 
-// ---- Usage Grid ----
+// ---- Usage ----
 
-.usage-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--space-4);
-}
+.usage-overview { display: flex; gap: var(--space-4); flex-wrap: wrap; }
 
-.usage-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
+.usage-card { display: flex; flex-direction: column; gap: var(--space-3); }
 
-.usage-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
+.usage-header { display: flex; align-items: center; gap: var(--space-2); }
 
-.usage-icon {
-  font-size: 1rem;
-  color: var(--color-primary);
-}
+.usage-icon { font-size: 1rem; color: var(--color-primary); }
 
-.usage-label {
-  flex: 1;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-primary);
-}
+.usage-label { flex: 1; font-size: 0.9rem; font-weight: 500; color: var(--text-primary); }
 
-.usage-count {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  white-space: nowrap;
-}
+.usage-count { font-size: 0.875rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
 
 .usage-bar-wrap {
   :host ::ng-deep {
-    .p-progressbar {
-      height: 6px;
-      border-radius: 9999px;
-      background: var(--color-gray-100);
-    }
-
-    .usage-bar--success .p-progressbar-value {
-      background: var(--color-success);
-    }
-
-    .usage-bar--warning .p-progressbar-value {
-      background: var(--color-warning);
-    }
-
-    .usage-bar--danger .p-progressbar-value {
-      background: var(--color-danger);
-    }
+    .p-progressbar { height: 6px; border-radius: 9999px; background: var(--color-gray-100); }
+    .usage-bar--success .p-progressbar-value { background: var(--color-success); }
+    .usage-bar--warning .p-progressbar-value { background: var(--color-warning); }
+    .usage-bar--danger .p-progressbar-value { background: var(--color-danger); }
   }
 }
 
-.usage-pct {
-  font-size: 0.8125rem;
-  color: var(--text-secondary);
+.usage-pct { font-size: 0.8125rem; color: var(--text-secondary); }
+
+.usage-unlimited { font-size: 0.875rem; font-weight: 500; color: var(--color-success); }
+
+// ---- Per-store Grouped Cards ----
+
+.store-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
 }
 
-.usage-unlimited {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-success);
+.card.store-usage-card { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+
+.store-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
 }
+
+.store-card-icon { font-size: 0.875rem; color: var(--text-secondary); flex-shrink: 0; }
+
+.store-card-name { font-size: 0.9375rem; font-weight: 600; color: var(--text-primary); }
+
+.store-metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  &:not(:last-child) { border-bottom: 1px solid var(--border-color); }
+}
+
+.store-metric-header { display: flex; align-items: center; gap: var(--space-2); }
+
+.store-metric-icon { font-size: 0.9rem; color: var(--color-primary); flex-shrink: 0; }
+
+.store-metric-label { flex: 1; font-size: 0.875rem; font-weight: 500; color: var(--text-primary); }
+
+.store-metric-count { font-size: 0.875rem; font-weight: 600; color: var(--text-secondary); white-space: nowrap; }
 
 // ---- Plans Grid ----
 
@@ -526,7 +520,8 @@
     text-align: left;
   }
 
-  .plans-grid {
+  .plans-grid,
+  .store-cards-grid {
     grid-template-columns: 1fr;
   }
 

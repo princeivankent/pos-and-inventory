@@ -1,0 +1,54 @@
+<p-dialog
+  header="Create New Store"
+  [visible]="visible"
+  (visibleChange)="onHide()"
+  [modal]="true"
+  [style]="{ width: '480px' }"
+  [closable]="true"
+>
+  <div class="form-grid">
+    <div class="form-section">
+      <h4>Store Details</h4>
+      <div class="field">
+        <label for="store-name">Store Name *</label>
+        <input pInputText id="store-name" [(ngModel)]="form.name"
+               placeholder="e.g. My Branch - Quezon City" class="w-full" />
+      </div>
+      <div class="field">
+        <label for="store-address">Address</label>
+        <textarea pTextarea id="store-address" [(ngModel)]="form.address"
+                  placeholder="Store address" [rows]="2" class="w-full"></textarea>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>Contact & Tax</h4>
+      <div class="field">
+        <label for="store-phone">Phone</label>
+        <input pInputText id="store-phone" [(ngModel)]="form.phone"
+               placeholder="09XX-XXX-XXXX" class="w-full" />
+      </div>
+      <div class="field">
+        <label for="store-email">Email</label>
+        <input pInputText id="store-email" [(ngModel)]="form.email"
+               type="email" placeholder="store@example.com" class="w-full" />
+      </div>
+      <div class="field">
+        <label for="store-tax">BIR TIN (Tax ID)</label>
+        <input pInputText id="store-tax" [(ngModel)]="form.tax_id"
+               placeholder="000-000-000-000" class="w-full" />
+      </div>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="onHide()" />
+    <p-button
+      label="Create Store"
+      icon="pi pi-plus"
+      (onClick)="save.emit()"
+      [disabled]="!isValid || saving"
+      [loading]="saving"
+    />
+  </ng-template>
+</p-dialog>

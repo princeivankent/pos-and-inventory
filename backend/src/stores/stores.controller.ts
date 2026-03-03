@@ -36,8 +36,11 @@ export class StoresController {
   @Roles(UserRole.ADMIN)
   @RequirePermissions(Permission.STORES_MANAGE)
   @CheckLimit({ resource: 'stores' })
-  create(@Body() createStoreDto: CreateStoreDto) {
-    return this.storesService.create(createStoreDto);
+  create(
+    @Body() createStoreDto: CreateStoreDto,
+    @CurrentUser() user: RequestUser,
+  ) {
+    return this.storesService.create(createStoreDto, user.userId, user.organizationId!);
   }
 
   @Get()

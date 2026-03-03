@@ -59,5 +59,59 @@
             <p-button label="Save Settings" icon="pi pi-check" (onClick)="saveSettings()" [loading]="savingSettings()" />
           </div>
         </div>
+
+        <div class="card stores-card">
+          <div class="stores-card-header">
+            <div class="stores-card-title">
+              <h3>Manage Stores</h3>
+              @if (hasMultiStore() && storeUsage()) {
+                <span class="usage-badge">
+                  {{ storeUsage()!.current }} of {{ storeUsage()!.limit }} stores used
+                </span>
+              }
+            </div>
+
+            @if (hasMultiStore()) {
+              <p-button
+                label="Add Store"
+                icon="pi pi-plus"
+                (onClick)="openCreateStoreDialog()"
+                [disabled]="isAtStoreLimit()"
+                [pTooltip]="isAtStoreLimit() ? 'Store limit reached. Upgrade your plan to add more.' : ''"
+                tooltipPosition="left"
+              />
+            }
+          </div>
+
+          @if (!hasMultiStore()) {
+            <div class="upgrade-prompt compact">
+              <i class="pi pi-building upgrade-icon"></i>
+              <p class="upgrade-title">Multiple Stores — Negosyo Plan &amp; Above</p>
+              <p class="upgrade-text">Manage multiple branches from a single account. Upgrade to unlock this feature.</p>
+            </div>
+          } @else {
+            <div class="stores-list">
+              @for (s of stores(); track s.id) {
+                <div class="store-row" [class.store-row--active]="s.id === activeStoreId()">
+                  <i class="pi pi-building store-row-icon"></i>
+                  <span class="store-row-name">{{ s.name }}</span>
+                  @if (s.id === activeStoreId()) {
+                    <span class="store-row-badge">Current</span>
+                  }
+                </div>
+              }
+            </div>
+            @if (isAtStoreLimit()) {
+              <p class="limit-text" style="margin-top: 0.75rem">You have reached your plan's store limit. Upgrade your plan to add more branches.</p>
+            }
+          }
+        </div>
       </div>
     }
+
+    <app-create-store-dialog
+      [(visible)]="createStoreDialogVisible"
+      [form]="createStoreForm"
+      [saving]="savingNewStore()"
+      (save)="createStore()"
+    />

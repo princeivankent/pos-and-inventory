@@ -2,11 +2,12 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Store } from '../database/entities/store.entity';
-import { UserStore } from '../database/entities/user-store.entity';
+import { UserStore, UserRole } from '../database/entities/user-store.entity';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 
@@ -19,9 +20,33 @@ export class StoresService {
     private userStoreRepository: Repository<UserStore>,
   ) {}
 
-  async create(createStoreDto: CreateStoreDto): Promise<Store> {
-    const store = this.storeRepository.create(createStoreDto);
-    return await this.storeRepository.save(store);
+  async create(
+    createStoreDto: CreateStoreDto,
+    userId: string,
+    organizationId: string,
+  ): Promise<Store> {
+    if (!organizationId) {
+      throw new BadRequestException(
+        'Cannot create additional stores for legacy accounts. Please contact support.',
+      );
+    }
+
+    const store = this.storeRepository.create({
+      ...createStoreDto,
+      settings: createStoreDto.settings ?? {},
+      organization_id: organizationId,
+    });
+    await this.storeRepository.save(store);
+
+    const userStore = this.userStoreRepository.create({
+      user_id: userId,
+      store_id: store.id,
+      role: UserRole.ADMIN,
+      is_default: false,
+    });
+    await this.userStoreRepository.save(userStore);
+
+    return store;
   }
 
   async findAll(): Promise<Store[]> {
