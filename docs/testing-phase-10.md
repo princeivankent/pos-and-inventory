@@ -131,6 +131,8 @@ Notes:
   - push to `main`
   - push to `develop`
   - manual dispatch
+- Workflow environment:
+  - `e2e`
 - Uses a dedicated Supabase E2E database only
 - Execution order:
   1. verify E2E database host guard
@@ -143,6 +145,7 @@ Notes:
   - `E2E_SUPABASE_ANON_KEY`
   - `E2E_SUPABASE_SERVICE_KEY`
   - `E2E_JWT_SECRET`
+- These secrets can be stored as repository secrets or as secrets in the GitHub `e2e` environment. The workflow is bound to the `e2e` environment.
 - Required non-secret E2E identifier:
   - `E2E_SUPABASE_PROJECT_REF=impslyevrarpceqfhxom`
 - Safety guards:

@@ -13,6 +13,7 @@ jobs:
   playwright-e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    environment: e2e
 
     env:
       CI: true
@@ -78,8 +79,13 @@ jobs:
           database_url = os.environ.get('DATABASE_URL', '')
           project_ref = os.environ.get('E2E_SUPABASE_PROJECT_REF', '')
 
-          if not database_url or not project_ref:
-            raise SystemExit('DATABASE_URL and E2E_SUPABASE_PROJECT_REF must be set')
+          if not project_ref:
+            raise SystemExit('E2E_SUPABASE_PROJECT_REF must be set')
+
+          if not database_url:
+            raise SystemExit(
+              'DATABASE_URL is empty. Check the E2E_DATABASE_URL secret in the GitHub Actions environment/repository settings.'
+            )
 
           database = urlparse(database_url)
           database_host = database.hostname or ''
