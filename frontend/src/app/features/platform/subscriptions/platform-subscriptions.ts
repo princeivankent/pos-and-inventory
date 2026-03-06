@@ -1,9 +1,15 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { DatePipe } from '@angular/common';
+import { DatePipe, TitleCasePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
 import { environment } from '../../../../environments/environment';
 import { PageHeader } from '../../../shared/components/page-header/page-header';
 import { ToastService } from '../../../core/services/toast.service';
@@ -27,13 +33,46 @@ interface PlatformSubscriptionItem {
 @Component({
   selector: 'app-platform-subscriptions',
   standalone: true,
-  imports: [FormsModule, PageHeader, DatePipe, DialogModule, ButtonModule],
+  imports: [
+    FormsModule,
+    PageHeader,
+    DatePipe,
+    TitleCasePipe,
+    DialogModule,
+    ButtonModule,
+    TableModule,
+    TagModule,
+    IconFieldModule,
+    InputIconModule,
+    InputTextModule,
+    SelectModule,
+  ],
   templateUrl: './platform-subscriptions.html',
   styleUrls: ['./platform-subscriptions.scss'],
 })
 export class PlatformSubscriptionsComponent implements OnInit {
   private http = inject(HttpClient);
   private toast = inject(ToastService);
+
+  statusOptions = [
+    { label: 'All statuses', value: '' },
+    { label: 'Trial', value: 'trial' },
+    { label: 'Active', value: 'active' },
+    { label: 'Past due', value: 'past_due' },
+    { label: 'Suspended', value: 'suspended' },
+    { label: 'Cancelled', value: 'cancelled' },
+    { label: 'Expired', value: 'expired' },
+  ];
+
+  getStatusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+    switch (status) {
+      case 'active':     return 'success';
+      case 'trial':      return 'info';
+      case 'past_due':
+      case 'suspended':  return 'warn';
+      default:           return 'secondary';
+    }
+  }
 
   loading = signal(true);
   search = signal('');

@@ -145,7 +145,7 @@ describe('StoreContextService', () => {
 
     const req = controller.expectOne('/api/auth/switch-store');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ store_id: 'store-2' });
+    expect(req.request.body).toEqual({ storeId: 'store-2' });
     req.flush({ store: newStore });
 
     expect(service.activeStore()?.id).toBe('store-2');

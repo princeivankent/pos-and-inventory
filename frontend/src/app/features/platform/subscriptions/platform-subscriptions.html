@@ -3,66 +3,101 @@
   subtitle="Monitor all customer organizations and manage billing states."
 />
 
-<div class="page-content">
-  <div class="card filters">
+<div class="filter-bar">
+  <p-iconfield>
+    <p-inputicon styleClass="pi pi-search" />
     <input
+      pInputText
       type="text"
       [ngModel]="search()"
       (ngModelChange)="search.set($event)"
       placeholder="Search org name or email"
-      class="field"
     />
-    <select [ngModel]="status()" (ngModelChange)="status.set($event)" class="field">
-      <option value="">All statuses</option>
-      <option value="trial">Trial</option>
-      <option value="active">Active</option>
-      <option value="past_due">Past due</option>
-      <option value="suspended">Suspended</option>
-      <option value="cancelled">Cancelled</option>
-      <option value="expired">Expired</option>
-    </select>
-    <button type="button" class="btn" (click)="load()">Apply Filters</button>
-  </div>
+  </p-iconfield>
+  <p-select
+    [options]="statusOptions"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="status()"
+    (ngModelChange)="status.set($event)"
+    placeholder="All statuses"
+  />
+  <p-button label="Apply Filters" icon="pi pi-filter" (onClick)="load()" />
+</div>
 
-  <div class="card table-wrap">
-    @if (loading()) {
-      <p>Loading subscriptions...</p>
-    } @else if (items().length === 0) {
-      <p>No subscriptions found.</p>
-    } @else {
-      <table class="table">
-        <thead>
-          <tr>
-            <th>Organization</th>
-            <th>Plan</th>
-            <th>Status</th>
-            <th>Renewal</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of items(); track item.id) {
-            <tr>
-              <td>
-                <div class="org-name">{{ item.organization.name }}</div>
-                <div class="org-email">{{ item.organization.billing_email || 'No billing email' }}</div>
-              </td>
-              <td>{{ item.plan.name }}</td>
-              <td><span class="status status--{{ item.status }}">{{ item.status }}</span></td>
-              <td>{{ item.current_period_end ? (item.current_period_end | date: 'mediumDate') : '—' }}</td>
-              <td class="actions">
-                @if (item.status !== 'suspended') {
-                  <button type="button" class="btn btn-danger" (click)="openActionDialog(item, 'suspend')">Suspend</button>
-                } @else {
-                  <button type="button" class="btn" (click)="openActionDialog(item, 'reactivate')">Reactivate</button>
-                }
-              </td>
-            </tr>
+<div class="card">
+  <p-table
+    [value]="items()"
+    [loading]="loading()"
+    [paginator]="true"
+    [rows]="15"
+    [rowsPerPageOptions]="[15, 30, 50]"
+    [rowHover]="true"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first}–{last} of {totalRecords} organizations"
+    styleClass="enhanced-table"
+    dataKey="id"
+  >
+    <ng-template #header>
+      <tr>
+        <th>Organization</th>
+        <th>Plan</th>
+        <th>Status</th>
+        <th>Renewal</th>
+        <th style="text-align: center">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-item>
+      <tr class="table-row">
+        <td>
+          <div class="org-name">{{ item.organization.name }}</div>
+          <div class="cell-secondary">{{ item.organization.billing_email || 'No billing email' }}</div>
+        </td>
+        <td>{{ item.plan.name }}</td>
+        <td>
+          <p-tag
+            [value]="item.status | titlecase"
+            [severity]="getStatusSeverity(item.status)"
+          />
+        </td>
+        <td>{{ item.current_period_end ? (item.current_period_end | date: 'mediumDate') : '—' }}</td>
+        <td class="actions-cell">
+          @if (item.status !== 'suspended') {
+            <p-button
+              label="Suspend"
+              severity="danger"
+              [text]="true"
+              [outlined]="true"
+              size="small"
+              (onClick)="openActionDialog(item, 'suspend')"
+            />
+          } @else {
+            <p-button
+              label="Reactivate"
+              severity="success"
+              [text]="true"
+              [outlined]="true"
+              size="small"
+              (onClick)="openActionDialog(item, 'reactivate')"
+            />
           }
-        </tbody>
-      </table>
-    }
-  </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="5" class="empty-state">
+          <div class="empty-content">
+            <i class="pi pi-building" style="font-size: 3rem; color: #d1d5db;"></i>
+            <h3>No subscriptions found</h3>
+            <p class="text-secondary">Try adjusting your search or filter criteria.</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 </div>
 
 <p-dialog

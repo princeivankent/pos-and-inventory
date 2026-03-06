@@ -652,7 +652,7 @@ Run with: `chmod +x test-subscription.sh && ./test-subscription.sh`
 - Mock payment service for development
 
 🔜 **Next Steps:**
-- Frontend billing page UI
 - Real PayMongo integration testing (add PAYMONGO_SECRET_KEY)
+- Hosted checkout/card UX wiring in the frontend payment step
 - Email notifications for trial ending
 - Webhook testing for payment confirmations
