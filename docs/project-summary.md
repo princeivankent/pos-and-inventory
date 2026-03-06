@@ -29,6 +29,7 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 - ✅ **Stores module**: CRUD + settings management (tax, receipt config)
 - ✅ **Categories module**: Hierarchical categories with parent/child support
 - ✅ **Products module**: Retail/cost pricing, stock tracking, SKU/barcode
+- ✅ **Suppliers module**: CRUD, soft delete, inventory stock-in linkage
 - ✅ **Inventory module**: FIFO batch management, stock movements, low stock alerts
 - ✅ **Sales module**: Atomic transactions, FIFO deduction, credit/partial payment validation
 - ✅ **Customers module**: CRUD, credit limits, utang tracking, credit statements, payment recording
@@ -44,9 +45,11 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 - ✅ **Inventory management**: Batches, stock movements, FIFO tracking
 - ✅ **Sales history**: Search, filters, sale details
 - ✅ **Customers management**: Customer list, credit statements, payment recording, form dialogs
+- ✅ **Suppliers management**: Supplier list, form dialogs, inventory stock-in integration
 - ✅ **Reports & Dashboard**: Sales charts, inventory stats
 - ✅ **Settings page**: Store config, user profile
 - ✅ **UI/UX Modernization**: Login, Reports, Products pages with modern design
+- ✅ **Billing pages**: Usage dashboard, plan comparison, upgrade/downgrade/cancel flows
 
 #### Subscription System (Feb 14-15, 2026)
 - ✅ **Backend** (Feb 14, 2026):
@@ -67,16 +70,14 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
   - Subscription models and feature enum
 
 ### 🚧 Still Pending Before Launch
-- Supplier management module (backend + frontend CRUD)
 - Thermal printer hardware integration (ESC/POS)
 - Low-stock automation (cron + notification flow)
-- Unit tests for backend services (Jest)
-- E2E tests for critical flows (sales, inventory, credit)
-- Frontend unit tests (Jasmine/Karma)
-- Integration tests (API + database)
+- Additional backend integration tests (void sale reversal, FIFO edge cases)
+- Additional E2E tests for critical flows (sales, inventory, credit)
+- Frontend feature-level tests (Vitest)
 - Performance optimization (lazy loading, caching)
 - Production deployment setup (Vercel + Supabase)
-- CI/CD pipeline (GitHub Actions)
+- CD pipeline (deploy automation)
 - User documentation and training materials
 
 ## Key Features
@@ -164,6 +165,7 @@ POS/
 │   │   ├── stores/            # ✅ Store CRUD + settings
 │   │   ├── categories/        # ✅ Hierarchical categories
 │   │   ├── products/          # ✅ Products CRUD + pricing
+│   │   ├── suppliers/         # ✅ Suppliers CRUD + stock-in integration
 │   │   ├── inventory/         # ✅ FIFO batches + stock movements
 │   │   ├── sales/             # ✅ Atomic transactions + credit
 │   │   ├── customers/         # ✅ Credit management + payments
@@ -187,8 +189,10 @@ POS/
 │   │       ├── inventory/     # ✅ Inventory overview, movements, low stock
 │   │       ├── sales/         # ✅ Sales list, sale detail
 │   │       ├── customers/     # ✅ Customer list, credit statements, payments
+│   │       ├── suppliers/     # ✅ Supplier management
 │   │       ├── reports/       # ✅ Reports with charts
 │   │       ├── users/         # ✅ User management
+│   │       ├── billing/       # ✅ Billing and subscription management
 │   │       └── settings/      # ✅ Store settings
 │   └── package.json
 ├── CLAUDE.md                  # ✅ AI development context
@@ -247,6 +251,6 @@ Proprietary - All rights reserved
 ---
 
 **Project Created**: February 5, 2026
-**Last Updated**: February 24, 2026
+**Last Updated**: March 7, 2026
 **Version**: 2.0.0 (Full Stack - Backend + Frontend Complete)
-**Status**: Core POS + Inventory + Credit complete; supplier management, thermal printer integration, low-stock automation, and testing/deployment are pending.
+**Status**: Core POS, inventory, credit, supplier management, and subscription billing are complete; thermal printer integration, low-stock automation, deployment, and remaining test coverage are pending.
