@@ -23,6 +23,7 @@ jobs:
       ALLOW_DB_RESET: 'true'
       DATABASE_SSL: 'true'
       PGSSLMODE: require
+      E2E_SUPABASE_PROJECT_REF: impslyevrarpceqfhxom
 
       DATABASE_URL: ${{ secrets.E2E_DATABASE_URL }}
       SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
@@ -77,20 +78,14 @@ jobs:
           from urllib.parse import urlparse
 
           database_url = os.environ.get('DATABASE_URL', '')
-          supabase_url = os.environ.get('SUPABASE_URL', '')
+          project_ref = os.environ.get('E2E_SUPABASE_PROJECT_REF', '')
 
-          if not database_url or not supabase_url:
-            raise SystemExit('DATABASE_URL and SUPABASE_URL must be set')
+          if not database_url or not project_ref:
+            raise SystemExit('DATABASE_URL and E2E_SUPABASE_PROJECT_REF must be set')
 
           database = urlparse(database_url)
-          supabase = urlparse(supabase_url)
-
           database_host = database.hostname or ''
           database_user = database.username or ''
-          project_ref = (supabase.hostname or '').split('.')[0]
-
-          if not project_ref:
-            raise SystemExit('Could not determine Supabase project ref from SUPABASE_URL')
 
           direct_host = f'db.{project_ref}.supabase.co'
           is_direct = database_host == direct_host

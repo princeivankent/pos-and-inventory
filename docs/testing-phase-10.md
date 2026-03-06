@@ -141,14 +141,15 @@ Notes:
   5. run Playwright browser suites
 - Required GitHub secrets:
   - `E2E_DATABASE_URL`
-  - `E2E_SUPABASE_URL`
   - `E2E_SUPABASE_ANON_KEY`
   - `E2E_SUPABASE_SERVICE_KEY`
   - `E2E_JWT_SECRET`
+- Required non-secret E2E identifier:
+  - `E2E_SUPABASE_PROJECT_REF=impslyevrarpceqfhxom`
 - Safety guards:
   - `APP_ENV=e2e`
   - `ALLOW_DB_RESET=true`
-  - `DATABASE_URL` must map to the same Supabase project ref as `E2E_SUPABASE_URL`
+  - `DATABASE_URL` must map to the configured `E2E_SUPABASE_PROJECT_REF`
   - direct database hosts and Supabase pooler URLs are both allowed for that project
   - reset script refuses to run unless `app.environment=e2e`
 
