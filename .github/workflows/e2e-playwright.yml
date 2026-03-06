@@ -31,7 +31,6 @@ jobs:
       JWT_SECRET: ${{ secrets.E2E_JWT_SECRET }}
       FRONTEND_URL: http://127.0.0.1:4200
       BYPASS_PAYMENT: 'true'
-      EXPECTED_E2E_DB_HOST: db.impslyevrarpceqfhxom.supabase.co
 
       PLAYWRIGHT_BASE_URL: http://127.0.0.1:4200
       PLAYWRIGHT_API_URL: http://127.0.0.1:3000/api
@@ -73,10 +72,40 @@ jobs:
             exit 1
           fi
 
-          if [[ "${DATABASE_URL}" != *"${EXPECTED_E2E_DB_HOST}"* ]]; then
-            echo "DATABASE_URL does not point to the expected E2E Supabase host"
-            exit 1
-          fi
+          DB_CHECK=$(python3 - <<'PY'
+          import os
+          from urllib.parse import urlparse
+
+          database_url = os.environ.get('DATABASE_URL', '')
+          supabase_url = os.environ.get('SUPABASE_URL', '')
+
+          if not database_url or not supabase_url:
+            raise SystemExit('DATABASE_URL and SUPABASE_URL must be set')
+
+          database = urlparse(database_url)
+          supabase = urlparse(supabase_url)
+
+          database_host = database.hostname or ''
+          database_user = database.username or ''
+          project_ref = (supabase.hostname or '').split('.')[0]
+
+          if not project_ref:
+            raise SystemExit('Could not determine Supabase project ref from SUPABASE_URL')
+
+          direct_host = f'db.{project_ref}.supabase.co'
+          is_direct = database_host == direct_host
+          is_pooler = database_host.endswith('.pooler.supabase.com') and project_ref in database_user
+
+          if not (is_direct or is_pooler):
+            raise SystemExit(
+              f'DATABASE_URL host {database_host or "<missing>"} is not approved for Supabase project {project_ref}'
+            )
+
+          print(f'Approved E2E database target: host={database_host}, project_ref={project_ref}')
+          PY
+          )
+
+          echo "${DB_CHECK}"
 
       - name: Reset E2E database schema
         shell: bash
@@ -108,6 +137,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
+          if-no-files-found: ignore
           path: |
             frontend/playwright-report
             frontend/test-results

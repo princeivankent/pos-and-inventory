@@ -148,7 +148,8 @@ Notes:
 - Safety guards:
   - `APP_ENV=e2e`
   - `ALLOW_DB_RESET=true`
-  - `EXPECTED_E2E_DB_HOST=db.impslyevrarpceqfhxom.supabase.co`
+  - `DATABASE_URL` must map to the same Supabase project ref as `E2E_SUPABASE_URL`
+  - direct database hosts and Supabase pooler URLs are both allowed for that project
   - reset script refuses to run unless `app.environment=e2e`
 
 ### CI Separation

@@ -2,11 +2,27 @@ import 'dotenv/config';
 import { Client } from 'pg';
 import { seedBaseFixtures } from './seeds/base.seed';
 
+function isApprovedSupabaseE2eTarget(databaseUrl: string, supabaseUrl: string) {
+  const database = new URL(databaseUrl);
+  const supabase = new URL(supabaseUrl);
+  const projectRef = supabase.hostname.split('.')[0];
+  const directHost = `db.${projectRef}.supabase.co`;
+  const isDirect = database.hostname === directHost;
+  const isPooler =
+    database.hostname.endsWith('.pooler.supabase.com') && database.username.includes(projectRef);
+
+  return {
+    approved: isDirect || isPooler,
+    databaseHost: database.hostname,
+    projectRef,
+  };
+}
+
 function assertSafe() {
   const databaseUrl = process.env.DATABASE_URL ?? '';
+  const supabaseUrl = process.env.SUPABASE_URL ?? '';
   const appEnv = process.env.APP_ENV;
   const allowReset = process.env.ALLOW_DB_RESET;
-  const expectedHost = process.env.EXPECTED_E2E_DB_HOST;
 
   if (appEnv !== 'e2e') {
     throw new Error('Refusing e2e seed: APP_ENV must be e2e');
@@ -16,8 +32,16 @@ function assertSafe() {
     throw new Error('Refusing e2e seed: ALLOW_DB_RESET must be true');
   }
 
-  if (!expectedHost || !databaseUrl.includes(expectedHost)) {
-    throw new Error('Refusing e2e seed: DATABASE_URL is not the expected E2E host');
+  if (!databaseUrl || !supabaseUrl) {
+    throw new Error('Refusing e2e seed: DATABASE_URL and SUPABASE_URL are required');
+  }
+
+  const target = isApprovedSupabaseE2eTarget(databaseUrl, supabaseUrl);
+
+  if (!target.projectRef || !target.approved) {
+    throw new Error(
+      `Refusing e2e seed: DATABASE_URL host ${target.databaseHost || '<missing>'} is not approved for Supabase project ${target.projectRef || '<missing>'}`,
+    );
   }
 }
 
