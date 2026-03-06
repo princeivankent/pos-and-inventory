@@ -1,4 +1,4 @@
-<div class="cart-panel">
+<div class="cart-panel" data-testid="cart-panel">
   <div class="cart-header">
     <h3>Current Order</h3>
     @if (cart.items().length > 0) {
@@ -23,7 +23,7 @@
         </button>
       </div>
     } @else {
-      <button class="add-customer-btn" (click)="addCustomer.emit()" type="button">
+      <button class="add-customer-btn" data-testid="add-customer-button" (click)="addCustomer.emit()" type="button">
         <i class="pi pi-user-plus"></i>
         <span>Add Customer</span>
       </button>
@@ -112,7 +112,7 @@
         }
       </div>
 
-      <button class="charge-btn" (click)="charge.emit()" type="button">
+      <button class="charge-btn" data-testid="charge-button" (click)="charge.emit()" type="button">
         <i class="pi pi-wallet"></i>
         <span>CHARGE {{ cart.total() | phpCurrency }}</span>
       </button>

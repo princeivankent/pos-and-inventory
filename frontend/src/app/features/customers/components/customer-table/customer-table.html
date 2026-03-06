@@ -21,7 +21,7 @@
       </tr>
     </ng-template>
     <ng-template #body let-customer>
-      <tr class="table-row">
+      <tr class="table-row" [attr.data-testid]="'customer-row-' + customer.name.replaceAll(' ', '-').toLowerCase()">
         <td>
           <div class="customer-name">
             <span class="name">{{ customer.name }}</span>
@@ -45,6 +45,7 @@
               [rounded]="true"
               [text]="true"
               severity="info"
+              [attr.data-testid]="'customer-statement-' + customer.id"
               pTooltip="View Statement"
               (onClick)="viewStatement.emit(customer)"
             />
@@ -55,6 +56,7 @@
               [rounded]="true"
               [text]="true"
               severity="success"
+              [attr.data-testid]="'customer-payment-' + customer.id"
               pTooltip="Record Payment"
               (onClick)="recordPayment.emit(customer)"
             />
@@ -65,6 +67,7 @@
               [rounded]="true"
               [text]="true"
               severity="secondary"
+              [attr.data-testid]="'customer-edit-' + customer.id"
               pTooltip="Edit"
               (onClick)="edit.emit(customer)"
             />
@@ -73,6 +76,7 @@
               [rounded]="true"
               [text]="true"
               severity="danger"
+              [attr.data-testid]="'customer-delete-' + customer.id"
               pTooltip="Deactivate"
               (onClick)="delete.emit(customer)"
             />

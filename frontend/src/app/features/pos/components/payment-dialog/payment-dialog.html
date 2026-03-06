@@ -5,6 +5,7 @@
   [style]="{ width: '520px' }"
   [closable]="!processing()"
   [closeOnEscape]="!processing()"
+  data-testid="payment-dialog"
   (onHide)="onClose()"
   (onShow)="onDialogShow()"
 >
@@ -14,6 +15,7 @@
         <button
           class="method-tab"
           [class.active]="cart.paymentMethod() === method.value"
+          [attr.data-testid]="'payment-method-' + method.value"
           (click)="selectPaymentMethod(method.value)"
           type="button"
         >
@@ -43,6 +45,7 @@
           [min]="0"
           inputStyleClass="payment-input"
           styleClass="w-full"
+          inputId="payment-amount-input"
           placeholder="Enter amount"
         />
       </div>
@@ -137,6 +140,7 @@
           [max]="totalAmount()"
           inputStyleClass="payment-input"
           styleClass="w-full"
+          inputId="partial-cash-amount-input"
           placeholder="Cash portion"
         />
       </div>
@@ -184,6 +188,7 @@
           (ngModelChange)="referenceNumber.set($event)"
           placeholder="Enter reference / approval code"
           class="ref-input"
+          data-testid="payment-reference-input"
         />
       </div>
 
@@ -205,6 +210,7 @@
     <p-button
       [label]="processing() ? 'Processing...' : 'Complete Sale'"
       [icon]="processing() ? 'pi pi-spinner pi-spin' : 'pi pi-check'"
+      data-testid="complete-sale-button"
       [disabled]="!canComplete()"
       [loading]="processing()"
       (onClick)="onComplete()"

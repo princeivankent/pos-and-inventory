@@ -1,6 +1,6 @@
 <app-page-header title="Billing & Subscription" subtitle="Manage your plan, monitor usage, and upgrade anytime." />
 
-<div class="page-content billing-page">
+<div class="page-content billing-page" data-testid="billing-page">
 
   <!-- Status Card -->
   @if (loading()) {
@@ -9,7 +9,7 @@
       <p-skeleton height="1rem" width="10rem" />
     </div>
   } @else if (subscription()) {
-    <div class="card status-card">
+    <div class="card status-card" data-testid="billing-status-card">
       <div class="status-left">
         <div class="plan-name">{{ subscription()!.plan_name }}</div>
         <span class="status-badge {{ getStatusBadgeClass(subscription()!.status) }}">
@@ -54,7 +54,7 @@
   } @else if (usage()) {
     <!-- Stores overview — global metric, compact standalone row -->
     <div class="usage-overview">
-      <div class="card usage-card">
+      <div class="card usage-card" data-testid="billing-usage-stores">
         <div class="usage-header">
           <i class="pi pi-shop usage-icon"></i>
           <span class="usage-label">Stores</span>
@@ -80,7 +80,7 @@
     @if (usage()!.store_details.length > 0) {
       <div class="store-cards-grid">
         @for (store of usage()!.store_details; track store.store_id) {
-          <div class="card store-usage-card">
+          <div class="card store-usage-card" [attr.data-testid]="'billing-store-' + store.store_id">
             <div class="store-card-header">
               <i class="pi pi-building store-card-icon"></i>
               <span class="store-card-name">{{ store.store_name }}</span>
@@ -150,7 +150,7 @@
   } @else {
     <div class="plans-grid">
       @for (plan of plans(); track plan.id) {
-        <div class="card plan-card" [class.plan-card--current]="getPlanAction(plan) === 'current'">
+        <div class="card plan-card" [class.plan-card--current]="getPlanAction(plan) === 'current'" [attr.data-testid]="'plan-card-' + plan.plan_code">
           @if (getPlanAction(plan) === 'current') {
             <div class="plan-current-badge">Current Plan</div>
           }
@@ -199,6 +199,7 @@
                 label="Upgrade"
                 icon="pi pi-arrow-up"
                 styleClass="w-full"
+                [attr.data-testid]="'upgrade-plan-' + plan.plan_code"
                 [loading]="actionLoading()"
                 (onClick)="openUpgradeDialog(plan)" />
             } @else {
@@ -208,6 +209,7 @@
                 [outlined]="true"
                 severity="secondary"
                 styleClass="w-full"
+                [attr.data-testid]="'downgrade-plan-' + plan.plan_code"
                 [loading]="actionLoading()"
                 (onClick)="openDowngradeDialog(plan)" />
             }
@@ -233,6 +235,7 @@
         label="Cancel Subscription"
         severity="danger"
         [outlined]="true"
+        data-testid="cancel-subscription-button"
         [loading]="actionLoading()"
         (onClick)="showCancelDialog()" />
     </div>
@@ -247,6 +250,7 @@
   [visible]="upgradeDialogVisible()"
   (visibleChange)="upgradeDialogVisible.set($event)"
   [style]="{ width: '32rem' }"
+  data-testid="upgrade-dialog"
   [draggable]="false">
 
   @if (selectedUpgradePlan()) {
@@ -330,6 +334,7 @@
         [label]="'Upgrade to ' + (selectedUpgradePlan()?.name ?? '')"
         icon="pi pi-arrow-right"
         iconPos="right"
+        data-testid="confirm-upgrade-button"
         [loading]="actionLoading()"
         (onClick)="confirmUpgrade()" />
     }

@@ -5,6 +5,7 @@
   [modal]="true"
   [style]="{ width: '480px' }"
   [closable]="true"
+  data-testid="customer-form-dialog"
 >
   <div class="form-grid">
     <!-- Basic Info -->
@@ -13,17 +14,17 @@
 
       <div class="field">
         <label for="name">Name *</label>
-        <input pInputText id="name" [(ngModel)]="form.name" placeholder="Customer name" class="w-full" />
+        <input pInputText id="name" [(ngModel)]="form.name" placeholder="Customer name" class="w-full" data-testid="customer-name-input" />
       </div>
 
       <div class="field">
         <label for="phone">Phone *</label>
-        <input pInputText id="phone" [(ngModel)]="form.phone" placeholder="09XX-XXX-XXXX" class="w-full" />
+        <input pInputText id="phone" [(ngModel)]="form.phone" placeholder="09XX-XXX-XXXX" class="w-full" data-testid="customer-phone-input" />
       </div>
 
       <div class="field">
         <label for="email">Email</label>
-        <input pInputText id="email" [(ngModel)]="form.email" placeholder="email@example.com" class="w-full" />
+        <input pInputText id="email" [(ngModel)]="form.email" placeholder="email@example.com" class="w-full" data-testid="customer-email-input" />
       </div>
     </div>
 
@@ -33,7 +34,7 @@
 
       <div class="field">
         <label for="address">Address</label>
-        <textarea pTextarea id="address" [(ngModel)]="form.address" placeholder="Customer address" [rows]="2" class="w-full"></textarea>
+        <textarea pTextarea id="address" [(ngModel)]="form.address" placeholder="Customer address" [rows]="2" class="w-full" data-testid="customer-address-input"></textarea>
       </div>
 
       <div class="field">
@@ -46,6 +47,7 @@
           locale="en-PH"
           [min]="0"
           styleClass="w-full"
+          inputId="customer-credit-limit-input"
         />
       </div>
     </div>
@@ -56,6 +58,7 @@
     <p-button
       [label]="editMode ? 'Update' : 'Create'"
       icon="pi pi-check"
+      data-testid="customer-save-button"
       (onClick)="save.emit()"
       [disabled]="!isValid || saving"
       [loading]="saving"

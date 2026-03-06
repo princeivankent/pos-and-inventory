@@ -4,6 +4,7 @@
   [modal]="true"
   [style]="{ width: '440px' }"
   [closable]="true"
+  data-testid="customer-search-dialog"
 >
   <div class="customer-search-body">
     <p-autocomplete
@@ -17,6 +18,7 @@
       [delay]="300"
       styleClass="w-full"
       inputStyleClass="customer-search-input"
+      inputId="customer-search-input"
     >
       <ng-template let-customer pTemplate="item">
         <div class="customer-item">
@@ -32,7 +34,7 @@
       </ng-template>
     </p-autocomplete>
 
-    <button class="walkin-btn" (click)="selectWalkIn()" type="button">
+    <button class="walkin-btn" data-testid="walk-in-button" (click)="selectWalkIn()" type="button">
       <i class="pi pi-user"></i>
       <span>Walk-in (No Customer)</span>
     </button>

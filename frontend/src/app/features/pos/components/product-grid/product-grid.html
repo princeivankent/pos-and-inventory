@@ -10,6 +10,7 @@
         class="product-tile"
         [class.out-of-stock]="product.current_stock <= 0"
         [disabled]="product.current_stock <= 0"
+        [attr.data-testid]="'pos-product-' + product.sku"
         (click)="onSelect(product)"
       >
         <div class="tile-color-bar" [style.background]="getCategoryColor(product)"></div>

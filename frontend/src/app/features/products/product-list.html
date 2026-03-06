@@ -16,7 +16,7 @@
   </p-buttonGroup>
 
   @if (storeCtx.isAdmin()) {
-    <p-button label="Add Product" icon="pi pi-plus" (onClick)="openNew()" />
+    <p-button label="Add Product" icon="pi pi-plus" data-testid="add-product-button" (onClick)="openNew()" />
   }
 </app-page-header>
 
@@ -39,7 +39,7 @@
 </div>
 
 <!-- Content -->
-<div class="card">
+<div class="card" data-testid="products-page">
   @if (viewMode() === 'table') {
     <!-- Table View -->
     <app-product-table

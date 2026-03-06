@@ -3,6 +3,7 @@
       [(visible)]="visible"
       [modal]="true"
       [style]="{ width: '380px' }"
+      data-testid="receipt-dialog"
     >
       @if (sale) {
         <div class="receipt" id="receipt-content">
@@ -76,6 +77,7 @@
         <p-button
           label="Print"
           icon="pi pi-print"
+          data-testid="receipt-print-button"
           (onClick)="onPrint()"
         />
         <p-button

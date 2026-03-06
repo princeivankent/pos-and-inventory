@@ -1,6 +1,6 @@
 <app-page-header title="Customers" subtitle="Manage customer accounts and credit">
   @if (storeCtx.isAdmin()) {
-    <p-button label="Add Customer" icon="pi pi-plus" (onClick)="openNew()" />
+    <p-button label="Add Customer" icon="pi pi-plus" data-testid="add-customer-page-button" (onClick)="openNew()" />
   }
 </app-page-header>
 
@@ -22,7 +22,7 @@
 </div>
 
 <!-- Customer Table -->
-<div class="card">
+<div class="card" data-testid="customers-page">
   <app-customer-table
     [customers]="customers()"
     [loading]="loading()"

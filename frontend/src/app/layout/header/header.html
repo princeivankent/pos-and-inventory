@@ -1,4 +1,4 @@
-<header class="app-header">
+<header class="app-header" data-testid="app-header">
       <div class="header-left">
         <p-select
           [options]="stores()"
@@ -8,6 +8,8 @@
           placeholder="Select store"
           (onChange)="onStoreChange($event.value)"
           styleClass="store-select"
+          inputId="store-switcher-input"
+          data-testid="store-switcher"
           appendTo="body"
         />
       </div>
@@ -18,6 +20,7 @@
           icon="pi pi-sign-out"
           [text]="true"
           severity="secondary"
+          data-testid="logout-button"
           (onClick)="onLogout()"
           pTooltip="Sign out"
         />

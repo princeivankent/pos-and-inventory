@@ -11,7 +11,7 @@
       />
     </app-page-header>
 
-    <div class="card">
+    <div class="card" data-testid="sales-page">
       <p-table
         [value]="sales()"
         [paginator]="true"
@@ -38,7 +38,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-sale>
-          <tr class="table-row">
+          <tr class="table-row" [attr.data-testid]="'sale-row-' + sale.sale_number">
             <td class="font-medium">{{ sale.sale_number }}</td>
             <td>{{ sale.sale_date | date:'MMM d, y h:mm a' }}</td>
             <td>{{ sale.cashier?.full_name ?? '-' }}</td>
@@ -58,9 +58,9 @@
             </td>
             <td>
               <div class="flex gap-2">
-                <p-button icon="pi pi-eye" [rounded]="true" [text]="true" (onClick)="viewSale(sale)" />
+                <p-button icon="pi pi-eye" [rounded]="true" [text]="true" [attr.data-testid]="'view-sale-' + sale.sale_number" (onClick)="viewSale(sale)" />
                 @if (storeCtx.isAdmin() && sale.status === 'completed') {
-                  <p-button icon="pi pi-ban" [rounded]="true" [text]="true" severity="danger" (onClick)="confirmVoid(sale)" pTooltip="Void sale" />
+                  <p-button icon="pi pi-ban" [rounded]="true" [text]="true" severity="danger" [attr.data-testid]="'void-sale-' + sale.sale_number" (onClick)="confirmVoid(sale)" pTooltip="Void sale" />
                 }
               </div>
             </td>
@@ -88,6 +88,7 @@
       header="Sale Detail"
       [modal]="true"
       [style]="{ width: '550px' }"
+      data-testid="sale-detail-dialog"
     >
       @if (selectedSale()) {
         <div class="sale-detail">

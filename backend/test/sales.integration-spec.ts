@@ -1,11 +1,14 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { SalesService } from '../src/sales/sales.service';
-import { Sale } from '../src/database/entities/sale.entity';
+import { Sale, SaleStatus } from '../src/database/entities/sale.entity';
 import { SaleItem } from '../src/database/entities/sale-item.entity';
 import { Product } from '../src/database/entities/product.entity';
 import { InventoryBatch } from '../src/database/entities/inventory-batch.entity';
-import { StockMovement } from '../src/database/entities/stock-movement.entity';
+import {
+  StockMovement,
+  MovementType,
+} from '../src/database/entities/stock-movement.entity';
 import { Store } from '../src/database/entities/store.entity';
 import { Category } from '../src/database/entities/category.entity';
 import { User } from '../src/database/entities/user.entity';
@@ -263,5 +266,387 @@ describeIfDb('SalesService (integration, postgres)', () => {
         cashier.id,
       ),
     ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('voidSale restores product stock, batch quantities, and customer credit balance', async () => {
+    const storeRepo = dataSource.getRepository(Store);
+    const categoryRepo = dataSource.getRepository(Category);
+    const userRepo = dataSource.getRepository(User);
+    const productRepo = dataSource.getRepository(Product);
+    const batchRepo = dataSource.getRepository(InventoryBatch);
+    const customerRepo = dataSource.getRepository(Customer);
+    const movementRepo = dataSource.getRepository(StockMovement);
+
+    const store = await storeRepo.save({
+      id: '10000000-0000-4000-8000-000000000021',
+      name: 'Credit Store',
+      settings: { tax_enabled: false },
+    });
+
+    await categoryRepo.save({
+      id: '20000000-0000-4000-8000-000000000021',
+      store_id: store.id,
+      name: 'General',
+    });
+
+    const admin = await userRepo.save({
+      id: '30000000-0000-4000-8000-000000000021',
+      email: 'admin-credit@example.com',
+      full_name: 'Admin Credit',
+      is_active: true,
+    });
+
+    const customer = await customerRepo.save({
+      id: '60000000-0000-4000-8000-000000000021',
+      store_id: store.id,
+      name: 'Juan Dela Cruz',
+      phone: '09170000021',
+      credit_limit: 500,
+      current_balance: 100,
+      is_active: true,
+    });
+
+    const product = await productRepo.save({
+      id: '40000000-0000-4000-8000-000000000021',
+      store_id: store.id,
+      category_id: '20000000-0000-4000-8000-000000000021',
+      sku: 'SKU-CREDIT',
+      name: 'Coffee',
+      unit: 'pcs',
+      retail_price: 50,
+      cost_price: 30,
+      current_stock: 10,
+      is_active: true,
+    });
+
+    await batchRepo.save({
+      id: '50000000-0000-4000-8000-000000000021',
+      store_id: store.id,
+      product_id: product.id,
+      batch_number: 'BCREDIT',
+      purchase_date: new Date('2026-02-01'),
+      unit_cost: 30,
+      initial_quantity: 10,
+      current_quantity: 10,
+      wholesale_price: 40,
+      retail_price: 50,
+      is_active: true,
+    });
+
+    const sale = await salesService.create(
+      {
+        customer_id: customer.id,
+        payment_method: 'credit',
+        amount_paid: 0,
+        credit_amount: 100,
+        items: [{ product_id: product.id, quantity: 2, unit_price: 50 }],
+      } as any,
+      store.id,
+      admin.id,
+    );
+
+    const afterSaleCustomer = await customerRepo.findOneByOrFail({ id: customer.id });
+    expect(Number(afterSaleCustomer.current_balance)).toBe(200);
+
+    const voidedSale = await salesService.voidSale(sale.id, store.id, admin.id);
+
+    const updatedProduct = await productRepo.findOneByOrFail({ id: product.id });
+    const updatedBatch = await batchRepo.findOneByOrFail({
+      id: '50000000-0000-4000-8000-000000000021',
+    });
+    const updatedCustomer = await customerRepo.findOneByOrFail({ id: customer.id });
+    const returnMovements = await movementRepo.find({
+      where: { reference_id: sale.id, reference_type: 'void' },
+    });
+
+    expect(voidedSale.status).toBe(SaleStatus.VOID);
+    expect(updatedProduct.current_stock).toBe(10);
+    expect(updatedBatch.current_quantity).toBe(10);
+    expect(updatedBatch.is_active).toBe(true);
+    expect(Number(updatedCustomer.current_balance)).toBe(100);
+    expect(returnMovements).toHaveLength(1);
+    expect(returnMovements[0].movement_type).toBe(MovementType.RETURN);
+    expect(Number(returnMovements[0].quantity)).toBe(2);
+  });
+
+  it('voidSale clamps reversed credit balance at zero', async () => {
+    const storeRepo = dataSource.getRepository(Store);
+    const categoryRepo = dataSource.getRepository(Category);
+    const userRepo = dataSource.getRepository(User);
+    const productRepo = dataSource.getRepository(Product);
+    const batchRepo = dataSource.getRepository(InventoryBatch);
+    const customerRepo = dataSource.getRepository(Customer);
+
+    const store = await storeRepo.save({
+      id: '10000000-0000-4000-8000-000000000022',
+      name: 'Clamp Store',
+      settings: { tax_enabled: false },
+    });
+
+    await categoryRepo.save({
+      id: '20000000-0000-4000-8000-000000000022',
+      store_id: store.id,
+      name: 'General',
+    });
+
+    const admin = await userRepo.save({
+      id: '30000000-0000-4000-8000-000000000022',
+      email: 'admin-clamp@example.com',
+      full_name: 'Admin Clamp',
+      is_active: true,
+    });
+
+    const customer = await customerRepo.save({
+      id: '60000000-0000-4000-8000-000000000022',
+      store_id: store.id,
+      name: 'Clamp Customer',
+      phone: '09170000022',
+      credit_limit: 500,
+      current_balance: 0,
+      is_active: true,
+    });
+
+    const product = await productRepo.save({
+      id: '40000000-0000-4000-8000-000000000022',
+      store_id: store.id,
+      category_id: '20000000-0000-4000-8000-000000000022',
+      sku: 'SKU-CLAMP',
+      name: 'Bread',
+      unit: 'pcs',
+      retail_price: 25,
+      cost_price: 10,
+      current_stock: 4,
+      is_active: true,
+    });
+
+    await batchRepo.save({
+      id: '50000000-0000-4000-8000-000000000022',
+      store_id: store.id,
+      product_id: product.id,
+      batch_number: 'BCLAMP',
+      purchase_date: new Date('2026-02-02'),
+      unit_cost: 10,
+      initial_quantity: 4,
+      current_quantity: 4,
+      wholesale_price: 15,
+      retail_price: 25,
+      is_active: true,
+    });
+
+    const sale = await salesService.create(
+      {
+        customer_id: customer.id,
+        payment_method: 'partial',
+        amount_paid: 40,
+        credit_amount: 10,
+        items: [{ product_id: product.id, quantity: 2, unit_price: 25 }],
+      } as any,
+      store.id,
+      admin.id,
+    );
+
+    await dataSource.getRepository(Customer).update(customer.id, {
+      current_balance: 5,
+    });
+
+    await salesService.voidSale(sale.id, store.id, admin.id);
+
+    const updatedCustomer = await customerRepo.findOneByOrFail({ id: customer.id });
+    expect(Number(updatedCustomer.current_balance)).toBe(0);
+  });
+
+  it('rolls back sale creation when FIFO batches do not cover requested quantity', async () => {
+    const storeRepo = dataSource.getRepository(Store);
+    const categoryRepo = dataSource.getRepository(Category);
+    const userRepo = dataSource.getRepository(User);
+    const productRepo = dataSource.getRepository(Product);
+    const batchRepo = dataSource.getRepository(InventoryBatch);
+    const saleRepo = dataSource.getRepository(Sale);
+    const saleItemRepo = dataSource.getRepository(SaleItem);
+    const movementRepo = dataSource.getRepository(StockMovement);
+
+    const store = await storeRepo.save({
+      id: '10000000-0000-4000-8000-000000000023',
+      name: 'Rollback Store',
+      settings: { tax_enabled: false },
+    });
+
+    await categoryRepo.save({
+      id: '20000000-0000-4000-8000-000000000023',
+      store_id: store.id,
+      name: 'General',
+    });
+
+    const cashier = await userRepo.save({
+      id: '30000000-0000-4000-8000-000000000023',
+      email: 'cashier-rollback@example.com',
+      full_name: 'Cashier Rollback',
+      is_active: true,
+    });
+
+    const product = await productRepo.save({
+      id: '40000000-0000-4000-8000-000000000023',
+      store_id: store.id,
+      category_id: '20000000-0000-4000-8000-000000000023',
+      sku: 'SKU-ROLLBACK',
+      name: 'Sugar',
+      unit: 'pcs',
+      retail_price: 60,
+      cost_price: 30,
+      current_stock: 5,
+      is_active: true,
+    });
+
+    await batchRepo.save({
+      id: '50000000-0000-4000-8000-000000000023',
+      store_id: store.id,
+      product_id: product.id,
+      batch_number: 'BROLLBACK',
+      purchase_date: new Date('2026-02-03'),
+      unit_cost: 30,
+      initial_quantity: 3,
+      current_quantity: 3,
+      wholesale_price: 45,
+      retail_price: 60,
+      is_active: true,
+    });
+
+    await expect(
+      salesService.create(
+        {
+          items: [{ product_id: product.id, quantity: 5, unit_price: 60 }],
+          amount_paid: 500,
+        } as any,
+        store.id,
+        cashier.id,
+      ),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    const updatedProduct = await productRepo.findOneByOrFail({ id: product.id });
+    const updatedBatch = await batchRepo.findOneByOrFail({
+      id: '50000000-0000-4000-8000-000000000023',
+    });
+
+    expect(updatedProduct.current_stock).toBe(5);
+    expect(updatedBatch.current_quantity).toBe(3);
+    expect(await saleRepo.count()).toBe(0);
+    expect(await saleItemRepo.count()).toBe(0);
+    expect(await movementRepo.count()).toBe(0);
+  });
+
+  it('allows the same daily sale number sequence in different stores', async () => {
+    const storeRepo = dataSource.getRepository(Store);
+    const categoryRepo = dataSource.getRepository(Category);
+    const userRepo = dataSource.getRepository(User);
+    const productRepo = dataSource.getRepository(Product);
+    const batchRepo = dataSource.getRepository(InventoryBatch);
+
+    const storeA = await storeRepo.save({
+      id: '10000000-0000-4000-8000-000000000024',
+      name: 'Store Seq A',
+      settings: { tax_enabled: false },
+    });
+
+    const storeB = await storeRepo.save({
+      id: '10000000-0000-4000-8000-000000000025',
+      name: 'Store Seq B',
+      settings: { tax_enabled: false },
+    });
+
+    await categoryRepo.save([
+      {
+        id: '20000000-0000-4000-8000-000000000024',
+        store_id: storeA.id,
+        name: 'General A',
+      },
+      {
+        id: '20000000-0000-4000-8000-000000000025',
+        store_id: storeB.id,
+        name: 'General B',
+      },
+    ]);
+
+    const cashier = await userRepo.save({
+      id: '30000000-0000-4000-8000-000000000024',
+      email: 'cashier-seq@example.com',
+      full_name: 'Cashier Seq',
+      is_active: true,
+    });
+
+    const productA = await productRepo.save({
+      id: '40000000-0000-4000-8000-000000000024',
+      store_id: storeA.id,
+      category_id: '20000000-0000-4000-8000-000000000024',
+      sku: 'SKU-SEQ-A',
+      name: 'Store A Product',
+      unit: 'pcs',
+      retail_price: 50,
+      cost_price: 30,
+      current_stock: 2,
+      is_active: true,
+    });
+
+    const productB = await productRepo.save({
+      id: '40000000-0000-4000-8000-000000000025',
+      store_id: storeB.id,
+      category_id: '20000000-0000-4000-8000-000000000025',
+      sku: 'SKU-SEQ-B',
+      name: 'Store B Product',
+      unit: 'pcs',
+      retail_price: 60,
+      cost_price: 35,
+      current_stock: 2,
+      is_active: true,
+    });
+
+    await batchRepo.save([
+      {
+        id: '50000000-0000-4000-8000-000000000024',
+        store_id: storeA.id,
+        product_id: productA.id,
+        batch_number: 'BSEQ-A',
+        purchase_date: new Date('2026-02-04'),
+        unit_cost: 30,
+        initial_quantity: 2,
+        current_quantity: 2,
+        wholesale_price: 40,
+        retail_price: 50,
+        is_active: true,
+      },
+      {
+        id: '50000000-0000-4000-8000-000000000025',
+        store_id: storeB.id,
+        product_id: productB.id,
+        batch_number: 'BSEQ-B',
+        purchase_date: new Date('2026-02-04'),
+        unit_cost: 35,
+        initial_quantity: 2,
+        current_quantity: 2,
+        wholesale_price: 45,
+        retail_price: 60,
+        is_active: true,
+      },
+    ]);
+
+    const saleA = await salesService.create(
+      {
+        items: [{ product_id: productA.id, quantity: 1, unit_price: 50 }],
+        amount_paid: 50,
+      } as any,
+      storeA.id,
+      cashier.id,
+    );
+
+    const saleB = await salesService.create(
+      {
+        items: [{ product_id: productB.id, quantity: 1, unit_price: 60 }],
+        amount_paid: 60,
+      } as any,
+      storeB.id,
+      cashier.id,
+    );
+
+    expect(saleA.sale_number).toMatch(/^SALE-\d{8}-0001$/);
+    expect(saleB.sale_number).toBe(saleA.sale_number);
   });
 });

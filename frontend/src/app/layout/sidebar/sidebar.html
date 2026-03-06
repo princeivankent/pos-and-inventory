@@ -1,4 +1,4 @@
-<aside class="sidebar">
+<aside class="sidebar" data-testid="sidebar">
       <div class="sidebar-brand">
         <span class="brand-icon">
           <i class="pi pi-shopping-cart"></i>
@@ -13,6 +13,7 @@
             routerLinkActive="active"
             [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
             class="nav-item"
+            [attr.data-testid]="'nav-' + item.route.replace('/', '')"
           >
             <i [class]="'pi ' + item.icon"></i>
             <span>{{ item.label }}</span>

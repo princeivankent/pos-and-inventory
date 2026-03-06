@@ -64,14 +64,14 @@ Notes:
 
 - Current e2e tests use controlled service doubles for deterministic API flow coverage, not full `AppModule` external infra wiring.
 - Integration tests are opt-in and require local/CI Postgres availability.
-- Frontend component tests are still pending.
+- Frontend component tests for dashboard, POS, products, and customers are now in place.
 
 ## Recommended Next Work Items
 
-1. Add integration tests for `voidSale` stock restoration and credit balance reversal.
-2. Add integration tests for inventory stock-out FIFO edge cases.
-3. Add CI workflow step to run `test`, `test:e2e`, and `test:integration` (with test DB service).
-4. Start frontend feature-level component tests for billing and sales pages.
+1. Run backend integration tests in CI with a dedicated Postgres test database.
+2. Add feature-level frontend component tests for billing and sales pages.
+3. Expand Playwright coverage for reports, settings, and supplier management.
+4. Add production smoke execution to deployment gates.
 
 ---
 
@@ -104,10 +104,25 @@ Notes:
 
 | File | Status |
 |---|---|
-| Dashboard component tests | [ ] |
-| POS component tests | [ ] |
-| Customers component tests | [ ] |
-| Products component tests | [ ] |
+| Dashboard component tests | [x] |
+| POS component tests | [x] |
+| Customers component tests | [x] |
+| Products component tests | [x] |
+
+### Playwright E2E Coverage
+
+| Suite | Status |
+|---|---|
+| Billing and permissions (`tests/e2e/billing-permissions.spec.ts`) | [x] 3 tests passing |
+| Smoke flows (`tests/e2e/smoke.spec.ts`) | [x] 3 tests passing |
+
+### Playwright Notes
+
+- Playwright now starts both the backend (`backend/npm run start:dev`) and frontend (`frontend/npm run start`) from `frontend/playwright.config.ts`.
+- Browser prerequisite: `npx playwright install chromium`
+- Sale-number collision fix applied:
+  - Migration: `backend/src/database/migrations/1707900000000-FixSaleNumberUniqueness.ts`
+  - Uniqueness is now scoped to `(store_id, sale_number)`
 
 ### How To Run (Frontend)
 
@@ -115,4 +130,5 @@ Notes:
 cd frontend
 npm run test                        # run all spec files
 npm run test -- --reporter=verbose  # verbose output per test
+npm run test:e2e                    # run Playwright suites (starts backend + frontend)
 ```

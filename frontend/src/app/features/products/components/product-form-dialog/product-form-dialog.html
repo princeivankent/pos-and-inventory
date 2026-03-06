@@ -3,6 +3,7 @@
   [header]="editMode ? 'Edit Product' : 'New Product'"
   [modal]="true"
   [style]="{ width: '500px' }"
+  data-testid="product-form-dialog"
   (onHide)="onHide()"
 >
   <div class="form-grid">
@@ -12,17 +13,17 @@
 
       <div class="field">
         <label>Name *</label>
-        <input pInputText [(ngModel)]="form.name" class="w-full" placeholder="Product name" />
+        <input pInputText [(ngModel)]="form.name" class="w-full" placeholder="Product name" data-testid="product-name-input" />
       </div>
 
       <div class="field-row">
         <div class="field">
           <label>SKU *</label>
-          <input pInputText [(ngModel)]="form.sku" class="w-full" placeholder="Stock keeping unit" />
+          <input pInputText [(ngModel)]="form.sku" class="w-full" placeholder="Stock keeping unit" data-testid="product-sku-input" />
         </div>
         <div class="field">
           <label>Barcode</label>
-          <input pInputText [(ngModel)]="form.barcode" class="w-full" placeholder="Barcode" />
+          <input pInputText [(ngModel)]="form.barcode" class="w-full" placeholder="Barcode" data-testid="product-barcode-input" />
         </div>
       </div>
 
@@ -35,13 +36,15 @@
           optionValue="id"
           placeholder="Select category"
           styleClass="w-full"
+          inputId="product-category-input"
+          data-testid="product-category-select"
           appendTo="body"
         />
       </div>
 
       <div class="field">
         <label>Description</label>
-        <input pInputText [(ngModel)]="form.description" class="w-full" placeholder="Optional description" />
+        <input pInputText [(ngModel)]="form.description" class="w-full" placeholder="Optional description" data-testid="product-description-input" />
       </div>
     </div>
 
@@ -58,6 +61,7 @@
             currency="PHP"
             locale="en-PH"
             styleClass="w-full"
+            inputId="product-retail-price-input"
           />
         </div>
         <div class="field">
@@ -68,6 +72,7 @@
             currency="PHP"
             locale="en-PH"
             styleClass="w-full"
+            inputId="product-cost-price-input"
           />
         </div>
       </div>
@@ -94,11 +99,11 @@
       <div class="field-row">
         <div class="field">
           <label>Unit</label>
-          <input pInputText [(ngModel)]="form.unit" class="w-full" placeholder="pcs" />
+          <input pInputText [(ngModel)]="form.unit" class="w-full" placeholder="pcs" data-testid="product-unit-input" />
         </div>
         <div class="field">
           <label>Reorder Level</label>
-          <p-inputNumber [(ngModel)]="form.reorder_level" [min]="0" styleClass="w-full" />
+          <p-inputNumber [(ngModel)]="form.reorder_level" [min]="0" styleClass="w-full" inputId="product-reorder-level-input" />
         </div>
       </div>
     </div>
@@ -109,6 +114,7 @@
     <p-button
       [label]="editMode ? 'Update' : 'Create'"
       icon="pi pi-check"
+      data-testid="product-save-button"
       (onClick)="onSave()"
       [loading]="saving"
       [disabled]="!form.name || !form.sku || !form.category_id"

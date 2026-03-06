@@ -217,11 +217,27 @@ Track your progress as you implement the POS system.
 - [x] `store-context.service.spec.ts` — initializeStore, switchStore, isAdmin (15 tests)
 - [x] `auth.service.spec.ts` — login/register/logout localStorage + subscription integration (16 tests)
 
-### Frontend Testing — Feature Layer (Future)
-- [ ] Dashboard component tests
-- [ ] POS component tests
-- [ ] Customers component tests
-- [ ] Products component tests
+### Frontend Testing — Feature Layer ✅
+- [x] `dashboard.spec.ts` — skips locked reports APIs and still loads always-available dashboard data
+- [x] `pos.spec.ts` — posts partial-sale payload with customer and discount context
+- [x] `customer-list.spec.ts` — payment submission reloads customer list
+- [x] `product-list.spec.ts` — init loading + create flow refresh coverage
+
+### Frontend E2E — Playwright ⏳
+- [x] Playwright installed and configured with frontend + backend web servers
+- [x] Billing and permissions suite:
+  - [x] Tindahan blocked-feature UI
+  - [x] Upgrade flow to Negosyo
+  - [x] Admin vs cashier access
+- [x] Smoke coverage added for:
+  - [x] Login
+  - [x] Create product
+  - [x] Stock in
+  - [x] Complete cash sale
+  - [x] Complete credit / partial sale
+  - [x] Void sale
+  - [x] Switch store / verify isolation
+- [x] Resolve backend `sales.sale_number` global uniqueness collision found by parallel Playwright sales flows
 
 ### Deployment
 - [ ] Backend deployment (Railway)
@@ -272,4 +288,4 @@ Track your progress as you implement the POS system.
 
 ---
 
-**Current Status**: Core backend/frontend, subscription system, and supplier management are complete ✅ | Thermal printer hardware integration, low-stock automation, deployment, and remaining integration tests are pending ⏳
+**Current Status**: Core backend/frontend, subscription system, supplier management, Playwright smoke/billing coverage, and feature-level frontend component tests are complete ✅ | Thermal printer hardware integration, low-stock automation, deployment, and remaining integration tests are pending ⏳

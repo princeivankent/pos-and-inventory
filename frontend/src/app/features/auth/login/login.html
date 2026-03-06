@@ -1,4 +1,4 @@
-<div class="login-page">
+<div class="login-page" data-testid="login-page">
       <div class="login-card">
         <!-- Brand Identity -->
         <div class="login-header">
@@ -21,6 +21,7 @@
               name="email"
               placeholder="Enter your email"
               class="w-full input-enhanced"
+              data-testid="login-email"
               required
               #emailInput="ngModel"
             />
@@ -44,6 +45,7 @@
               [feedback]="false"
               styleClass="w-full"
               inputStyleClass="w-full input-enhanced"
+              inputId="login-password-input"
               required
               #passwordInput="ngModel"
             />
@@ -68,6 +70,7 @@
             type="submit"
             label="Sign In"
             styleClass="w-full btn-signin"
+            data-testid="login-submit"
             [loading]="loading()"
             [disabled]="!email || !password"
           />

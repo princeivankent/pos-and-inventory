@@ -1,0 +1,111 @@
+name: E2E Playwright
+
+on:
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      CI: true
+      NODE_ENV: test
+      APP_ENV: e2e
+      ALLOW_DB_RESET: 'true'
+      DATABASE_SSL: 'true'
+      PGSSLMODE: require
+
+      DATABASE_URL: ${{ secrets.E2E_DATABASE_URL }}
+      SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_KEY: ${{ secrets.E2E_SUPABASE_SERVICE_KEY }}
+      JWT_SECRET: ${{ secrets.E2E_JWT_SECRET }}
+      FRONTEND_URL: http://127.0.0.1:4200
+      BYPASS_PAYMENT: 'true'
+      EXPECTED_E2E_DB_HOST: db.impslyevrarpceqfhxom.supabase.co
+
+      PLAYWRIGHT_BASE_URL: http://127.0.0.1:4200
+      PLAYWRIGHT_API_URL: http://127.0.0.1:3000/api
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Safety check E2E target
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${APP_ENV}" != "e2e" ]]; then
+            echo "APP_ENV must be e2e"
+            exit 1
+          fi
+
+          if [[ "${ALLOW_DB_RESET}" != "true" ]]; then
+            echo "ALLOW_DB_RESET must be true"
+            exit 1
+          fi
+
+          if [[ "${DATABASE_URL}" != *"${EXPECTED_E2E_DB_HOST}"* ]]; then
+            echo "DATABASE_URL does not point to the expected E2E Supabase host"
+            exit 1
+          fi
+
+      - name: Reset E2E database schema
+        shell: bash
+        run: |
+          set -euo pipefail
+          PGOPTIONS="-c app.environment=e2e" \
+          psql "${DATABASE_URL}" \
+            -v ON_ERROR_STOP=1 \
+            -f backend/scripts/db/reset-e2e.sql
+
+      - name: Run migrations
+        working-directory: backend
+        run: npm run migration:run
+
+      - name: Seed E2E database
+        working-directory: backend
+        run: npm run db:seed:e2e
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E
+        working-directory: frontend
+        run: npm run test:e2e
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            frontend/playwright-report
+            frontend/test-results

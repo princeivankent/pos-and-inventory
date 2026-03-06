@@ -1,6 +1,6 @@
 <app-page-header title="Inventory" subtitle="Stock levels and management">
       @if (storeCtx.isAdmin()) {
-        <p-button label="Stock In" icon="pi pi-plus" (onClick)="openStockIn()" />
+        <p-button label="Stock In" icon="pi pi-plus" data-testid="open-stock-in-button" (onClick)="openStockIn()" />
       }
       <a routerLink="/inventory/low-stock">
         <p-button label="Low Stock" icon="pi pi-exclamation-triangle" severity="warn" [outlined]="true" />
@@ -10,7 +10,7 @@
       </a>
     </app-page-header>
 
-    <div class="card">
+    <div class="card" data-testid="inventory-page">
       <p-table
         [value]="products()"
         [paginator]="true"
@@ -83,6 +83,7 @@
       header="Stock In"
       [modal]="true"
       [style]="{ width: '440px' }"
+      data-testid="stock-in-dialog"
     >
       <div class="form-grid">
         <div class="field">
@@ -95,16 +96,18 @@
             placeholder="Select a product"
             styleClass="w-full"
             [filter]="true"
+            inputId="stock-in-product-input"
+            data-testid="stock-in-product-select"
             appendTo="body"
           />
         </div>
         <div class="field">
           <label>Quantity</label>
-          <p-inputNumber [(ngModel)]="stockInForm.quantity" [min]="1" styleClass="w-full" />
+          <p-inputNumber [(ngModel)]="stockInForm.quantity" [min]="1" styleClass="w-full" inputId="stock-in-quantity-input" />
         </div>
         <div class="field">
           <label>Unit Cost (optional)</label>
-          <p-inputNumber [(ngModel)]="stockInForm.unit_cost" [min]="0" [minFractionDigits]="2" [maxFractionDigits]="2" styleClass="w-full" placeholder="Leave blank to use product cost price" />
+          <p-inputNumber [(ngModel)]="stockInForm.unit_cost" [min]="0" [minFractionDigits]="2" [maxFractionDigits]="2" styleClass="w-full" placeholder="Leave blank to use product cost price" inputId="stock-in-unit-cost-input" />
         </div>
         <div class="field">
           <label>Supplier (optional)</label>
@@ -117,19 +120,21 @@
             styleClass="w-full"
             [filter]="true"
             [showClear]="true"
+            inputId="stock-in-supplier-input"
+            data-testid="stock-in-supplier-select"
             appendTo="body"
             [loading]="suppliersLoading()"
           />
         </div>
         <div class="field">
           <label>Notes</label>
-          <input pInputText [(ngModel)]="stockInForm.notes" class="w-full" placeholder="e.g. Purchase from supplier" />
+          <input pInputText [(ngModel)]="stockInForm.notes" class="w-full" placeholder="e.g. Purchase from supplier" data-testid="stock-in-notes-input" />
         </div>
       </div>
 
       <ng-template pTemplate="footer">
         <p-button label="Cancel" [text]="true" severity="secondary" (onClick)="stockInVisible = false" />
-        <p-button label="Stock In" icon="pi pi-plus" (onClick)="applyStockIn()" [loading]="saving()" />
+        <p-button label="Stock In" icon="pi pi-plus" data-testid="stock-in-submit-button" (onClick)="applyStockIn()" [loading]="saving()" />
       </ng-template>
     </p-dialog>
 

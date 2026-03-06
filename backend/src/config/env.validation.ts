@@ -39,4 +39,3 @@ export function validateEnv(config: Env): Env {
 
   return config;
 }
-

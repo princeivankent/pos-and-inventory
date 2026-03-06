@@ -18,9 +18,9 @@ export enum SaleStatus {
 @Entity('sales')
 @Index(['store_id', 'sale_date'])
 @Index(['store_id', 'customer_id'])
-@Index(['store_id', 'sale_number'])
+@Index(['store_id', 'sale_number'], { unique: true })
 export class Sale extends TenantBaseEntity {
-  @Column({ type: 'varchar', length: 50, unique: true })
+  @Column({ type: 'varchar', length: 50 })
   sale_number: string;
 
   @Column({ type: 'uuid', nullable: true })
