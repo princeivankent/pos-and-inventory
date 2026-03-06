@@ -225,6 +225,8 @@ Track your progress as you implement the POS system.
 
 ### Frontend E2E — Playwright ⏳
 - [x] Playwright installed and configured with frontend + backend web servers
+- [x] Dedicated GitHub Actions workflow for isolated Supabase E2E runs
+- [x] CI-safe reset → migrate → seed → test pipeline for `pos-and-inventory-e2e`
 - [x] Billing and permissions suite:
   - [x] Tindahan blocked-feature UI
   - [x] Upgrade flow to Negosyo

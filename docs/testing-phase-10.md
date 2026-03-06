@@ -124,6 +124,38 @@ Notes:
   - Migration: `backend/src/database/migrations/1707900000000-FixSaleNumberUniqueness.ts`
   - Uniqueness is now scoped to `(store_id, sale_number)`
 
+### Playwright CI Workflow
+
+- GitHub Actions workflow: `.github/workflows/e2e-playwright.yml`
+- Triggered on:
+  - push to `main`
+  - push to `develop`
+  - pull requests targeting `main` or `develop`
+  - manual dispatch
+- Uses a dedicated Supabase E2E database only
+- Execution order:
+  1. verify E2E database host guard
+  2. reset `public` schema with `backend/scripts/db/reset-e2e.sql`
+  3. run backend migrations
+  4. seed base E2E fixtures with `backend/scripts/db/seed-e2e.ts`
+  5. run Playwright browser suites
+- Required GitHub secrets:
+  - `E2E_DATABASE_URL`
+  - `E2E_SUPABASE_URL`
+  - `E2E_SUPABASE_ANON_KEY`
+  - `E2E_SUPABASE_SERVICE_KEY`
+  - `E2E_JWT_SECRET`
+- Safety guards:
+  - `APP_ENV=e2e`
+  - `ALLOW_DB_RESET=true`
+  - `EXPECTED_E2E_DB_HOST=db.impslyevrarpceqfhxom.supabase.co`
+  - reset script refuses to run unless `app.environment=e2e`
+
+### CI Separation
+
+- `.github/workflows/ci.yml` remains the fast lane for backend/frontend build + non-E2E tests.
+- `.github/workflows/e2e-playwright.yml` is the isolated browser-testing lane that is allowed to reset and seed the E2E Supabase database.
+
 ### How To Run (Frontend)
 
 ```bash
