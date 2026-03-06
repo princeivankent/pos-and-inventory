@@ -130,7 +130,6 @@ Notes:
 - Triggered on:
   - push to `main`
   - push to `develop`
-  - pull requests targeting `main` or `develop`
   - manual dispatch
 - Uses a dedicated Supabase E2E database only
 - Execution order:
@@ -157,6 +156,7 @@ Notes:
 
 - `.github/workflows/ci.yml` remains the fast lane for backend/frontend build + non-E2E tests.
 - `.github/workflows/e2e-playwright.yml` is the isolated browser-testing lane that is allowed to reset and seed the E2E Supabase database.
+- The Playwright workflow is intentionally not triggered by `pull_request`, because GitHub does not expose the required E2E secrets there and the job resets a dedicated external database.
 
 ### How To Run (Frontend)
 

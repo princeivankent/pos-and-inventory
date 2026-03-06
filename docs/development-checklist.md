@@ -228,6 +228,7 @@ Track your progress as you implement the POS system.
 - [x] Dedicated GitHub Actions workflow for isolated Supabase E2E runs
 - [x] CI-safe reset → migrate → seed → test pipeline for `pos-and-inventory-e2e`
 - [x] E2E database guard validates the Supabase project ref and accepts both direct DB and pooler connection strings
+- [x] Playwright E2E runs on protected-branch pushes/manual dispatch, not on `pull_request`, because the isolated Supabase reset requires secrets
 - [x] Billing and permissions suite:
   - [x] Tindahan blocked-feature UI
   - [x] Upgrade flow to Negosyo
