@@ -197,6 +197,7 @@ Track your progress as you implement the POS system.
 - [x] Unit tests for backend services (tenant.guard, sales.service)
 - [x] E2E tests — registration to first sale happy path
 - [x] Integration tests scaffold (DB-backed SalesService with real TypeORM)
+- [x] Fresh-DB migration parity fix for `customers.is_active` used by app code and E2E seeds
 - [ ] Additional integration tests: voidSale stock restoration + credit balance reversal
 - [ ] Additional integration tests: inventory stock-out FIFO edge cases
 
