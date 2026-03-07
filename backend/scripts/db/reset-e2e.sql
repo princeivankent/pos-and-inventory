@@ -1,7 +1,7 @@
 DO $$
 BEGIN
-  IF :'app_environment' IS DISTINCT FROM 'e2e' THEN
-    RAISE EXCEPTION 'Refusing reset: app_environment must be e2e';
+  IF current_setting('app.environment', true) IS DISTINCT FROM 'e2e' THEN
+    RAISE EXCEPTION 'Refusing reset: app.environment must be e2e';
   END IF;
 END $$;
 

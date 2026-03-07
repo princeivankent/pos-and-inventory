@@ -112,7 +112,7 @@ jobs:
           set -euo pipefail
           psql "${DATABASE_URL}" \
             -v ON_ERROR_STOP=1 \
-            -v app_environment=e2e \
+            -c "SET app.environment = 'e2e'" \
             -f backend/scripts/db/reset-e2e.sql
 
       - name: Run migrations
