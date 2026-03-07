@@ -110,9 +110,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          PGOPTIONS="-c app.environment=e2e" \
           psql "${DATABASE_URL}" \
             -v ON_ERROR_STOP=1 \
+            -v app_environment=e2e \
             -f backend/scripts/db/reset-e2e.sql
 
       - name: Run migrations

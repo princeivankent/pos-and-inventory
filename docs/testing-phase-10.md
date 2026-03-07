@@ -153,7 +153,7 @@ Notes:
   - `ALLOW_DB_RESET=true`
   - `DATABASE_URL` must map to the configured `E2E_SUPABASE_PROJECT_REF`
   - direct database hosts and Supabase pooler URLs are both allowed for that project
-  - reset script refuses to run unless `app.environment=e2e`
+  - reset script refuses to run unless `app_environment=e2e` is passed by the workflow
 
 ### CI Separation
 
