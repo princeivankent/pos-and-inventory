@@ -5,6 +5,7 @@ This repo is split into two TypeScript apps:
 - `backend/`: NestJS API (`src/` modules like `auth`, `products`, `sales`, `billing`, `database`).
 - `frontend/`: Angular 21 app (`src/app/{core,shared,layout,features}`).
 - `docs/`: architecture, roadmap, and feature implementation notes.
+- `memory/`: operational project memory and current implementation status.
 
 Keep domain logic inside feature modules (`backend/src/<domain>` and `frontend/src/app/features/<domain>`). Put cross-cutting concerns in `backend/src/common` and `frontend/src/app/core`.
 
@@ -75,7 +76,9 @@ All PrimeNG tables follow the Products page pattern:
 - Search: use `<p-iconfield>` + `<p-inputicon styleClass="pi pi-search" />` (NOT deprecated `span.p-input-icon-left`)
 
 ## Documentation Workflow
-- Before creating or modifying code, always read the `docs/` directory to understand the current project status and existing plans.
+- Before creating or modifying code, always read `memory/index.md` and the relevant `memory/features/*.md` file first. Use `docs/` as the polished reference layer after that.
 - After making changes, update relevant files in `docs/` when needed so documentation stays aligned with implementation.
+- After meaningful changes, update the relevant `memory/features/*.md`, `memory/recent-changes.md`, and `memory/index.md` when project status, blockers, or next steps changed.
+- Treat `memory/` as the operational source of truth for current status. If `memory/` and `docs/` disagree, fix `memory/` first, then reconcile `docs/`.
 - Only add necessary documentation items; do not add unnecessary or redundant entries.
 - Supplier Management details are documented in `docs/features/supplier-management.md`.

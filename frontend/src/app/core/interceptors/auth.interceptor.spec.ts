@@ -7,6 +7,8 @@ import { authInterceptor } from './auth.interceptor';
 import { AuthService } from '../services/auth.service';
 
 describe('authInterceptor', () => {
+  const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+
   function setup(token: string | null) {
     const mockAuth = { getToken: vi.fn().mockReturnValue(token) };
 
@@ -56,5 +58,17 @@ describe('authInterceptor', () => {
     controller.verify();
 
     expect(received).toBe(true);
+  });
+
+  it('does not log token details', () => {
+    const { http, controller } = setup('secret-token');
+
+    http.get('/api/products').subscribe();
+
+    const req = controller.expectOne('/api/products');
+    req.flush({});
+    controller.verify();
+
+    expect(consoleLogSpy).not.toHaveBeenCalled();
   });
 });

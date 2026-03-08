@@ -1,6 +1,6 @@
 # Phase 10 Testing Handoff
 
-This document is the current source of truth for automated testing added during Phase 10.
+This document is a scoped testing handoff for Phase 10. Operational project status now lives in `memory/`, especially `memory/index.md` and `memory/features/testing-ci.md`.
 
 ## Scope Implemented
 

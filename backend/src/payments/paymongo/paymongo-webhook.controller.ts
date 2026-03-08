@@ -3,6 +3,7 @@ import {
   Post,
   Body,
   Headers,
+  RawBody,
   Inject,
   Logger,
   HttpCode,
@@ -35,11 +36,11 @@ export class PaymongoWebhookController {
   @HttpCode(HttpStatus.OK)
   async handleWebhook(
     @Body() body: any,
+    @RawBody() rawBody: Buffer | undefined,
     @Headers('paymongo-signature') signature: string,
   ) {
-    // Verify signature
-    const rawBody = JSON.stringify(body);
-    if (!this.paymentGateway.verifyWebhookSignature(rawBody, signature || '')) {
+    const payload = rawBody?.toString('utf8') ?? JSON.stringify(body);
+    if (!this.paymentGateway.verifyWebhookSignature(payload, signature || '')) {
       this.logger.warn('Invalid webhook signature');
       throw new BadRequestException('Invalid signature');
     }

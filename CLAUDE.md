@@ -16,6 +16,21 @@ A multi-tenant POS & Inventory Management System for Philippine retail stores wi
 - ✅ **Production Hardening Complete**: Env validation, platform admin APIs, payment-intent flow, webhook idempotency (Mar 2, 2026)
 - 🚧 Phase 10 In Progress: Testing & Deployment preparation
 
+## Operational Memory
+
+Use `memory/` as the operational source of truth for current project state.
+
+Before meaningful work:
+- Read `memory/index.md`
+- Read the relevant `memory/features/*.md` file
+
+After meaningful work:
+- Update the relevant `memory/features/*.md`
+- Add a short entry to `memory/recent-changes.md`
+- Update `memory/index.md` and `memory/next-up.md` if status, blockers, or next actions changed
+
+Treat `docs/` as the polished reference layer. If `memory/` and `docs/` disagree, fix `memory/` first, then reconcile `docs/`.
+
 ## Technology Stack
 
 - **Backend**: NestJS + TypeORM + PostgreSQL (Supabase)
@@ -419,10 +434,9 @@ if (this.subscriptionService.hasFeature('reports')) {
 - Deployment: Backend (Railway), Frontend (Vercel), run migrations on production DB
 - CD pipeline (auto-deploy on main branch)
 - Thermal printer ESC/POS integration (wiring up installed `escpos`/`escpos-usb` deps)
-- Additional integration tests: voidSale + FIFO edge cases
 - Low-stock alert cron job + dashboard notifications
 - Data seeding & onboarding flow (sample categories, first-run wizard)
-- Frontend feature layer tests (Dashboard, POS, Customers, Products)
+- Additional frontend feature tests where launch risk justifies them (billing, sales, or other uncovered critical paths)
 - Email notifications (trial ending, payment receipts, renewal confirmations)
 - PayMongo live key configuration (`PAYMONGO_SECRET_KEY` + `BYPASS_PAYMENT=false`)
 

@@ -149,6 +149,7 @@ pos-and-inventory/
 
 ## Documentation
 
+- **memory/index.md** - Operational source of truth for current implementation status and next work
 - **CLAUDE.md** - Development patterns and AI context
 - **QUICKSTART.md** - Quick setup guide
 - **docs/architecture.md** - System architecture and flow diagrams

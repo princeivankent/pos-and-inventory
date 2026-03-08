@@ -20,4 +20,5 @@ All project documentation lives in this folder.
 
 - **Getting started**: See [../README.md](../README.md) and [../QUICKSTART.md](../QUICKSTART.md)
 - **AI dev context**: See [../CLAUDE.md](../CLAUDE.md)
-- **Current status**: See [roadmap.md](./roadmap.md), [development-checklist.md](./development-checklist.md), and [subscription-status.md](./subscription-status.md)
+- **Operational status**: See [../memory/index.md](../memory/index.md)
+- **Current status (polished docs)**: See [roadmap.md](./roadmap.md), [development-checklist.md](./development-checklist.md), and [subscription-status.md](./subscription-status.md)

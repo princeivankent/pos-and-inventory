@@ -198,8 +198,8 @@ Track your progress as you implement the POS system.
 - [x] E2E tests — registration to first sale happy path
 - [x] Integration tests scaffold (DB-backed SalesService with real TypeORM)
 - [x] Fresh-DB migration parity fix for `customers.is_active` used by app code and E2E seeds
-- [ ] Additional integration tests: voidSale stock restoration + credit balance reversal
-- [ ] Additional integration tests: inventory stock-out FIFO edge cases
+- [x] Integration tests: voidSale stock restoration + credit balance reversal
+- [x] Integration tests: FIFO rollback / insufficient-batch coverage
 
 ### Frontend Testing — Infrastructure ✅
 - [x] Install `vitest` + `@vitest/coverage-v8`
@@ -260,6 +260,9 @@ Track your progress as you implement the POS system.
 - [x] Platform billing admin page (`/platform/subscriptions`)
 - [x] Payment-intent upgrade flow (`POST /api/payments/intents` + `payment_id` verification in `POST /api/billing/upgrade`)
 - [x] Webhook event idempotency guard (dedupe via processed event IDs)
+- [x] Frontend production environment replacement wired (`environment.prod.ts` now used in production builds)
+- [x] Removed auth token logging from frontend HTTP interceptor
+- [x] PayMongo webhook verification now uses raw request body with Nest `rawBody` support
 
 ---
 
@@ -293,4 +296,4 @@ Track your progress as you implement the POS system.
 
 ---
 
-**Current Status**: Core backend/frontend, subscription system, supplier management, Playwright smoke/billing coverage, and feature-level frontend component tests are complete ✅ | Thermal printer hardware integration, low-stock automation, deployment, and remaining integration tests are pending ⏳
+**Current Status**: Core backend/frontend, subscription system, supplier management, Playwright smoke/billing coverage, feature-level frontend component tests, and backend sales integration coverage are complete ✅ | Thermal printer hardware integration, low-stock automation, deployment, and broader launch hardening are pending ⏳

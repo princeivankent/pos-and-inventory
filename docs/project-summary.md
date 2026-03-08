@@ -72,13 +72,17 @@ This is a comprehensive Multi-Tenant Point of Sale and Inventory Management Syst
 ### 🚧 Still Pending Before Launch
 - Thermal printer hardware integration (ESC/POS)
 - Low-stock automation (cron + notification flow)
-- Additional backend integration tests (void sale reversal, FIFO edge cases)
 - Additional E2E tests for critical flows (sales, inventory, credit)
 - Frontend feature-level tests (Vitest)
 - Performance optimization (lazy loading, caching)
 - Production deployment setup (Vercel + Supabase)
 - CD pipeline (deploy automation)
 - User documentation and training materials
+
+### ✅ Recent Production Hardening
+- Frontend production builds now use `environment.prod.ts`, so billing no longer risks staying in dev bypass mode after a production build.
+- Frontend auth interceptor no longer logs token details to the browser console.
+- PayMongo webhook signature verification now uses the raw HTTP request body instead of a re-serialized JSON payload.
 
 ## Key Features
 
