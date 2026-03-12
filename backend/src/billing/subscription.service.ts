@@ -133,6 +133,22 @@ export class SubscriptionService {
       throw new NotFoundException('Plan not found');
     }
 
+    // Idempotency: webhook may have already applied this upgrade before the user
+    // clicked "I've Paid — Activate Plan". If the subscription is already on the
+    // target plan and active, treat this as a success rather than an error.
+    if (subscription.plan_id === newPlanId && subscription.status === SubscriptionStatus.ACTIVE) {
+      return {
+        message: `Already on ${newPlan.name} plan`,
+        subscription: {
+          id: subscription.id,
+          status: subscription.status,
+          plan_code: newPlan.plan_code,
+          plan_name: newPlan.name,
+          current_period_end: subscription.current_period_end,
+        },
+      };
+    }
+
     if (newPlan.sort_order <= subscription.plan.sort_order) {
       throw new BadRequestException(
         'Cannot upgrade to a lower or same tier plan. Use downgrade instead.',
