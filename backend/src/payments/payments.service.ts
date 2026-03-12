@@ -184,6 +184,7 @@ export class PaymentsService {
       payment_id: payment.id,
       invoice_id: invoice.id,
       payment_intent: paymentIntent,
+      checkout_url: paymentIntent.checkout_url,
       requires_action: payment.status !== PaymentStatus.SUCCEEDED,
     };
   }

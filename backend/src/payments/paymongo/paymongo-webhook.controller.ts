@@ -50,9 +50,11 @@ export class PaymongoWebhookController {
 
     switch (event.type) {
       case 'payment.paid':
+      case 'checkout_session.payment.paid':
         await this.handlePaymentPaid(event.data, event.eventId);
         break;
       case 'payment.failed':
+      case 'checkout_session.payment.failed':
         await this.handlePaymentFailed(event.data, event.eventId);
         break;
       default:
@@ -103,8 +105,14 @@ export class PaymongoWebhookController {
 
         if (subscription) {
           subscription.status = SubscriptionStatus.ACTIVE;
+          // Update plan if this was an upgrade (invoice may target a new plan)
+          if (invoice.plan_id) {
+            subscription.plan_id = invoice.plan_id;
+          }
           subscription.current_period_start = invoice.period_start;
           subscription.current_period_end = invoice.period_end;
+          subscription.trial_start = null;
+          subscription.trial_end = null;
           await this.subscriptionRepository.save(subscription);
         }
       }

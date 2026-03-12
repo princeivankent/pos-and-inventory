@@ -20,7 +20,11 @@ export class PaymongoService implements PaymentGateway {
   async createPaymentIntent(
     params: CreatePaymentIntentParams,
   ): Promise<PaymentIntentResult> {
-    const response = await fetch(`${this.baseUrl}/payment_intents`, {
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:4200');
+    const successUrl = `${frontendUrl}/billing?payment=success`;
+    const cancelUrl = `${frontendUrl}/billing?payment=cancelled`;
+
+    const response = await fetch(`${this.baseUrl}/checkout_sessions`, {
       method: 'POST',
       headers: {
         Authorization: `Basic ${Buffer.from(this.secretKey + ':').toString('base64')}`,
@@ -29,10 +33,20 @@ export class PaymongoService implements PaymentGateway {
       body: JSON.stringify({
         data: {
           attributes: {
-            amount: Math.round(params.amount * 100),
-            payment_method_allowed: ['gcash', 'grab_pay', 'card', 'paymaya'],
-            currency: params.currency,
-            description: params.description,
+            cancel_url: cancelUrl,
+            success_url: successUrl,
+            payment_method_types: ['gcash', 'card', 'paymaya', 'grab_pay'],
+            show_description: true,
+            show_line_items: true,
+            send_email_receipt: false,
+            line_items: [
+              {
+                amount: Math.round(params.amount * 100),
+                currency: params.currency,
+                name: params.description,
+                quantity: 1,
+              },
+            ],
             metadata: params.metadata,
           },
         },
@@ -42,17 +56,17 @@ export class PaymongoService implements PaymentGateway {
     const data = await response.json();
 
     if (!response.ok) {
-      this.logger.error('PayMongo create payment intent failed', data);
-      throw new Error(data.errors?.[0]?.detail || 'Payment creation failed');
+      this.logger.error('PayMongo create checkout session failed', data);
+      throw new Error(data.errors?.[0]?.detail || 'Checkout session creation failed');
     }
 
     const attrs = data.data.attributes;
     return {
       id: data.data.id,
-      status: attrs.status,
-      amount: attrs.amount / 100,
-      currency: attrs.currency,
-      client_key: attrs.client_key,
+      status: attrs.status ?? 'active',
+      amount: params.amount,
+      currency: params.currency,
+      checkout_url: attrs.checkout_url,
       metadata: attrs.metadata,
     };
   }
