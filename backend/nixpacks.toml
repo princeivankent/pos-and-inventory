@@ -1,1 +1,2 @@
-# Nixpacks configuration for Railway deployment
+[phases.install]
+cmds = ["NPM_CONFIG_PRODUCTION=false npm ci"]
