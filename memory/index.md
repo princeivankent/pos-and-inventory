@@ -1,22 +1,29 @@
 # Project Memory Index
 
-Last updated: 2026-03-07
+Last updated: 2026-03-13
 
 ## Overall State
 
-- Stage: pre-launch
+- Stage: pre-launch (deployed to production, not yet open to real customers)
 - Operational source of truth: this `memory/` folder
-- Overall status: core POS, inventory, credit, suppliers, billing, CI, and Playwright E2E are implemented
-- Main remaining launch blockers: deployment/CD, thermal printer path, low-stock automation, live payment rollout, frontend bundle/perf tuning
+- Overall status: core POS, inventory, credit, suppliers, billing, CI, Playwright E2E, and production deployment are all live
+- Main remaining launch blockers: thermal printer path, low-stock automation, PayMongo live keys (business verification), frontend bundle warning
+
+## Production URLs
+
+- Frontend: https://pos-and-inventory-seven.vercel.app
+- Backend: https://pos-and-inventory-production.up.railway.app
 
 ## Launch Blockers
 
-- Deployment path is not implemented in-repo yet
-- CD automation is not implemented in-repo yet
-- Thermal printing is not wired to real POS hardware flows
-- Low-stock automation exists only as views/endpoints, not cron + notification flow
-- PayMongo live rollout still needs live-key configuration and production validation
+- Thermal printing is not wired to real POS hardware flows (hardware not yet purchased)
+- Low-stock automation exists only as views/endpoints, not cron + notification flow (next up)
 - Frontend production bundle is above the warning budget
+- Supabase: intentionally sharing dev DB for now, split before scaling to real customers
+
+## Resolved Blockers
+
+- PayMongo live keys configured in Railway (Mar 13, 2026)
 
 ## Feature Matrix
 
@@ -33,11 +40,10 @@ Last updated: 2026-03-07
 | [Reports](./features/reports.md) | `done` | `verified` | 2026-03-07 | Keep stable and optimize where needed |
 | [Billing & Subscriptions](./features/billing-subscriptions.md) | `done` | `verified` | 2026-03-07 | Complete live-payment rollout and production validation |
 | [Testing & CI](./features/testing-ci.md) | `done` | `verified` | 2026-03-07 | Add deployment smoke coverage and broader feature E2E where valuable |
-| [Deployment](./features/deployment.md) | `planned` | `verified` | 2026-03-07 | Define and implement production deployment path |
+| [Deployment](./features/deployment.md) | `done` | `verified` | 2026-03-13 | Split prod/dev Supabase, complete PayMongo live rollout |
 
 ## Current Top Priorities
 
-- Finalize production deployment and CD
 - Wire thermal printing for real POS environments
 - Automate low-stock detection and surface it in workflow-friendly ways
 - Complete live PayMongo rollout validation with production-safe config
@@ -45,6 +51,7 @@ Last updated: 2026-03-07
 
 ## Recently Completed Milestones
 
+- **Production deployment live** (Mar 13, 2026): Railway (backend) + Vercel (frontend) + CD via native GitHub integrations + branch protection on main + PayMongo test keys wired
 - Added production hardening for frontend environment replacement, auth token log removal, and raw-body webhook verification
 - Confirmed DB-backed sales integration coverage for void reversal and FIFO rollback paths
 - Added repository memory system to centralize operational project state

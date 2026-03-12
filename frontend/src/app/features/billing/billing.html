@@ -267,17 +267,27 @@
             </p>
           </div>
         </div>
-        <!-- Checkout handoff placeholder. Use checkout_url from /payments/intents to complete payment. -->
-        <div class="payment-methods-placeholder">
-          <div class="payment-method-row">
-            <i class="pi pi-mobile"></i>
-            <span>GCash</span>
-            <span class="payment-coming">Configure PAYMONGO_SECRET_KEY to enable</span>
+        <!-- Step 1: Open PayMongo Checkout -->
+        <div class="checkout-steps">
+          <div class="checkout-step">
+            <span class="checkout-step-num">1</span>
+            <div class="checkout-step-body">
+              <p class="checkout-step-label">Open the payment page</p>
+              <p class="checkout-step-hint">You'll be redirected to PayMongo's secure checkout. Pay via GCash, Card, Maya, or GrabPay.</p>
+              <p-button
+                label="Open Payment Page"
+                icon="pi pi-external-link"
+                [disabled]="!checkoutUrl()"
+                (onClick)="openCheckoutUrl()"
+                styleClass="mt-2" />
+            </div>
           </div>
-          <div class="payment-method-row">
-            <i class="pi pi-credit-card"></i>
-            <span>Credit / Debit Card</span>
-            <span class="payment-coming">Configure PAYMONGO_SECRET_KEY to enable</span>
+          <div class="checkout-step">
+            <span class="checkout-step-num">2</span>
+            <div class="checkout-step-body">
+              <p class="checkout-step-label">Return here after payment</p>
+              <p class="checkout-step-hint">Once payment is complete, come back and click the button below to activate your plan.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -320,10 +330,10 @@
         [outlined]="true"
         (onClick)="upgradePaymentStep.set(false)" />
       <p-button
-        label="Pay & Upgrade"
-        icon="pi pi-lock"
+        label="I've Paid — Activate Plan"
+        icon="pi pi-check"
         [loading]="actionLoading()"
-        (onClick)="doUpgrade(latestPaymentId())" />
+        (onClick)="verifyPayment()" />
     } @else {
       <p-button
         label="Cancel"

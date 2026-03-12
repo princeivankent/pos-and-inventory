@@ -40,9 +40,12 @@ export class BillingComponent implements OnInit {
   selectedUpgradePlan = signal<SubscriptionPlan | null>(null);
   selectedDowngradePlan = signal<SubscriptionPlan | null>(null);
   latestPaymentId = signal<string | null>(null);
+  checkoutUrl = signal<string | null>(null);
   // Payment bypass toggle — reads from environment (mirrors backend BYPASS_PAYMENT)
   readonly bypassPayment = environment.bypassPayment;
   upgradePaymentStep = signal(false);
+
+  private readonly PENDING_PAYMENT_KEY = 'pos_pending_upgrade_payment_id';
 
   subscription = this.subscriptionService.subscription;
   plans = this.subscriptionService.availablePlans;
@@ -183,6 +186,7 @@ export class BillingComponent implements OnInit {
     this.actionLoading.set(true);
     this.http.post(`${environment.apiUrl}/billing/upgrade`, { plan_id: plan.id, payment_id: paymentId ?? undefined }).subscribe({
       next: () => {
+        localStorage.removeItem(this.PENDING_PAYMENT_KEY);
         this.subscriptionService.refreshSubscription().subscribe(() => {
           this.toast.success('Plan upgraded', `You are now on the ${plan.name} plan.`);
           this.actionLoading.set(false);
@@ -196,13 +200,30 @@ export class BillingComponent implements OnInit {
     });
   }
 
+  openCheckoutUrl() {
+    const url = this.checkoutUrl();
+    if (url) {
+      window.open(url, '_blank');
+    }
+  }
+
+  verifyPayment() {
+    const paymentId = this.latestPaymentId() ?? localStorage.getItem(this.PENDING_PAYMENT_KEY);
+    if (!paymentId) {
+      this.toast.error('No pending payment found', 'Please start the upgrade process again.');
+      return;
+    }
+    this.latestPaymentId.set(paymentId);
+    this.doUpgrade(paymentId);
+  }
+
   private startUpgradePayment() {
     const plan = this.selectedUpgradePlan();
     if (!plan) return;
 
     this.actionLoading.set(true);
     this.http
-      .post<{ payment_id: string; requires_action: boolean; payment_intent: { checkout_url?: string } }>(
+      .post<{ payment_id: string; requires_action: boolean; checkout_url?: string; payment_intent: { checkout_url?: string } }>(
         `${environment.apiUrl}/payments/intents`,
         { plan_id: plan.id },
       )
@@ -212,16 +233,14 @@ export class BillingComponent implements OnInit {
           this.latestPaymentId.set(res.payment_id);
 
           if (res.requires_action) {
+            const url = res.checkout_url ?? res.payment_intent?.checkout_url;
+            this.checkoutUrl.set(url ?? null);
+            localStorage.setItem(this.PENDING_PAYMENT_KEY, res.payment_id);
             this.upgradePaymentStep.set(true);
-            this.toast.info(
-              'Payment action required',
-              res.payment_intent?.checkout_url
-                ? 'Use the provided checkout URL to complete payment, then click Pay & Upgrade.'
-                : 'Complete payment first, then click Pay & Upgrade.',
-            );
             return;
           }
 
+          localStorage.removeItem(this.PENDING_PAYMENT_KEY);
           this.doUpgrade(res.payment_id);
         },
         error: (err) => {
