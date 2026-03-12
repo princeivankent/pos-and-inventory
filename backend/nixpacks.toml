@@ -1,2 +1,1 @@
-[phases.install]
-cmds = ["npm ci --ignore-scripts"]
+# Nixpacks configuration for Railway deployment
