@@ -1,5 +1,16 @@
 # Recent Changes
 
+## 2026-03-13
+
+- `production-deployment`
+  - Backend live on Railway: https://pos-and-inventory-production.up.railway.app
+  - Frontend live on Vercel: https://pos-and-inventory-seven.vercel.app
+  - CD wired via native GitHub integrations on both platforms (auto-deploy on main)
+  - Migrations run automatically at startup via start.sh
+  - GitHub branch protection on main requires CI to pass before merge
+  - PayMongo test mode keys configured in Railway
+  - Added: backend/railway.json, backend/start.sh, frontend/vercel.json
+
 ## 2026-03-07
 
 - `memory-system`
