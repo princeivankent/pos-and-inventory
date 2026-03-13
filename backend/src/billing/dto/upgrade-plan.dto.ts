@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsUUID, IsIn } from 'class-validator';
 
 export class UpgradePlanDto {
   @IsNotEmpty()
@@ -8,4 +8,8 @@ export class UpgradePlanDto {
   @IsOptional()
   @IsUUID()
   payment_id?: string;
+
+  @IsOptional()
+  @IsIn(['monthly', 'annual'])
+  billing_period?: 'monthly' | 'annual';
 }

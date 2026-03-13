@@ -30,14 +30,16 @@ export class PaymentsService {
     plan: SubscriptionPlan,
     periodStart: Date,
     periodEnd: Date,
+    amountOverride?: number,
   ): Promise<Invoice> {
     const invoiceNumber = `INV-${Date.now()}-${Math.random().toString(36).substr(2, 5).toUpperCase()}`;
+    const amount = amountOverride !== undefined ? amountOverride : Number(plan.price_php);
 
     const invoice = this.invoiceRepository.create({
       organization_id: organizationId,
       plan_id: plan.id,
       invoice_number: invoiceNumber,
-      amount: plan.price_php,
+      amount,
       tax_amount: 0,
       currency: 'PHP',
       status: InvoiceStatus.PENDING,
@@ -123,7 +125,7 @@ export class PaymentsService {
     });
   }
 
-  async createUpgradePaymentIntent(organizationId: string, planId: string) {
+  async createUpgradePaymentIntent(organizationId: string, planId: string, billingPeriod: 'monthly' | 'annual' = 'monthly') {
     const subscription = await this.subscriptionRepository.findOne({
       where: { organization_id: organizationId },
       relations: ['plan'],
@@ -145,18 +147,27 @@ export class PaymentsService {
     }
 
     const now = new Date();
-    const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-    const invoice = await this.createInvoice(organizationId, targetPlan, now, periodEnd);
+    const periodDays = billingPeriod === 'annual' ? 365 : 30;
+    const periodEnd = new Date(now.getTime() + periodDays * 24 * 60 * 60 * 1000);
+
+    // Annual billing = 10 months price (2 months free)
+    const chargeAmount = billingPeriod === 'annual'
+      ? Number(targetPlan.price_php) * 10
+      : Number(targetPlan.price_php);
+
+    const invoice = await this.createInvoice(organizationId, targetPlan, now, periodEnd, chargeAmount);
 
     const totalAmount = invoice.amount + invoice.tax_amount;
+    const billingLabel = billingPeriod === 'annual' ? 'annual' : 'monthly';
     const paymentIntent = await this.paymentGateway.createPaymentIntent({
       amount: totalAmount,
       currency: invoice.currency,
-      description: `Plan upgrade to ${targetPlan.name}`,
+      description: `Plan upgrade to ${targetPlan.name} (${billingLabel})`,
       metadata: {
         organization_id: organizationId,
         invoice_id: invoice.id,
         target_plan_id: targetPlan.id,
+        billing_period: billingPeriod,
       },
     });
 

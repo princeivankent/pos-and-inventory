@@ -1,6 +1,6 @@
 # Project Memory Index
 
-Last updated: 2026-03-14
+Last updated: 2026-03-14 (subscription plan refinement)
 
 ## Overall State
 
@@ -51,11 +51,11 @@ Last updated: 2026-03-14
 
 ## Recently Completed Milestones
 
+- **Subscription plan refinement** (Mar 14, 2026): pricing corrected (₱599/₱1,499/₱2,999), 30-day Negosyo trial, annual billing, utang ungated to Tindahan, suppliers gated to Negosyo+. Migration: `1708000000000-UpdateSubscriptionPlans.ts` — **run `npm run migration:run` before deploying**
 - **Production deployment live** (Mar 13, 2026): Railway (backend) + Vercel (frontend) + CD via native GitHub integrations + branch protection on main + PayMongo test keys wired
 - Added production hardening for frontend environment replacement, auth token log removal, and raw-body webhook verification
 - Confirmed DB-backed sales integration coverage for void reversal and FIFO rollback paths
 - Added repository memory system to centralize operational project state
-- Split receipt/PDF support from unfinished real thermal-printing work in operational memory
 
 ## Known Docs To Reconcile Over Time
 

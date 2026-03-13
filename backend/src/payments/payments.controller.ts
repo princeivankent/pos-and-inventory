@@ -44,7 +44,7 @@ export class PaymentsController {
     @Body() dto: CreateUpgradeIntentDto,
     @CurrentUser() user: RequestUser,
   ) {
-    return this.paymentsService.createUpgradePaymentIntent(user.organizationId, dto.plan_id);
+    return this.paymentsService.createUpgradePaymentIntent(user.organizationId, dto.plan_id, dto.billing_period);
   }
 
   @Get('methods')

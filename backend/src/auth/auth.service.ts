@@ -273,7 +273,7 @@ export class AuthService {
 
   private async createTrialForOrganization(organizationId: string) {
     const plan = await this.planRepository.findOne({
-      where: { plan_code: 'tindahan', is_active: true },
+      where: { plan_code: 'negosyo', is_active: true },
     });
 
     if (!plan) {
@@ -281,7 +281,7 @@ export class AuthService {
     }
 
     const now = new Date();
-    const trialEnd = new Date(now.getTime() + 14 * 24 * 60 * 60 * 1000);
+    const trialEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
     const subscription = this.subscriptionRepository.create({
       organization_id: organizationId,

@@ -52,9 +52,10 @@ export class SubscriptionRenewalService {
           delete newStats.pending_downgrade_plan_id;
           subscription.usage_stats = newStats;
 
-          // Extend period by 30 days
+          // Extend period by 30 or 365 days based on billing_period
+          const periodDays = subscription.billing_period === 'annual' ? 365 : 30;
           const periodStart = new Date(subscription.current_period_end);
-          const periodEnd = new Date(periodStart.getTime() + 30 * 24 * 60 * 60 * 1000);
+          const periodEnd = new Date(periodStart.getTime() + periodDays * 24 * 60 * 60 * 1000);
           subscription.current_period_start = periodStart;
           subscription.current_period_end = periodEnd;
           await this.subscriptionRepository.save(subscription);
@@ -161,22 +162,22 @@ export class SubscriptionRenewalService {
 
       try {
         if (daysUntilExpiry <= 0) {
-          // Trial expired - update status
-          subscription.status = SubscriptionStatus.EXPIRED;
+          // Trial expired - suspend account, data preserved, user must choose a plan
+          subscription.status = SubscriptionStatus.SUSPENDED;
           await this.subscriptionRepository.save(subscription);
           this.logger.log(
-            `Trial expired for org ${subscription.organization_id}`,
+            `Trial expired — suspended org ${subscription.organization_id}`,
           );
-        } else if (daysUntilExpiry <= 1) {
-          this.logger.log(
-            `Trial ending TOMORROW for org ${subscription.organization_id}`,
-          );
-          // TODO: Send notification (email/push)
         } else if (daysUntilExpiry <= 3) {
+          this.logger.log(
+            `Trial ending in ${daysUntilExpiry} day(s) for org ${subscription.organization_id}`,
+          );
+          // TODO: Send notification (email/push) — urgent reminder
+        } else if (daysUntilExpiry <= 10) {
           this.logger.log(
             `Trial ending in ${daysUntilExpiry} days for org ${subscription.organization_id}`,
           );
-          // TODO: Send notification (email/push)
+          // TODO: Send notification (email/push) — early reminder
         }
       } catch (error) {
         this.logger.error(

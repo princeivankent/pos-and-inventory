@@ -42,6 +42,9 @@ export class Subscription extends BaseEntity {
   @Column({ type: 'boolean', default: false })
   cancel_at_period_end: boolean;
 
+  @Column({ type: 'varchar', length: 10, default: 'monthly' })
+  billing_period: 'monthly' | 'annual';
+
   @Column({ type: 'jsonb', default: {} })
   usage_stats: Record<string, any>;
 

@@ -48,6 +48,7 @@ export class BillingController {
       user.organizationId,
       dto.plan_id,
       dto.payment_id,
+      dto.billing_period,
     );
   }
 

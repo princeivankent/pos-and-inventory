@@ -3,10 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { DialogModule } from 'primeng/dialog';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { SubscriptionService } from '../../core/services/subscription.service';
 import { SubscriptionPlan, UsageResponse } from '../../core/models/subscription.model';
 import { PageHeader } from '../../shared/components/page-header/page-header';
@@ -17,10 +19,12 @@ import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
   selector: 'app-billing',
   standalone: true,
   imports: [
+    FormsModule,
     ButtonModule,
     ProgressBarModule,
     DialogModule,
     SkeletonModule,
+    ToggleSwitchModule,
     PageHeader,
     PhpCurrencyPipe,
   ],
@@ -50,6 +54,10 @@ export class BillingComponent implements OnInit, OnDestroy {
 
   private readonly PENDING_PAYMENT_KEY = 'pos_pending_upgrade_payment_id';
   private readonly PENDING_PLAN_KEY = 'pos_pending_upgrade_plan_id';
+  private readonly PENDING_BILLING_PERIOD_KEY = 'pos_pending_upgrade_billing_period';
+
+  // Annual billing toggle
+  isAnnual = false;
 
   subscription = this.subscriptionService.subscription;
   plans = this.subscriptionService.availablePlans;
@@ -105,12 +113,14 @@ export class BillingComponent implements OnInit, OnDestroy {
       this.router.navigate([], { replaceUrl: true, queryParams: {} });
       this.latestPaymentId.set(pendingPaymentId);
 
-      // Restore the selected plan from localStorage (needed when redirected in a new tab)
+      // Restore the selected plan and billing period from localStorage (needed when redirected in a new tab)
       const pendingPlanId = localStorage.getItem(this.PENDING_PLAN_KEY);
       if (pendingPlanId && !this.selectedUpgradePlan()) {
         const plan = this.plans().find((p) => p.id === pendingPlanId);
         if (plan) this.selectedUpgradePlan.set(plan);
       }
+      const pendingBillingPeriod = localStorage.getItem(this.PENDING_BILLING_PERIOD_KEY);
+      if (pendingBillingPeriod === 'annual') this.isAnnual = true;
 
       this.verifyPayment();
     }
@@ -213,16 +223,27 @@ export class BillingComponent implements OnInit, OnDestroy {
     return limit === -1 ? 'Unlimited' : limit.toString();
   }
 
+  getDisplayPrice(plan: SubscriptionPlan): number {
+    return this.isAnnual ? plan.price_php * 10 : plan.price_php;
+  }
+
+  getAnnualSavings(plan: SubscriptionPlan): number {
+    return plan.price_php * 2;
+  }
+
   getPlanFeatureList(plan: SubscriptionPlan): string[] {
     const features: string[] = [];
     if (plan.features['pos']) features.push('Point of Sale');
     if (plan.features['basic_inventory']) features.push('Inventory management');
+    if (plan.features['fifo_inventory']) features.push('FIFO batch tracking');
     if (plan.features['utang_management']) features.push('Customer credit (utang)');
     if (plan.features['reports']) features.push('Sales & profit reports');
-    if (plan.features['fifo_inventory']) features.push('FIFO batch tracking');
+    if (plan.features['supplier_management']) features.push('Supplier management');
     if (plan.features['multi_store']) features.push('Multi-store management');
     if (plan.features['receipt_customization']) features.push('Receipt customization');
-    if (plan.features['export_data']) features.push('Data export');
+    if (plan.features['export_data']) features.push('Data export (CSV)');
+    if (plan.features['export_advanced']) features.push('Advanced export (CSV + PDF)');
+    if (plan.features['low_stock_alerts']) features.push('Low-stock alerts');
     return features;
   }
 
@@ -257,10 +278,12 @@ export class BillingComponent implements OnInit, OnDestroy {
     if (!plan) return;
     this.upgradeDialogVisible.set(false);
     this.actionLoading.set(true);
-    this.http.post(`${environment.apiUrl}/billing/upgrade`, { plan_id: plan.id, payment_id: paymentId ?? undefined }).subscribe({
+    const billingPeriod = this.isAnnual ? 'annual' : 'monthly';
+    this.http.post(`${environment.apiUrl}/billing/upgrade`, { plan_id: plan.id, payment_id: paymentId ?? undefined, billing_period: billingPeriod }).subscribe({
       next: () => {
         localStorage.removeItem(this.PENDING_PAYMENT_KEY);
         localStorage.removeItem(this.PENDING_PLAN_KEY);
+        localStorage.removeItem(this.PENDING_BILLING_PERIOD_KEY);
         this.subscriptionService.refreshSubscription().subscribe(() => {
           this.toast.success('Plan upgraded', `You are now on the ${plan.name} plan.`);
           this.actionLoading.set(false);
@@ -295,11 +318,12 @@ export class BillingComponent implements OnInit, OnDestroy {
     const plan = this.selectedUpgradePlan();
     if (!plan) return;
 
+    const billingPeriod = this.isAnnual ? 'annual' : 'monthly';
     this.actionLoading.set(true);
     this.http
       .post<{ payment_id: string; requires_action: boolean; checkout_url?: string; payment_intent: { checkout_url?: string } }>(
         `${environment.apiUrl}/payments/intents`,
-        { plan_id: plan.id },
+        { plan_id: plan.id, billing_period: billingPeriod },
       )
       .subscribe({
         next: (res) => {
@@ -311,11 +335,13 @@ export class BillingComponent implements OnInit, OnDestroy {
             this.checkoutUrl.set(url ?? null);
             localStorage.setItem(this.PENDING_PAYMENT_KEY, res.payment_id);
             localStorage.setItem(this.PENDING_PLAN_KEY, plan.id);
+            localStorage.setItem(this.PENDING_BILLING_PERIOD_KEY, billingPeriod);
             this.upgradePaymentStep.set(true);
             return;
           }
 
           localStorage.removeItem(this.PENDING_PAYMENT_KEY);
+          localStorage.removeItem(this.PENDING_BILLING_PERIOD_KEY);
           this.doUpgrade(res.payment_id);
         },
         error: (err) => {
