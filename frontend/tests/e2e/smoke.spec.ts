@@ -11,7 +11,6 @@ import {
   selectPrimeOption,
   stockInProduct,
   uniqueSuffix,
-  upgradeToNegosyoViaUi,
 } from './helpers';
 
 test.describe('Playwright smoke suite', () => {
@@ -78,7 +77,7 @@ test.describe('Playwright smoke suite', () => {
     const customer = await createCustomer(request, session, `Customer ${uniqueSuffix('cust')}`, 1000);
 
     await loginViaUi(page, session);
-    await upgradeToNegosyoViaUi(page);
+    // New accounts start on Negosyo trial which includes utang_management — no upgrade needed
 
     await page.goto('/pos');
     await page.getByTestId(`pos-product-${product.sku}`).click();
@@ -127,7 +126,7 @@ test.describe('Playwright smoke suite', () => {
     });
 
     await loginViaUi(page, session);
-    await upgradeToNegosyoViaUi(page);
+    // New accounts start on Negosyo trial which allows multi-store — no upgrade needed
 
     const secondStoreName = `Branch ${uniqueSuffix('store')}`;
     await createStore(request, session, secondStoreName);
