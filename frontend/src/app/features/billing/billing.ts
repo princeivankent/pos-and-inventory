@@ -49,6 +49,7 @@ export class BillingComponent implements OnInit {
   upgradePaymentStep = signal(false);
 
   private readonly PENDING_PAYMENT_KEY = 'pos_pending_upgrade_payment_id';
+  private readonly PENDING_PLAN_KEY = 'pos_pending_upgrade_plan_id';
 
   subscription = this.subscriptionService.subscription;
   plans = this.subscriptionService.availablePlans;
@@ -82,6 +83,14 @@ export class BillingComponent implements OnInit {
       // Clear the query param from the URL without navigation
       this.router.navigate([], { replaceUrl: true, queryParams: {} });
       this.latestPaymentId.set(pendingPaymentId);
+
+      // Restore the selected plan from localStorage (needed when redirected in a new tab)
+      const pendingPlanId = localStorage.getItem(this.PENDING_PLAN_KEY);
+      if (pendingPlanId && !this.selectedUpgradePlan()) {
+        const plan = this.plans().find((p) => p.id === pendingPlanId);
+        if (plan) this.selectedUpgradePlan.set(plan);
+      }
+
       this.verifyPayment();
     }
   }
@@ -204,6 +213,7 @@ export class BillingComponent implements OnInit {
     this.http.post(`${environment.apiUrl}/billing/upgrade`, { plan_id: plan.id, payment_id: paymentId ?? undefined }).subscribe({
       next: () => {
         localStorage.removeItem(this.PENDING_PAYMENT_KEY);
+        localStorage.removeItem(this.PENDING_PLAN_KEY);
         this.subscriptionService.refreshSubscription().subscribe(() => {
           this.toast.success('Plan upgraded', `You are now on the ${plan.name} plan.`);
           this.actionLoading.set(false);
@@ -253,6 +263,7 @@ export class BillingComponent implements OnInit {
             const url = res.checkout_url ?? res.payment_intent?.checkout_url;
             this.checkoutUrl.set(url ?? null);
             localStorage.setItem(this.PENDING_PAYMENT_KEY, res.payment_id);
+            localStorage.setItem(this.PENDING_PLAN_KEY, plan.id);
             this.upgradePaymentStep.set(true);
             return;
           }
