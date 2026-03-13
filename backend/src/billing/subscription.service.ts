@@ -226,8 +226,16 @@ export class SubscriptionService {
 
     // If still pending, check PayMongo directly and sync status
     if (payment.status !== PaymentStatus.SUCCEEDED) {
+      if (!payment.gateway_payment_id) {
+        this.logger.error(`Payment ${payment.id} has no gateway_payment_id`);
+        throw new BadRequestException('Payment record is missing a gateway reference. Please contact support.');
+      }
+
       try {
+        this.logger.log(`Verifying checkout session ${payment.gateway_payment_id} for payment ${payment.id}`);
         const session = await this.paymentGateway.getCheckoutSession(payment.gateway_payment_id);
+        this.logger.log(`Checkout session ${payment.gateway_payment_id} returned status: ${session.status}`);
+
         if (session.status === 'succeeded') {
           payment.status = PaymentStatus.SUCCEEDED;
           await this.paymentRepository.save(payment);
@@ -239,12 +247,13 @@ export class SubscriptionService {
           }
           this.logger.log(`Payment ${payment.id} synced to SUCCEEDED from PayMongo`);
         } else {
-          throw new BadRequestException('Payment is not successful yet');
+          throw new BadRequestException(`Payment is not successful yet (PayMongo session status: ${session.status})`);
         }
       } catch (err) {
         if (err instanceof BadRequestException) throw err;
-        this.logger.error('Failed to verify payment with PayMongo', err);
-        throw new BadRequestException('Payment is not successful yet');
+        const detail = err instanceof Error ? err.message : String(err);
+        this.logger.error(`Failed to verify checkout session ${payment.gateway_payment_id}: ${detail}`);
+        throw new BadRequestException(`Payment verification failed: ${detail}`);
       }
     }
   }
