@@ -1,6 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ButtonModule } from 'primeng/button';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -30,6 +31,8 @@ export class BillingComponent implements OnInit {
   private http = inject(HttpClient);
   private subscriptionService = inject(SubscriptionService);
   private toast = inject(ToastService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
 
   usage = signal<UsageResponse | null>(null);
   loading = signal(true);
@@ -61,12 +64,26 @@ export class BillingComponent implements OnInit {
       next: ({ usage }) => {
         this.usage.set(usage);
         this.loading.set(false);
+        this.checkForPendingPayment();
       },
       error: () => {
         this.loading.set(false);
+        this.checkForPendingPayment();
         this.toast.error('Failed to load billing information');
       },
     });
+  }
+
+  private checkForPendingPayment() {
+    const paymentParam = this.route.snapshot.queryParamMap.get('payment');
+    const pendingPaymentId = localStorage.getItem(this.PENDING_PAYMENT_KEY);
+
+    if (paymentParam === 'success' && pendingPaymentId) {
+      // Clear the query param from the URL without navigation
+      this.router.navigate([], { replaceUrl: true, queryParams: {} });
+      this.latestPaymentId.set(pendingPaymentId);
+      this.verifyPayment();
+    }
   }
 
   getDaysRemaining(): number {
