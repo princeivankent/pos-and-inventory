@@ -219,7 +219,7 @@
 }
 
 .plan-name-title {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0 0 0.25rem 0;
@@ -294,6 +294,53 @@
   :host ::ng-deep .w-full {
     width: 100%;
   }
+}
+
+// ---- Pending Downgrade Banner ----
+
+.pending-downgrade-card {
+  border-color: color-mix(in srgb, var(--color-warning) 35%, transparent);
+  background: color-mix(in srgb, var(--color-warning) 4%, white);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.pending-downgrade-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  flex: 1;
+}
+
+.pending-downgrade-icon {
+  font-size: 1.25rem;
+  color: var(--color-warning);
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.pending-downgrade-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pending-downgrade-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.pending-downgrade-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0;
+  max-width: 520px;
+  line-height: 1.5;
 }
 
 // ---- Danger Zone ----

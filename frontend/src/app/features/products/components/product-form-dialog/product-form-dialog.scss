@@ -26,6 +26,7 @@
   flex-direction: column;
   gap: 0.5rem;
   flex: 1;
+  min-width: 0;
 
   label {
     font-size: 0.875rem;
@@ -37,10 +38,33 @@
 .field-row {
   display: flex;
   gap: 1rem;
+
+  .field {
+    overflow: hidden;
+  }
 }
 
 .w-full {
   width: 100%;
+}
+
+:host ::ng-deep {
+  .p-inputnumber {
+    width: 100%;
+
+    .p-inputnumber-input {
+      width: 100%;
+    }
+  }
+
+  .p-select {
+    width: 100%;
+  }
+
+  textarea.p-textarea {
+    width: 100%;
+    resize: none;
+  }
 }
 
 .price-warning {

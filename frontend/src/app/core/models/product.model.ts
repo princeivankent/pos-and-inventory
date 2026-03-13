@@ -31,8 +31,8 @@ export interface CreateProductDto {
   unit?: string;
   reorder_level?: number;
   has_expiry?: boolean;
-  retail_price: number;
-  cost_price: number;
+  retail_price: number | null;
+  cost_price: number | null;
   current_stock?: number;
 }
 

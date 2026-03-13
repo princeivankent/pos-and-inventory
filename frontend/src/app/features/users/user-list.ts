@@ -1,10 +1,12 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { SelectModule } from 'primeng/select';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -21,6 +23,7 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
   imports: [
     FormsModule, TableModule, ButtonModule, DialogModule,
     InputTextModule, SelectModule, ConfirmDialogModule, PageHeader, StatusBadge,
+    IconFieldModule, InputIconModule,
   ],
   templateUrl: './user-list.html',
   styleUrls: ['./user-list.scss'],
@@ -31,6 +34,14 @@ export class UserListComponent implements OnInit {
   private confirmService = inject(ConfirmationService);
 
   users = signal<UserWithStore[]>([]);
+  searchQuery = signal('');
+  filteredUsers = computed(() => {
+    const q = this.searchQuery().toLowerCase();
+    if (!q) return this.users();
+    return this.users().filter(u =>
+      u.full_name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)
+    );
+  });
   loading = signal(false);
   saving = signal(false);
   createDialogVisible = false;

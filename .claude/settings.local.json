@@ -45,7 +45,9 @@
       "WebFetch(domain:squareup.com)",
       "WebFetch(domain:help.shopify.com)",
       "Bash(xargs grep:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(cd \"C:\\\\Users\\\\prince-asus\\\\Projects\\\\pos-and-inventory\\\\backend\" && rm -rf dist && npm run build 2>&1)"
     ]
   }
 }

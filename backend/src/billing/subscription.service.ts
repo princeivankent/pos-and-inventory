@@ -71,6 +71,19 @@ export class SubscriptionService {
       throw new NotFoundException('No subscription found');
     }
 
+    let pending_downgrade: { plan_code: string; plan_name: string; effective_date: Date } | undefined;
+    const pendingPlanId = subscription.usage_stats?.pending_downgrade_plan_id;
+    if (pendingPlanId) {
+      const pendingPlan = await this.planRepository.findOne({ where: { id: pendingPlanId } });
+      if (pendingPlan) {
+        pending_downgrade = {
+          plan_code: pendingPlan.plan_code,
+          plan_name: pendingPlan.name,
+          effective_date: subscription.current_period_end,
+        };
+      }
+    }
+
     return {
       status: subscription.status,
       plan_code: subscription.plan.plan_code,
@@ -83,6 +96,7 @@ export class SubscriptionService {
         max_users_per_store: subscription.plan.max_users_per_store,
         max_products_per_store: subscription.plan.max_products_per_store,
       },
+      ...(pending_downgrade ? { pending_downgrade } : {}),
     };
   }
 
@@ -341,6 +355,20 @@ export class SubscriptionService {
             : subscription.current_period_end,
       },
     };
+  }
+
+  async cancelDowngrade(organizationId: string) {
+    const subscription = await this.getCurrentSubscription(organizationId);
+
+    if (!subscription.usage_stats?.pending_downgrade_plan_id) {
+      throw new BadRequestException('No pending downgrade to cancel');
+    }
+
+    const { pending_downgrade_plan_id: _removed, ...restStats } = subscription.usage_stats;
+    subscription.usage_stats = Object.keys(restStats).length > 0 ? restStats : null;
+    await this.subscriptionRepository.save(subscription);
+
+    return { message: 'Pending downgrade cancelled successfully' };
   }
 
   async cancelSubscription(organizationId: string, immediate: boolean = false) {

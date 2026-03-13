@@ -5,20 +5,17 @@
 </app-page-header>
 
 <!-- Search -->
-<div class="page-controls">
-  <div class="search-section">
-    <span class="p-input-icon-left">
-      <i class="pi pi-search"></i>
-      <input
-        pInputText
-        type="text"
-        [(ngModel)]="searchQuery"
-        (input)="onSearch()"
-        placeholder="Search by name or phone..."
-        class="w-full"
-      />
-    </span>
-  </div>
+<div class="search-bar">
+  <p-iconfield>
+    <p-inputicon styleClass="pi pi-search" />
+    <input
+      pInputText
+      type="text"
+      [(ngModel)]="searchQuery"
+      (input)="onSearch()"
+      placeholder="Search by name or phone..."
+    />
+  </p-iconfield>
 </div>
 
 <!-- Customer Table -->

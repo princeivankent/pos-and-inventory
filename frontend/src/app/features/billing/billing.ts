@@ -55,6 +55,7 @@ export class BillingComponent implements OnInit, OnDestroy {
   plans = this.subscriptionService.availablePlans;
   currentPlanCode = this.subscriptionService.currentPlan;
   isTrialing = this.subscriptionService.isTrialing;
+  pendingDowngrade = this.subscriptionService.pendingDowngrade;
 
   private readonly onStorageChange = (event: StorageEvent) => {
     // Another tab completed the upgrade (removed the pending payment key)
@@ -164,11 +165,37 @@ export class BillingComponent implements OnInit, OnDestroy {
     return order[planCode] ?? 0;
   }
 
-  getPlanAction(plan: SubscriptionPlan): 'current' | 'upgrade' | 'downgrade' {
+  getPlanAction(plan: SubscriptionPlan): 'current' | 'upgrade' | 'downgrade' | 'scheduled' {
     const current = this.getPlanOrder(this.currentPlanCode() ?? '');
     const target = this.getPlanOrder(plan.plan_code);
     if (current === target) return 'current';
+    if (this.pendingDowngrade()?.plan_code === plan.plan_code) return 'scheduled';
     return target > current ? 'upgrade' : 'downgrade';
+  }
+
+  formatDate(dateStr: string): string {
+    return new Date(dateStr).toLocaleDateString('en-PH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }
+
+  cancelPendingDowngrade() {
+    this.actionLoading.set(true);
+    this.subscriptionService.cancelDowngrade().subscribe({
+      next: () => {
+        this.subscriptionService.refreshSubscription().subscribe(() => {
+          this.toast.success('Downgrade cancelled', 'Your plan will remain unchanged.');
+          this.actionLoading.set(false);
+          this.ngOnInit();
+        });
+      },
+      error: (err) => {
+        this.toast.error('Failed to cancel downgrade', err?.error?.message ?? 'Please try again.');
+        this.actionLoading.set(false);
+      },
+    });
   }
 
   getUsagePercent(current: number, limit: number): number {
@@ -311,7 +338,12 @@ export class BillingComponent implements OnInit, OnDestroy {
     this.http.post(`${environment.apiUrl}/billing/downgrade`, { plan_id: plan.id }).subscribe({
       next: () => {
         this.subscriptionService.refreshSubscription().subscribe(() => {
-          this.toast.success('Plan downgraded', `You are now on the ${plan.name} plan.`);
+          const isTrialing = this.subscriptionService.isTrialing();
+          if (isTrialing) {
+            this.toast.success('Plan downgraded', `You are now on the ${plan.name} plan.`);
+          } else {
+            this.toast.success('Downgrade scheduled', `Your plan will switch to ${plan.name} at the end of your billing period.`);
+          }
           this.actionLoading.set(false);
           this.ngOnInit();
         });

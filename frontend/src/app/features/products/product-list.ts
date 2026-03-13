@@ -212,7 +212,7 @@ export class ProductListComponent implements OnInit {
   private emptyForm(): CreateProductDto & { barcode?: string; description?: string } {
     return {
       name: '', sku: '', barcode: '', category_id: '', description: '',
-      retail_price: 0, cost_price: 0, unit: 'pcs', reorder_level: 0,
+      retail_price: null, cost_price: null, unit: 'pcs', reorder_level: 0,
     };
   }
 }
