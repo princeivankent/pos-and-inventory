@@ -111,8 +111,17 @@ export class PaymongoService implements PaymentGateway {
     }
 
     const attrs = data.data.attributes;
-    // payment_status is 'paid' | 'unpaid' | 'no_payment_required'
-    const status = attrs.payment_status === 'paid' ? 'succeeded' : attrs.payment_status;
+    // PayMongo checkout session: payment status is inside the embedded payment_intent
+    // payment_intent.attributes.status: 'awaiting_payment_method' | 'processing' | 'succeeded'
+    const paymentIntentStatus = attrs.payment_intent?.attributes?.status;
+    if (!paymentIntentStatus) {
+      this.logger.warn(
+        `Checkout session ${id}: payment_intent status is ${paymentIntentStatus}. ` +
+        `payment_intent type: ${typeof attrs.payment_intent}, ` +
+        `session status: ${attrs.status}, paid_at: ${attrs.paid_at}`,
+      );
+    }
+    const status = paymentIntentStatus === 'succeeded' ? 'succeeded' : paymentIntentStatus;
     return {
       id: data.data.id,
       status,
