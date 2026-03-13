@@ -3,10 +3,13 @@ import {
   NotFoundException,
   BadRequestException,
   ForbiddenException,
+  Inject,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
+import { PAYMENT_GATEWAY, PaymentGateway } from '../payments/payment-gateway.interface';
 import { Subscription, SubscriptionStatus } from '../database/entities/subscription.entity';
 import { SubscriptionPlan } from '../database/entities/subscription-plan.entity';
 import { Organization } from '../database/entities/organization.entity';
@@ -14,11 +17,16 @@ import { Store } from '../database/entities/store.entity';
 import { UserStore } from '../database/entities/user-store.entity';
 import { Product } from '../database/entities/product.entity';
 import { Payment, PaymentStatus } from '../database/entities/payment.entity';
+import { Invoice, InvoiceStatus } from '../database/entities/invoice.entity';
 
 @Injectable()
 export class SubscriptionService {
+  private readonly logger = new Logger(SubscriptionService.name);
+
   constructor(
     private configService: ConfigService,
+    @Inject(PAYMENT_GATEWAY)
+    private paymentGateway: PaymentGateway,
     @InjectRepository(Subscription)
     private subscriptionRepository: Repository<Subscription>,
     @InjectRepository(SubscriptionPlan)
@@ -33,6 +41,8 @@ export class SubscriptionService {
     private productRepository: Repository<Product>,
     @InjectRepository(Payment)
     private paymentRepository: Repository<Payment>,
+    @InjectRepository(Invoice)
+    private invoiceRepository: Repository<Invoice>,
   ) {}
 
   async getCurrentSubscription(organizationId: string) {
@@ -204,9 +214,6 @@ export class SubscriptionService {
     if (!payment) {
       throw new NotFoundException('Payment not found');
     }
-    if (payment.status !== PaymentStatus.SUCCEEDED) {
-      throw new BadRequestException('Payment is not successful yet');
-    }
     if (payment.metadata?.target_plan_id !== planId) {
       throw new BadRequestException('Payment does not match selected target plan');
     }
@@ -215,6 +222,30 @@ export class SubscriptionService {
     const paymentAge = Date.now() - new Date(payment.created_at).getTime();
     if (paymentAge > maxAgeMs) {
       throw new BadRequestException('Payment is too old. Please start a new upgrade payment.');
+    }
+
+    // If still pending, check PayMongo directly and sync status
+    if (payment.status !== PaymentStatus.SUCCEEDED) {
+      try {
+        const session = await this.paymentGateway.getCheckoutSession(payment.gateway_payment_id);
+        if (session.status === 'succeeded') {
+          payment.status = PaymentStatus.SUCCEEDED;
+          await this.paymentRepository.save(payment);
+          if (payment.invoice_id) {
+            await this.invoiceRepository.update(payment.invoice_id, {
+              status: InvoiceStatus.PAID,
+              paid_at: new Date(),
+            });
+          }
+          this.logger.log(`Payment ${payment.id} synced to SUCCEEDED from PayMongo`);
+        } else {
+          throw new BadRequestException('Payment is not successful yet');
+        }
+      } catch (err) {
+        if (err instanceof BadRequestException) throw err;
+        this.logger.error('Failed to verify payment with PayMongo', err);
+        throw new BadRequestException('Payment is not successful yet');
+      }
     }
   }
 

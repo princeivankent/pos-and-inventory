@@ -31,6 +31,10 @@ export class MockPaymentService implements PaymentGateway {
     return result;
   }
 
+  async getCheckoutSession(id: string): Promise<PaymentIntentResult> {
+    return this.getPaymentIntent(id);
+  }
+
   async getPaymentIntent(id: string): Promise<PaymentIntentResult> {
     const payment = this.payments.get(id);
     if (!payment) {

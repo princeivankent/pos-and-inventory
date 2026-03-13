@@ -96,6 +96,32 @@ export class PaymongoService implements PaymentGateway {
     };
   }
 
+  async getCheckoutSession(id: string): Promise<PaymentIntentResult> {
+    const response = await fetch(`${this.baseUrl}/checkout_sessions/${id}`, {
+      headers: {
+        Authorization: `Basic ${Buffer.from(this.secretKey + ':').toString('base64')}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      this.logger.error('PayMongo get checkout session failed', data);
+      throw new Error(data.errors?.[0]?.detail || 'Failed to get checkout session');
+    }
+
+    const attrs = data.data.attributes;
+    // payment_status is 'paid' | 'unpaid' | 'no_payment_required'
+    const status = attrs.payment_status === 'paid' ? 'succeeded' : attrs.payment_status;
+    return {
+      id: data.data.id,
+      status,
+      amount: (attrs.line_items?.[0]?.amount ?? 0) / 100,
+      currency: attrs.currency,
+      metadata: attrs.metadata,
+    };
+  }
+
   verifyWebhookSignature(payload: string, signature: string): boolean {
     // PayMongo uses HMAC-SHA256 for webhook verification
     const crypto = require('crypto');

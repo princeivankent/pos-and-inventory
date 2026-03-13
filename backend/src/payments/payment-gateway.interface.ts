@@ -27,6 +27,7 @@ export interface WebhookEvent {
 export interface PaymentGateway {
   createPaymentIntent(params: CreatePaymentIntentParams): Promise<PaymentIntentResult>;
   getPaymentIntent(id: string): Promise<PaymentIntentResult>;
+  getCheckoutSession(id: string): Promise<PaymentIntentResult>;
   verifyWebhookSignature(payload: string, signature: string): boolean;
   parseWebhookEvent(payload: any): WebhookEvent;
 }

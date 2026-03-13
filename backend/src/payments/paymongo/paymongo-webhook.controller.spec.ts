@@ -14,6 +14,7 @@ describe('PaymongoWebhookController', () => {
     paymentGateway = {
       createPaymentIntent: jest.fn(),
       getPaymentIntent: jest.fn(),
+      getCheckoutSession: jest.fn(),
       verifyWebhookSignature: jest.fn(),
       parseWebhookEvent: jest.fn(),
     };

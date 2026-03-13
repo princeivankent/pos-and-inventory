@@ -12,7 +12,9 @@ import { Store } from '../database/entities/store.entity';
 import { UserStore } from '../database/entities/user-store.entity';
 import { Product } from '../database/entities/product.entity';
 import { Payment } from '../database/entities/payment.entity';
+import { Invoice } from '../database/entities/invoice.entity';
 import { SubscriptionGuardModule } from '../common/guards/subscription-guard.module';
+import { PaymentsModule } from '../payments/payments.module';
 
 @Module({
   imports: [
@@ -24,9 +26,11 @@ import { SubscriptionGuardModule } from '../common/guards/subscription-guard.mod
       UserStore,
       Product,
       Payment,
+      Invoice,
     ]),
     SubscriptionGuardModule,
     ScheduleModule.forRoot(),
+    PaymentsModule,
   ],
   controllers: [BillingController],
   providers: [SubscriptionService, UsageTrackerService, SubscriptionRenewalService],
