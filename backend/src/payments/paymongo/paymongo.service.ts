@@ -116,7 +116,7 @@ export class PaymongoService implements PaymentGateway {
     return {
       id: data.data.id,
       status,
-      amount: attrs.line_items?.[0]?.amount / 100 ?? 0,
+      amount: (attrs.line_items?.[0]?.amount ?? 0) / 100,
       currency: attrs.currency,
       metadata: attrs.metadata,
     };
