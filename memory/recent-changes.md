@@ -1,5 +1,21 @@
 # Recent Changes
 
+## 2026-03-14 (subscription-plan-refinement)
+
+- Refined subscription plans: pricing, feature allocation, trial strategy, annual billing, supplier gating
+  - **Pricing fixed**: ₱599 / ₱1,499 / ₱2,999 (was inconsistent between CLAUDE.md and migration)
+  - **Trial**: 30 days on Negosyo plan (was 14 days on Tindahan) — show full value before asking to pay
+  - **Trial expiry**: suspends account (data preserved); reminder crons now fire at 10 days + 3 days remaining
+  - **Tindahan** now includes `fifo_inventory` + `utang_management` (moved from Negosyo); product limit raised 100→300
+  - **Negosyo** product limit raised 500→1,000; `supplier_management` feature added and gated here
+  - **Kadena** price lowered 3,999→2,999; product limit raised 2,000→99,999; new features: `export_advanced`, `low_stock_alerts`
+  - **Annual billing**: new `billing_period` column on `subscriptions`; annual = 10× monthly price (2 months free); period set to 365 days
+  - **Suppliers gated**: `@RequireFeature('supplier_management')` added to `suppliers.controller.ts`; sidebar item hidden for Tindahan
+  - **Utang ungated**: `@RequireFeature('utang_management')` removed from customers controller (now Tindahan+)
+  - **PayMongo**: `createUpgradePaymentIntent` now accepts `billing_period`; invoice amount = plan.price × 10 for annual
+  - Migration: `1708000000000-UpdateSubscriptionPlans.ts`
+  - All SubscriptionFeature enum values updated in frontend model
+
 ## 2026-03-14
 
 - `fix/downgrade-pending-state`

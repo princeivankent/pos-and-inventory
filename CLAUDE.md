@@ -363,7 +363,7 @@ feature-name/
 
 **Completed - Subscription System Backend (Feb 14, 2026)**:
 - ✅ Database entities (Organization, SubscriptionPlan, Subscription, Invoice, Payment, PaymentMethod)
-- ✅ Migration for subscription tables with 3 plan tiers (Tindahan ₱799, Negosyo ₱1499, Kadena ₱2999)
+- ✅ Migration for subscription tables with 3 plan tiers (Tindahan ₱599, Negosyo ₱1,499, Kadena ₱2,999) — prices updated Mar 14, 2026 via `1708000000000-UpdateSubscriptionPlans.ts`
 - ✅ SubscriptionGuard (validates active subscription, backward compatible with legacy stores)
 - ✅ FeatureGateGuard + @RequireFeature decorator (e.g., reports, utang_management)
 - ✅ UsageLimitGuard + @CheckLimit decorator (products, stores, users per plan)
@@ -387,11 +387,21 @@ feature-name/
 **Completed - Supplier Management (Feb 25, 2026)**:
 - ✅ Suppliers module (`backend/src/suppliers/`) — CRUD, soft-delete, permissions
 - ✅ Migration `1707600000000-AddSupplierIsActive.ts` adds `is_active` column
-- ✅ Permissions: `SUPPLIERS_VIEW`, `SUPPLIERS_MANAGE` (admin-only, no feature gate)
+- ✅ Permissions: `SUPPLIERS_VIEW`, `SUPPLIERS_MANAGE` (admin-only); now **feature-gated** to Negosyo+ via `@RequireFeature('supplier_management')` (Mar 14, 2026)
 - ✅ Inventory batch stock-in links optional `supplier_id`
 - ✅ Stock movements include supplier name via batch relation
 - ✅ Frontend: `features/suppliers/` — supplier-list, supplier-table, supplier-form-dialog
 - ✅ Route `/suppliers` (adminGuard), sidebar between Customers and Reports
+
+**Completed - Subscription Plan Refinement (Mar 14, 2026)**:
+- ✅ Pricing corrected: Tindahan ₱599/mo (₱5,990/yr), Negosyo ₱1,499/mo (₱14,990/yr), Kadena ₱2,999/mo (₱29,990/yr)
+- ✅ `utang_management` + `fifo_inventory` moved to Tindahan tier (no longer gated)
+- ✅ `supplier_management` now gated to Negosyo+ (backend + sidebar)
+- ✅ Trial: 30 days on Negosyo plan; expiry suspends account (data preserved)
+- ✅ Annual billing: `billing_period` column on `subscriptions`; period = 365 days; charge = `price × 10`; PayMongo checkout amount reflects billing period
+- ✅ Product limits: 300 / 1,000 / 99,999 per store
+- ✅ New Kadena-only features: `export_advanced`, `low_stock_alerts` (gating in place; endpoints TBD)
+- ✅ Migration: `1708000000000-UpdateSubscriptionPlans.ts` — **run `npm run migration:run` before deploying**
 
 **Completed - Production Hardening (Mar 2, 2026)**:
 - ✅ Startup env validation (required vars + production payment safety checks)

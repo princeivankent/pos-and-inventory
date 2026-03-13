@@ -97,6 +97,14 @@
   margin-bottom: calc(var(--space-4) * -1); // compensate for parent gap
 }
 
+.section-header-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
 .section-title {
   font-size: 1.125rem;
   font-weight: 600;
@@ -108,6 +116,41 @@
   font-size: 0.9rem;
   color: var(--text-secondary);
   margin: 0;
+}
+
+// ---- Billing Period Toggle ----
+
+.billing-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+
+  .toggle-label--active {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+}
+
+.annual-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  background: var(--color-success-light);
+  color: var(--color-success);
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: 0.25rem;
+}
+
+.plan-annual-savings {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-success);
+  margin-top: 0.125rem;
 }
 
 // ---- Usage ----

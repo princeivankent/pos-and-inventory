@@ -147,7 +147,7 @@ export class SubscriptionService {
     };
   }
 
-  async upgradePlan(organizationId: string, newPlanId: string, paymentId?: string) {
+  async upgradePlan(organizationId: string, newPlanId: string, paymentId?: string, billingPeriod: 'monthly' | 'annual' = 'monthly') {
     const subscription = await this.getCurrentSubscription(organizationId);
     const newPlan = await this.planRepository.findOne({
       where: { id: newPlanId, is_active: true },
@@ -189,13 +189,15 @@ export class SubscriptionService {
 
     // Upgrade immediately
     const now = new Date();
-    const periodEnd = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const periodDays = billingPeriod === 'annual' ? 365 : 30;
+    const periodEnd = new Date(now.getTime() + periodDays * 24 * 60 * 60 * 1000);
 
     // Set both the FK column and the relation object — TypeORM resolves the FK
     // from the in-memory relation reference when saving, not the plain column.
     subscription.plan_id = newPlan.id;
     subscription.plan = newPlan;
     subscription.status = SubscriptionStatus.ACTIVE;
+    subscription.billing_period = billingPeriod;
     subscription.current_period_start = now;
     subscription.current_period_end = periodEnd;
     subscription.trial_start = null;

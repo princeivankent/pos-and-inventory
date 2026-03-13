@@ -23,6 +23,7 @@ import { SubscriptionGuard } from '../common/guards/subscription.guard';
 import { FeatureGateGuard } from '../common/guards/feature-gate.guard';
 import { UserRole } from '../database/entities/user-store.entity';
 import { Permission } from '../common/permissions/permission.enum';
+import { RequireFeature } from '../common/decorators/require-feature.decorator';
 
 @Controller('suppliers')
 @UseGuards(
@@ -33,6 +34,7 @@ import { Permission } from '../common/permissions/permission.enum';
   PermissionsGuard,
   FeatureGateGuard,
 )
+@RequireFeature('supplier_management')
 export class SuppliersController {
   constructor(private readonly suppliersService: SuppliersService) {}
 

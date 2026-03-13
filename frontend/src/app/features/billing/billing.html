@@ -155,8 +155,20 @@
 
   <!-- Plan Comparison -->
   <div class="section-header">
-    <h2 class="section-title">Plans</h2>
-    <p class="section-subtitle">Compare plans and upgrade or downgrade at any time.</p>
+    <div class="section-header-top">
+      <div>
+        <h2 class="section-title">Plans</h2>
+        <p class="section-subtitle">Compare plans and upgrade or downgrade at any time.</p>
+      </div>
+      <div class="billing-toggle" data-testid="billing-period-toggle">
+        <span [class.toggle-label--active]="!isAnnual">Monthly</span>
+        <p-toggleswitch [(ngModel)]="isAnnual" />
+        <span [class.toggle-label--active]="isAnnual">
+          Annual
+          <span class="annual-badge">Save 2 months</span>
+        </span>
+      </div>
+    </div>
   </div>
 
   @if (loading()) {
@@ -181,9 +193,12 @@
           <div class="plan-header">
             <h3 class="plan-name-title">{{ plan.name }}</h3>
             <div class="plan-price">
-              {{ plan.price_php | phpCurrency }}
-              <span class="plan-price-period">/mo</span>
+              {{ getDisplayPrice(plan) | phpCurrency }}
+              <span class="plan-price-period">{{ isAnnual ? '/yr' : '/mo' }}</span>
             </div>
+            @if (isAnnual) {
+              <div class="plan-annual-savings">Save {{ getAnnualSavings(plan) | phpCurrency }}/yr</div>
+            }
           </div>
 
           <ul class="plan-limits">
@@ -295,7 +310,7 @@
           <div>
             <p class="payment-step-title">Payment required</p>
             <p class="payment-step-desc">
-              You'll be charged {{ selectedUpgradePlan()!.price_php | phpCurrency }}/month.
+              You'll be charged {{ getDisplayPrice(selectedUpgradePlan()!) | phpCurrency }}{{ isAnnual ? '/year' : '/month' }}.
               Connect a PayMongo payment method to complete your upgrade.
             </p>
           </div>
@@ -328,10 +343,10 @@
       <!-- Plan review step (default) -->
       <div class="upgrade-price-row">
         <div class="upgrade-price-amount">
-          {{ selectedUpgradePlan()!.price_php | phpCurrency }}
-          <span class="upgrade-price-period">/month</span>
+          {{ getDisplayPrice(selectedUpgradePlan()!) | phpCurrency }}
+          <span class="upgrade-price-period">{{ isAnnual ? '/year' : '/month' }}</span>
         </div>
-        <span class="upgrade-billing-cycle">Billed monthly</span>
+        <span class="upgrade-billing-cycle">{{ isAnnual ? 'Billed annually (2 months free)' : 'Billed monthly' }}</span>
       </div>
 
       <div class="upgrade-divider"></div>
@@ -350,7 +365,7 @@
       </ul>
 
       <p class="upgrade-note">
-        Your upgrade takes effect immediately. A new 30-day billing cycle starts today.
+        Your upgrade takes effect immediately. A new {{ isAnnual ? '365-day' : '30-day' }} billing cycle starts today.
       </p>
     }
   }
