@@ -38,7 +38,7 @@ export class PaymentsService {
       plan_id: plan.id,
       invoice_number: invoiceNumber,
       amount: plan.price_php,
-      tax_amount: plan.price_php * 0.12,
+      tax_amount: 0,
       currency: 'PHP',
       status: InvoiceStatus.PENDING,
       due_date: new Date(periodStart.getTime() + 7 * 24 * 60 * 60 * 1000),

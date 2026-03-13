@@ -35,7 +35,7 @@ export class PaymongoService implements PaymentGateway {
           attributes: {
             cancel_url: cancelUrl,
             success_url: successUrl,
-            payment_method_types: ['gcash', 'card', 'paymaya', 'grab_pay'],
+            payment_method_types: ['qrph'],
             show_description: true,
             show_line_items: true,
             send_email_receipt: false,
