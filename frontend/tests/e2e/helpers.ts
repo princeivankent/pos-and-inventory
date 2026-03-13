@@ -148,6 +148,25 @@ export async function upgradePlan(
   return response.json();
 }
 
+export async function downgradePlan(
+  request: APIRequestContext,
+  session: TestSession,
+  planCode: 'tindahan' | 'negosyo',
+) {
+  const plansRes = await request.get(`${apiBaseUrl}/subscription-plans`);
+  expect(plansRes.ok()).toBeTruthy();
+  const plans = await plansRes.json();
+  const plan = plans.find((p: { plan_code: string }) => p.plan_code === planCode);
+  expect(plan).toBeTruthy();
+
+  const response = await request.post(`${apiBaseUrl}/billing/downgrade`, {
+    headers: authHeaders(session.token, session.storeId),
+    data: { plan_id: plan.id },
+  });
+  expect(response.ok()).toBeTruthy();
+  return response.json();
+}
+
 export async function createStore(
   request: APIRequestContext,
   session: TestSession,
