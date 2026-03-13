@@ -2,11 +2,24 @@
       <p-button label="Add Category" icon="pi pi-plus" (onClick)="openNew()" />
     </app-page-header>
 
+    <div class="filter-bar">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Search categories…" />
+      </p-iconfield>
+    </div>
+
     <div class="card">
       <p-table
-        [value]="categories()"
+        [value]="filteredCategories()"
         [loading]="loading()"
+        [paginator]="true"
+        [rows]="15"
+        [rowsPerPageOptions]="[15, 30, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first}–{last} of {totalRecords} categories"
         dataKey="id"
+        styleClass="enhanced-table"
       >
         <ng-template pTemplate="header">
           <tr>
@@ -17,7 +30,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-cat>
-          <tr>
+          <tr class="table-row">
             <td>
               @if (cat.parent_id) {
                 <span class="indent">&#8627; </span>

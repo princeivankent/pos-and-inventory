@@ -10,6 +10,11 @@ export interface SubscriptionInfo {
     max_users_per_store: number;
     max_products_per_store: number;
   };
+  pending_downgrade?: {
+    plan_code: string;
+    plan_name: string;
+    effective_date: string;
+  };
 }
 
 export interface SubscriptionPlan {

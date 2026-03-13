@@ -1,25 +1,19 @@
-.page-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
+.search-bar {
+  margin-bottom: 16px;
+  max-width: 360px;
 
-.search-section {
-  width: 100%;
-  max-width: 400px;
-
-  .p-input-icon-left {
+  p-iconfield,
+  ::ng-deep .p-iconfield {
     width: 100%;
+  }
 
-    input {
-      width: 100%;
-    }
+  input {
+    width: 100%;
   }
 }
 
 @media (max-width: 768px) {
-  .search-section {
+  .search-bar {
     max-width: 100%;
   }
 }

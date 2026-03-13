@@ -23,6 +23,7 @@ export class SubscriptionService {
 
   currentPlan = computed(() => this.subscription()?.plan_code ?? null);
   isTrialing = computed(() => this.subscription()?.status === 'trial');
+  pendingDowngrade = computed(() => this.subscription()?.pending_downgrade ?? null);
 
   constructor() {
     this.loadFromStorage();
@@ -86,6 +87,11 @@ export class SubscriptionService {
   clear() {
     localStorage.removeItem(this.STORAGE_KEY);
     this.subscription.set(null);
+  }
+
+  // Cancel a scheduled downgrade
+  cancelDowngrade() {
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/billing/cancel-downgrade`, {});
   }
 
   // Get minimum plan needed for a feature

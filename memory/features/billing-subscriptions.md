@@ -14,24 +14,30 @@ Control subscription state, plan features, usage limits, billing workflows, paym
 
 - Organization, subscription, invoice, payment, and plan data model
 - Subscription, feature-gate, and usage-limit guards
-- Billing management APIs for upgrade, downgrade, cancel, and usage
+- Billing management APIs for upgrade, downgrade, cancel, usage, and cancel-downgrade
 - Frontend billing page and platform subscription admin page
 - Payment-intent upgrade flow
 - Webhook idempotency protection
 - Raw-body webhook verification
 - Production guardrails that block `BYPASS_PAYMENT=true` in backend production mode
 - Frontend production builds now correctly use `bypassPayment: false`
+- **Pending downgrade state surfaced in UI** (Mar 14, 2026):
+  - `GET /billing/subscription` now includes `pending_downgrade { plan_code, plan_name, effective_date }` when a downgrade is scheduled
+  - `POST /billing/cancel-downgrade` removes the pending downgrade
+  - Frontend billing page shows a warning banner with the target plan, effective date, and "Cancel Downgrade" button
+  - Plan card for the scheduled plan shows a disabled "Scheduled" button instead of "Downgrade"
+  - Downgrade toast now correctly says "Downgrade scheduled" for active subs (not "You are now on X plan")
 
 ## Known Gaps
 
-- Live PayMongo rollout is still pending
-- Production payment flow still needs final end-to-end validation with real credentials
+- Live PayMongo rollout still needs final end-to-end validation with real credentials
 - Billing notifications are not yet implemented
 
 ## Recent Decisions
 
 - Frontend and backend bypass-payment behavior must stay aligned through environment configuration
 - Webhook signature verification must use raw request bodies
+- Downgrade is always scheduled at period end for active subscriptions (standard SaaS pattern); trial downgrades apply immediately
 
 ## Dependencies / Cross-Cutting Notes
 
@@ -52,4 +58,4 @@ Control subscription state, plan features, usage limits, billing workflows, paym
 
 ## Last Updated
 
-- 2026-03-07
+- 2026-03-14

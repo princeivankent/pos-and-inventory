@@ -62,6 +62,11 @@ export class BillingController {
     );
   }
 
+  @Post('cancel-downgrade')
+  cancelDowngrade(@CurrentUser() user: RequestUser) {
+    return this.subscriptionService.cancelDowngrade(user.organizationId);
+  }
+
   @Post('cancel')
   cancel(
     @Body() dto: CancelSubscriptionDto,

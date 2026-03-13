@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
+import { TextareaModule } from 'primeng/textarea';
 import { CreateProductDto } from '../../../../core/models/product.model';
 import { Category } from '../../../../core/models/category.model';
 
@@ -18,6 +19,7 @@ import { Category } from '../../../../core/models/category.model';
     InputTextModule,
     InputNumberModule,
     SelectModule,
+    TextareaModule,
   ],
   templateUrl: './product-form-dialog.html',
   styleUrls: ['./product-form-dialog.scss'],
@@ -41,9 +43,9 @@ export class ProductFormDialogComponent {
   }
 
   getMarginPercent(): number {
-    if (this.form.cost_price === 0) return 0;
+    if (!this.form.cost_price) return 0;
     return Math.round(
-      ((this.form.retail_price - this.form.cost_price) / this.form.cost_price) * 100
+      (((this.form.retail_price ?? 0) - this.form.cost_price) / this.form.cost_price) * 100
     );
   }
 

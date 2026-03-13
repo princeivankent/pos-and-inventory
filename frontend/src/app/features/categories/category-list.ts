@@ -1,9 +1,11 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { DialogModule } from 'primeng/dialog';
 import { SelectModule } from 'primeng/select';
 import { ConfirmationService } from 'primeng/api';
@@ -19,6 +21,7 @@ import { PageHeader } from '../../shared/components/page-header/page-header';
   imports: [
     FormsModule, TableModule, ButtonModule, InputTextModule,
     DialogModule, SelectModule, ConfirmDialogModule, PageHeader,
+    IconFieldModule, InputIconModule,
   ],
   templateUrl: './category-list.html',
   styleUrls: ['./category-list.scss'],
@@ -29,6 +32,12 @@ export class CategoryListComponent implements OnInit {
   private confirmService = inject(ConfirmationService);
 
   categories = signal<Category[]>([]);
+  searchQuery = signal('');
+  filteredCategories = computed(() => {
+    const q = this.searchQuery().toLowerCase();
+    if (!q) return this.categories();
+    return this.categories().filter(c => c.name.toLowerCase().includes(q));
+  });
   loading = signal(false);
   saving = signal(false);
   dialogVisible = false;

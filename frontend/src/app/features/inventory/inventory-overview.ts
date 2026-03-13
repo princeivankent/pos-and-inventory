@@ -1,8 +1,10 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
@@ -24,6 +26,7 @@ import { StatusBadge } from '../../shared/components/status-badge/status-badge';
   imports: [
     RouterLink, TableModule, ButtonModule, DialogModule, InputNumberModule,
     InputTextModule, SelectModule, FormsModule, PageHeader, PhpCurrencyPipe, StatusBadge,
+    IconFieldModule, InputIconModule,
   ],
   templateUrl: './inventory-overview.html',
   styleUrls: ['./inventory-overview.scss'],
@@ -35,6 +38,14 @@ export class InventoryOverviewComponent implements OnInit {
   storeCtx = inject(StoreContextService);
 
   products = signal<Product[]>([]);
+  searchQuery = signal('');
+  filteredProducts = computed(() => {
+    const q = this.searchQuery().toLowerCase();
+    if (!q) return this.products();
+    return this.products().filter(p =>
+      p.name.toLowerCase().includes(q) || (p.sku ?? '').toLowerCase().includes(q)
+    );
+  });
   suppliers = signal<Supplier[]>([]);
   suppliersLoading = signal(false);
   loading = signal(false);

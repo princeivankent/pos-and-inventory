@@ -2,6 +2,8 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { Customer, CreateCustomerDto, RecordPaymentDto, CreditStatement } from '../../core/models/customer.model';
@@ -22,6 +24,8 @@ import { RecordPaymentDialogComponent } from './components/record-payment-dialog
     FormsModule,
     ButtonModule,
     InputTextModule,
+    IconFieldModule,
+    InputIconModule,
     ConfirmDialogModule,
     PageHeader,
     CustomerTableComponent,

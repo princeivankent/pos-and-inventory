@@ -2,8 +2,25 @@
       <p-button label="Add User" icon="pi pi-plus" (onClick)="openNew()" />
     </app-page-header>
 
+    <div class="filter-bar">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Search users…" />
+      </p-iconfield>
+    </div>
+
     <div class="card">
-      <p-table [value]="users()" [loading]="loading()" dataKey="id">
+      <p-table
+        [value]="filteredUsers()"
+        [loading]="loading()"
+        [paginator]="true"
+        [rows]="15"
+        [rowsPerPageOptions]="[15, 30, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first}–{last} of {totalRecords} users"
+        dataKey="id"
+        styleClass="enhanced-table"
+      >
         <ng-template pTemplate="header">
           <tr>
             <th>Name</th>
@@ -14,7 +31,7 @@
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-user>
-          <tr>
+          <tr class="table-row">
             <td class="font-medium">{{ user.full_name }}</td>
             <td>{{ user.email }}</td>
             <td>

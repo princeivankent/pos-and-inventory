@@ -2,7 +2,8 @@
   [(visible)]="visible"
   [header]="editMode ? 'Edit Product' : 'New Product'"
   [modal]="true"
-  [style]="{ width: '500px' }"
+  [style]="{ width: '560px', maxWidth: '95vw' }"
+  [contentStyle]="{ overflowX: 'hidden', overflowY: 'auto' }"
   data-testid="product-form-dialog"
   (onHide)="onHide()"
 >
@@ -44,7 +45,7 @@
 
       <div class="field">
         <label>Description</label>
-        <input pInputText [(ngModel)]="form.description" class="w-full" placeholder="Optional description" data-testid="product-description-input" />
+        <textarea pTextarea [(ngModel)]="form.description" class="w-full" placeholder="Optional description" [rows]="2" [autoResize]="true" data-testid="product-description-input"></textarea>
       </div>
     </div>
 
@@ -61,6 +62,7 @@
             currency="PHP"
             locale="en-PH"
             styleClass="w-full"
+            inputStyleClass="w-full"
             inputId="product-retail-price-input"
           />
         </div>
@@ -72,19 +74,20 @@
             currency="PHP"
             locale="en-PH"
             styleClass="w-full"
+            inputStyleClass="w-full"
             inputId="product-cost-price-input"
           />
         </div>
       </div>
 
-      @if (form.cost_price > 0 && form.retail_price > 0 && form.cost_price >= form.retail_price) {
+      @if (form.cost_price && form.retail_price && form.cost_price >= form.retail_price) {
         <small class="price-warning">
           <i class="pi pi-exclamation-triangle"></i>
           Cost price is higher than or equal to retail price. You may be selling at a loss.
         </small>
       }
 
-      @if (form.cost_price > 0 && form.retail_price > 0 && form.retail_price > form.cost_price) {
+      @if (form.cost_price && form.retail_price && form.retail_price > form.cost_price) {
         <div class="margin-display" [class]="getMarginClass()">
           <span class="margin-label">Profit Margin:</span>
           <span class="margin-value">{{ getMarginPercent() }}%</span>
@@ -103,7 +106,7 @@
         </div>
         <div class="field">
           <label>Reorder Level</label>
-          <p-inputNumber [(ngModel)]="form.reorder_level" [min]="0" styleClass="w-full" inputId="product-reorder-level-input" />
+          <p-inputNumber [(ngModel)]="form.reorder_level" [min]="0" styleClass="w-full" inputStyleClass="w-full" inputId="product-reorder-level-input" />
         </div>
       </div>
     </div>

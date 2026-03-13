@@ -33,7 +33,7 @@
         } @else if (!hasReportsFeature()) {
           <div class="upgrade-prompt compact">
             <i class="pi pi-lock"></i>
-            <p>Sales analytics available in Negosyo plan</p>
+            <p>Sales analytics available in <strong>Negosyo</strong> plan</p>
           </div>
         } @else {
           <div class="stat-icon" style="background: var(--color-primary-light); color: var(--color-primary)">
@@ -55,7 +55,7 @@
         } @else if (!hasReportsFeature()) {
           <div class="upgrade-prompt compact">
             <i class="pi pi-lock"></i>
-            <p>Sales analytics available in Negosyo plan</p>
+            <p>Sales analytics available in <strong>Negosyo</strong> plan</p>
           </div>
         } @else {
           <div class="stat-icon" style="background: var(--color-info-light); color: var(--color-info)">
@@ -124,9 +124,9 @@
           <p class="upgrade-title">Unlock Sales Trends</p>
           <p class="upgrade-text">
             Track your weekly sales performance with interactive charts and insights.
-            Available in Negosyo and Kadena plans.
+            Available in <strong>Negosyo</strong> and <strong>Kadena</strong> plans.
           </p>
-          <a routerLink="/settings">
+          <a routerLink="/billing">
             <p-button label="Upgrade Now" icon="pi pi-arrow-up" />
           </a>
         </div>
@@ -203,9 +203,9 @@
               <i class="pi pi-lock upgrade-icon"></i>
               <p class="upgrade-title">Unlock Sales Analytics</p>
               <p class="upgrade-text">
-                Track your best-selling products and analyze sales trends with the Negosyo plan
+                Track your best-selling products and analyze sales trends with the <strong>Negosyo</strong> plan
               </p>
-              <a routerLink="/settings">
+              <a routerLink="/billing">
                 <p-button label="Upgrade Now" icon="pi pi-arrow-up" size="small" />
               </a>
             </div>
@@ -289,8 +289,8 @@
           } @else if (!hasReportsFeature()) {
             <div class="upgrade-prompt compact">
               <i class="pi pi-lock"></i>
-              <p>Advanced profit tracking available in Negosyo plan</p>
-              <a routerLink="/settings">
+              <p>Advanced profit tracking available in <strong>Negosyo</strong> plan</p>
+              <a routerLink="/billing">
                 <p-button label="View Plans" size="small" [text]="true" />
               </a>
             </div>
@@ -340,8 +340,8 @@
           } @else if (!hasReportsFeature()) {
             <div class="upgrade-prompt compact">
               <i class="pi pi-lock"></i>
-              <p>Detailed inventory reports available in Negosyo plan</p>
-              <a routerLink="/settings">
+              <p>Detailed inventory reports available in <strong>Negosyo</strong> plan</p>
+              <a routerLink="/billing">
                 <p-button label="View Plans" size="small" [text]="true" />
               </a>
             </div>

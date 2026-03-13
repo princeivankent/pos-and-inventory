@@ -6,6 +6,12 @@
   }
 }
 
+.filter-bar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
 .form-grid { display: flex; flex-direction: column; gap: 1rem; }
     .field { display: flex; flex-direction: column; gap: 0.375rem; label { font-size: 0.875rem; font-weight: 500; } }
     .w-full { width: 100%; }

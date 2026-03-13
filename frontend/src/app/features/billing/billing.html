@@ -35,6 +35,30 @@
     </div>
   }
 
+  <!-- Pending Downgrade Banner -->
+  @if (!loading() && pendingDowngrade()) {
+    <div class="pending-downgrade-card card" data-testid="pending-downgrade-banner">
+      <div class="pending-downgrade-header">
+        <i class="pi pi-clock pending-downgrade-icon"></i>
+        <div class="pending-downgrade-info">
+          <p class="pending-downgrade-title">Downgrade scheduled</p>
+          <p class="pending-downgrade-desc">
+            Your plan will switch to <strong>{{ pendingDowngrade()!.plan_name }}</strong> on {{ formatDate(pendingDowngrade()!.effective_date) }}.
+            You keep full access to your current plan until then.
+          </p>
+        </div>
+      </div>
+      <p-button
+        label="Cancel Downgrade"
+        severity="secondary"
+        [outlined]="true"
+        icon="pi pi-times"
+        data-testid="cancel-downgrade-button"
+        [loading]="actionLoading()"
+        (onClick)="cancelPendingDowngrade()" />
+    </div>
+  }
+
   <!-- Usage Section -->
   <div class="section-header">
     <h2 class="section-title">Usage</h2>
@@ -193,6 +217,15 @@
                 [outlined]="true"
                 severity="secondary"
                 styleClass="w-full"
+                [disabled]="true" />
+            } @else if (getPlanAction(plan) === 'scheduled') {
+              <p-button
+                label="Scheduled"
+                icon="pi pi-clock"
+                [outlined]="true"
+                severity="warn"
+                styleClass="w-full"
+                [attr.data-testid]="'scheduled-plan-' + plan.plan_code"
                 [disabled]="true" />
             } @else if (getPlanAction(plan) === 'upgrade') {
               <p-button

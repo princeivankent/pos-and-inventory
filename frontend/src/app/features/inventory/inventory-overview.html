@@ -10,9 +10,16 @@
       </a>
     </app-page-header>
 
+    <div class="filter-bar">
+      <p-iconfield>
+        <p-inputicon styleClass="pi pi-search" />
+        <input pInputText [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Search by name or SKU…" />
+      </p-iconfield>
+    </div>
+
     <div class="card" data-testid="inventory-page">
       <p-table
-        [value]="products()"
+        [value]="filteredProducts()"
         [paginator]="true"
         [rows]="15"
         [rowsPerPageOptions]="[15, 30, 50]"
