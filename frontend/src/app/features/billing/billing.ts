@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -27,7 +27,7 @@ import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
   templateUrl: './billing.html',
   styleUrls: ['./billing.scss'],
 })
-export class BillingComponent implements OnInit {
+export class BillingComponent implements OnInit, OnDestroy {
   private http = inject(HttpClient);
   private subscriptionService = inject(SubscriptionService);
   private toast = inject(ToastService);
@@ -56,7 +56,23 @@ export class BillingComponent implements OnInit {
   currentPlanCode = this.subscriptionService.currentPlan;
   isTrialing = this.subscriptionService.isTrialing;
 
+  private readonly onStorageChange = (event: StorageEvent) => {
+    // Another tab completed the upgrade (removed the pending payment key)
+    if (event.key === this.PENDING_PAYMENT_KEY && event.newValue === null && this.upgradeDialogVisible()) {
+      const planName = this.selectedUpgradePlan()?.name ?? 'new plan';
+      this.upgradeDialogVisible.set(false);
+      this.selectedUpgradePlan.set(null);
+      this.checkoutUrl.set(null);
+      this.upgradePaymentStep.set(false);
+      this.subscriptionService.refreshSubscription().subscribe(() => {
+        this.toast.success('Plan upgraded', `You are now on the ${planName} plan.`);
+        this.ngOnInit();
+      });
+    }
+  };
+
   ngOnInit() {
+    window.addEventListener('storage', this.onStorageChange);
     this.loading.set(true);
     forkJoin({
       usage: this.http.get<UsageResponse>(`${environment.apiUrl}/billing/usage`),
@@ -73,6 +89,10 @@ export class BillingComponent implements OnInit {
         this.toast.error('Failed to load billing information');
       },
     });
+  }
+
+  ngOnDestroy() {
+    window.removeEventListener('storage', this.onStorageChange);
   }
 
   private checkForPendingPayment() {
