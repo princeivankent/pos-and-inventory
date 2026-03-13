@@ -3,5 +3,5 @@ export const environment = {
   apiUrl: '/api',
   // Set to true to skip payment collection and upgrade plans directly (dev/testing).
   // Mirror of BYPASS_PAYMENT in backend/.env — both must match.
-  bypassPayment: false,
+  bypassPayment: true,
 };
