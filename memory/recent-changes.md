@@ -1,5 +1,15 @@
 # Recent Changes
 
+## 2026-03-14
+
+- `fix/downgrade-pending-state`
+  - `GET /billing/subscription` now returns `pending_downgrade { plan_code, plan_name, effective_date }` when a downgrade is scheduled at period end
+  - Added `POST /billing/cancel-downgrade` endpoint to remove a pending downgrade
+  - Frontend billing page shows a warning banner when a downgrade is pending (target plan + effective date + Cancel Downgrade button)
+  - Plan card for the scheduled plan shows a disabled "Scheduled" button instead of "Downgrade"
+  - Fixed incorrect toast message for active-sub downgrades ("Downgrade scheduled" instead of "You are now on X plan")
+  - Branch: `fix/downgrade-pending-state`
+
 ## 2026-03-13
 
 - `production-deployment`

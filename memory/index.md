@@ -1,6 +1,6 @@
 # Project Memory Index
 
-Last updated: 2026-03-13
+Last updated: 2026-03-14
 
 ## Overall State
 
@@ -38,7 +38,7 @@ Last updated: 2026-03-13
 | [Customers](./features/customers.md) | `done` | `verified` | 2026-03-07 | Keep stable |
 | [Suppliers](./features/suppliers.md) | `done` | `verified` | 2026-03-07 | Keep stable |
 | [Reports](./features/reports.md) | `done` | `verified` | 2026-03-07 | Keep stable and optimize where needed |
-| [Billing & Subscriptions](./features/billing-subscriptions.md) | `done` | `verified` | 2026-03-07 | Complete live-payment rollout and production validation |
+| [Billing & Subscriptions](./features/billing-subscriptions.md) | `done` | `verified` | 2026-03-14 | Complete live-payment rollout and production validation |
 | [Testing & CI](./features/testing-ci.md) | `done` | `verified` | 2026-03-07 | Add deployment smoke coverage and broader feature E2E where valuable |
 | [Deployment](./features/deployment.md) | `done` | `verified` | 2026-03-13 | Split prod/dev Supabase, complete PayMongo live rollout |
 
