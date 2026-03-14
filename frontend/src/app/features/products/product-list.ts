@@ -10,6 +10,8 @@ import { Product, CreateProductDto, UpdateProductDto } from '../../core/models/p
 import { Category } from '../../core/models/category.model';
 import { ToastService } from '../../core/services/toast.service';
 import { StoreContextService } from '../../core/services/store-context.service';
+import { SubscriptionService } from '../../core/services/subscription.service';
+import { CsvExportService } from '../../core/services/csv-export.service';
 import { PageHeader } from '../../shared/components/page-header/page-header';
 import { ProductSearchComponent } from './components/product-search/product-search';
 import { ProductCardComponent } from './components/product-card/product-card';
@@ -45,6 +47,10 @@ export class ProductListComponent implements OnInit {
   private toast = inject(ToastService);
   private confirmService = inject(ConfirmationService);
   storeCtx = inject(StoreContextService);
+  private subscriptionService = inject(SubscriptionService);
+  private csvExport = inject(CsvExportService);
+
+  canExport = this.subscriptionService.hasFeatureSignal('export_data');
 
   products = signal<Product[]>([]);
   categories = signal<Category[]>([]);
@@ -207,6 +213,21 @@ export class ProductListComponent implements OnInit {
         });
       },
     });
+  }
+
+  exportCsv() {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    this.csvExport.export(this.filteredProducts(), [
+      { field: 'name', header: 'Name' },
+      { field: 'sku', header: 'SKU' },
+      { field: 'barcode', header: 'Barcode' },
+      { field: 'category.name', header: 'Category' },
+      { field: 'retail_price', header: 'Retail Price' },
+      { field: 'cost_price', header: 'Cost Price' },
+      { field: 'current_stock', header: 'Stock' },
+      { field: 'unit', header: 'Unit' },
+    ], `products-${dateStr}.csv`);
   }
 
   private emptyForm(): CreateProductDto & { barcode?: string; description?: string } {

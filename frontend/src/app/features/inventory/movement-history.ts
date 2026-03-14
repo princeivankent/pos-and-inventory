@@ -8,6 +8,8 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { StockMovement } from '../../core/models/inventory.model';
 import { PageHeader } from '../../shared/components/page-header/page-header';
+import { SubscriptionService } from '../../core/services/subscription.service';
+import { CsvExportService } from '../../core/services/csv-export.service';
 
 interface TypeFilter {
   label: string;
@@ -23,6 +25,10 @@ interface TypeFilter {
 })
 export class MovementHistoryComponent implements OnInit {
   private http = inject(HttpClient);
+  private subscriptionService = inject(SubscriptionService);
+  private csvExport = inject(CsvExportService);
+
+  canExport = this.subscriptionService.hasFeatureSignal('export_data');
 
   movements = signal<StockMovement[]>([]);
   loading = signal(false);
@@ -72,6 +78,24 @@ export class MovementHistoryComponent implements OnInit {
         },
         error: () => this.loading.set(false),
       });
+  }
+
+  // Exports the currently loaded page of movements (not all records — data is lazy-loaded)
+  exportCsv() {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    const typeStr = this.activeTypeFilter ?? 'all';
+    this.csvExport.export(this.movements(), [
+      { field: 'created_at', header: 'Date' },
+      { field: 'batch.product.name', header: 'Product' },
+      { field: 'batch.product.sku', header: 'SKU' },
+      { field: 'movement_type', header: 'Type' },
+      { field: 'quantity', header: 'Quantity' },
+      { field: 'batch.supplier.name', header: 'Supplier' },
+      { field: 'batch.batch_number', header: 'Batch #' },
+      { field: 'notes', header: 'Notes' },
+      { field: 'creator.full_name', header: 'Created By' },
+    ], `stock-movements-${typeStr}-${dateStr}.csv`);
   }
 
   getTypeConfig(type: string): { label: string; cls: string } {

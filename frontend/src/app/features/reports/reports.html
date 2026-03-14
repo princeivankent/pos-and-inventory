@@ -20,6 +20,11 @@
           @if (isCurrentPeriod(salesDate, salesPeriod)) {
             <span class="current-badge">Current</span>
           }
+          @if (canExport()) {
+            <span style="margin-left: auto">
+              <p-button label="Export CSV" icon="pi pi-download" [outlined]="true" severity="secondary" (onClick)="exportSalesCsv()" />
+            </span>
+          }
         </div>
 
         @if (salesLoading()) {
@@ -120,6 +125,11 @@
       </p-tabpanel>
 
       <p-tabpanel value="inventory" header="Inventory">
+        @if (canExport() && inventoryReport()) {
+          <div class="report-controls" style="margin-top: 0.75rem; justify-content: flex-end;">
+            <p-button label="Export CSV" icon="pi pi-download" [outlined]="true" severity="secondary" (onClick)="exportInventoryCsv()" />
+          </div>
+        }
         @if (inventoryLoading()) {
           <div class="stats-grid" style="margin-top: 1rem;">
             @for (_ of [1,2,3,4]; track _) {
@@ -249,6 +259,11 @@
           @if (isCurrentPeriod(bestSellingDate, bestSellingPeriod)) {
             <span class="current-badge">Current</span>
           }
+          @if (canExport()) {
+            <span style="margin-left: auto">
+              <p-button label="Export CSV" icon="pi pi-download" [outlined]="true" severity="secondary" (onClick)="exportBestSellingCsv()" />
+            </span>
+          }
         </div>
 
         @if (bestSellingLoading()) {
@@ -303,6 +318,11 @@
           </div>
           @if (isCurrentPeriod(profitDate, profitPeriod)) {
             <span class="current-badge">Current</span>
+          }
+          @if (canExport()) {
+            <span style="margin-left: auto">
+              <p-button label="Export CSV" icon="pi pi-download" [outlined]="true" severity="secondary" (onClick)="exportProfitCsv()" />
+            </span>
           }
         </div>
 

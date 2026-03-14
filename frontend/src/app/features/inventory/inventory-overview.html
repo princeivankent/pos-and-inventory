@@ -1,4 +1,7 @@
 <app-page-header title="Inventory" subtitle="Stock levels and management">
+      @if (canExport()) {
+        <p-button label="Export CSV" icon="pi pi-download" [outlined]="true" severity="secondary" (onClick)="exportCsv()" />
+      }
       @if (storeCtx.isAdmin()) {
         <p-button label="Stock In" icon="pi pi-plus" data-testid="open-stock-in-button" (onClick)="openStockIn()" />
       }

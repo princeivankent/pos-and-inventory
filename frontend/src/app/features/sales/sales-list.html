@@ -9,6 +9,9 @@
         (onClear)="loadSales()"
         inputStyleClass="date-input"
       />
+      @if (canExport()) {
+        <p-button label="Export CSV" icon="pi pi-download" [outlined]="true" severity="secondary" (onClick)="exportCsv()" />
+      }
     </app-page-header>
 
     <div class="card" data-testid="sales-page">
