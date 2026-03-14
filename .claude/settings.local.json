@@ -47,7 +47,10 @@
       "Bash(xargs grep:*)",
       "Bash(git checkout:*)",
       "Bash(git cherry-pick:*)",
-      "Bash(cd \"C:\\\\Users\\\\prince-asus\\\\Projects\\\\pos-and-inventory\\\\backend\" && rm -rf dist && npm run build 2>&1)"
+      "Bash(cd \"C:\\\\Users\\\\prince-asus\\\\Projects\\\\pos-and-inventory\\\\backend\" && rm -rf dist && npm run build 2>&1)",
+      "Bash(find \"C:/Users/prince-asus/Projects/pos-and-inventory/backend/src\" -type f -name \"*.ts\" -exec grep -l \"download\\\\|Download\\\\|export.*CSV\\\\|exportCSV\\\\|toCSV\" {} \\\\; 2>/dev/null | sort)",
+      "Bash(find \"C:/Users/prince-asus/Projects/pos-and-inventory/frontend/src\" -type f -name \"*.ts\" -exec grep -l \"download\\\\|Download\\\\|export.*CSV\\\\|exportCSV\\\\|toCSV\" {} \\\\; 2>/dev/null | sort)",
+      "Bash(grep:*)"
     ]
   }
 }

@@ -236,12 +236,12 @@
   transition: box-shadow var(--transition-normal);
 
   &:hover {
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-card-hover);
   }
 
   &.plan-card--current {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 1px var(--color-primary);
+    box-shadow: 0 0 0 2px var(--color-primary), var(--shadow-card);
   }
 }
 

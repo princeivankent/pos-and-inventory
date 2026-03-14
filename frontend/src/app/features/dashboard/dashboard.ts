@@ -227,6 +227,19 @@ export class DashboardComponent implements OnInit {
   private buildChartData(report: SalesReport | null) {
     const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
+    const gradientPlugin = {
+      id: 'chartAreaGradient',
+      beforeDraw: (chart: any) => {
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return;
+        const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+        gradient.addColorStop(0, 'rgba(99, 102, 241, 0.22)');
+        gradient.addColorStop(1, 'rgba(99, 102, 241, 0.02)');
+        chart.data.datasets[0].backgroundColor = gradient;
+        chart.update('none');
+      },
+    };
+
     if (!report?.daily_breakdown?.length) {
       this.salesChartData = {
         labels: dayLabels,
@@ -235,13 +248,15 @@ export class DashboardComponent implements OnInit {
           data: [0, 0, 0, 0, 0, 0, 0],
           fill: true,
           borderColor: '#6366f1',
-          backgroundColor: 'rgba(99, 102, 241, 0.08)',
+          borderWidth: 2,
+          backgroundColor: 'rgba(99, 102, 241, 0.14)',
           tension: 0.4,
           pointRadius: 4,
           pointBackgroundColor: '#6366f1',
           pointBorderColor: '#ffffff',
           pointBorderWidth: 2,
         }],
+        plugins: [gradientPlugin],
       };
       return;
     }
@@ -259,13 +274,15 @@ export class DashboardComponent implements OnInit {
         data,
         fill: true,
         borderColor: '#6366f1',
-        backgroundColor: 'rgba(99, 102, 241, 0.08)',
+        borderWidth: 2,
+        backgroundColor: 'rgba(99, 102, 241, 0.14)',
         tension: 0.4,
         pointRadius: 4,
         pointBackgroundColor: '#6366f1',
         pointBorderColor: '#ffffff',
         pointBorderWidth: 2,
       }],
+      plugins: [gradientPlugin],
     };
   }
 

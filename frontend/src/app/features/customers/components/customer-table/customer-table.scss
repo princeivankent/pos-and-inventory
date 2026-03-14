@@ -2,7 +2,7 @@
   transition: background-color 0.15s;
 
   &:hover {
-    background: #f9fafb !important;
+    background: var(--bg-secondary) !important;
   }
 }
 
@@ -13,12 +13,12 @@
 
   .name {
     font-weight: 600;
-    color: #111827;
+    color: var(--text-primary);
   }
 
   .email {
     font-size: 0.8rem;
-    color: #6b7280;
+    color: var(--text-secondary);
   }
 }
 

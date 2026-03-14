@@ -195,19 +195,22 @@
   height: 52px;
   border: none;
   border-radius: var(--border-radius);
-  background: var(--color-primary, #3b82f6);
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
   color: white;
   font-size: 1.0625rem;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s;
   letter-spacing: 0.02em;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
   i { font-size: 1.125rem; }
   &:hover {
-    filter: brightness(1.08);
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    box-shadow: 0 6px 18px rgba(99, 102, 241, 0.45);
+    transform: translateY(-1px);
   }
   &:active {
-    transform: scale(0.98);
+    transform: scale(0.98) translateY(0);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
   }
 }

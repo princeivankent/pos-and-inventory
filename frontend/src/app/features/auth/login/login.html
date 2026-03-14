@@ -1,84 +1,140 @@
 <div class="login-page" data-testid="login-page">
-      <div class="login-card">
-        <!-- Brand Identity -->
-        <div class="login-header">
-          <div class="brand-logo">
-            <i class="pi pi-shopping-cart"></i>
+
+  <!-- Left: Brand Panel -->
+  <div class="brand-panel">
+    <div class="deco-circle deco-circle-1"></div>
+    <div class="deco-circle deco-circle-2"></div>
+    <div class="deco-dots"></div>
+
+    <div class="brand-panel-content">
+      <div class="brand-logo-large">
+        <i class="pi pi-shopping-cart"></i>
+      </div>
+      <h1 class="brand-name">Benta</h1>
+      <p class="brand-tagline">Your complete retail business platform for Philippine stores</p>
+
+      <div class="brand-features">
+        <div class="brand-feature">
+          <span class="feature-icon">🛒</span>
+          <div class="feature-text">
+            <strong>Point of Sale</strong>
+            <span>Fast checkout with FIFO inventory deduction</span>
           </div>
-          <h1>Benta</h1>
-          <p>Manage your retail business with ease</p>
         </div>
-
-        <form (ngSubmit)="onLogin()" class="login-form">
-          <!-- Email Field -->
-          <div class="field">
-            <label for="email">Email</label>
-            <input
-              pInputText
-              id="email"
-              type="email"
-              [(ngModel)]="email"
-              name="email"
-              placeholder="Enter your email"
-              class="w-full input-enhanced"
-              data-testid="login-email"
-              required
-              #emailInput="ngModel"
-            />
-            @if (emailInput.invalid && emailInput.touched) {
-              <small class="error-message">Please enter a valid email</small>
-            }
+        <div class="brand-feature">
+          <span class="feature-icon">📦</span>
+          <div class="feature-text">
+            <strong>Inventory Tracking</strong>
+            <span>Batch management with low-stock alerts</span>
           </div>
-
-          <!-- Password Field -->
-          <div class="field">
-            <div class="label-row">
-              <label for="password">Password</label>
-              <span class="forgot-link disabled">Forgot password? (Coming Soon)</span>
-            </div>
-            <p-password
-              id="password"
-              [(ngModel)]="password"
-              name="password"
-              placeholder="Enter your password"
-              [toggleMask]="true"
-              [feedback]="false"
-              styleClass="w-full"
-              inputStyleClass="w-full input-enhanced"
-              inputId="login-password-input"
-              required
-              #passwordInput="ngModel"
-            />
-            @if (passwordInput.invalid && passwordInput.touched) {
-              <small class="error-message">Password is required</small>
-            }
+        </div>
+        <div class="brand-feature">
+          <span class="feature-icon">💰</span>
+          <div class="feature-text">
+            <strong>Utang Management</strong>
+            <span>Customer credit tracking made simple</span>
           </div>
-
-          <!-- Remember Me Checkbox -->
-          <div class="remember-me">
-            <p-checkbox
-              [(ngModel)]="rememberMe"
-              name="rememberMe"
-              [binary]="true"
-              inputId="remember"
-            />
-            <label for="remember" class="remember-label">Remember me</label>
+        </div>
+        <div class="brand-feature">
+          <span class="feature-icon">📊</span>
+          <div class="feature-text">
+            <strong>Business Reports</strong>
+            <span>Sales insights and analytics dashboard</span>
           </div>
-
-          <!-- Submit Button -->
-          <p-button
-            type="submit"
-            label="Sign In"
-            styleClass="w-full btn-signin"
-            data-testid="login-submit"
-            [loading]="loading()"
-            [disabled]="!email || !password"
-          />
-        </form>
-
-        <div class="login-footer">
-          <span>Don't have an account?</span>
-          <a routerLink="/register">Register</a>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Right: Form Panel -->
+  <div class="form-panel">
+    <div class="login-card">
+      <!-- Mobile-only brand mark -->
+      <div class="brand-logo-mobile">
+        <i class="pi pi-shopping-cart"></i>
+      </div>
+
+      <div class="login-header">
+        <h2>Welcome back</h2>
+        <p>Sign in to your Benta account</p>
+      </div>
+
+      <form (ngSubmit)="onLogin()" class="login-form">
+        <!-- Email Field -->
+        <div class="field">
+          <label for="email">Email address</label>
+          <input
+            pInputText
+            id="email"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="you@example.com"
+            class="w-full input-enhanced"
+            data-testid="login-email"
+            required
+            #emailInput="ngModel"
+          />
+          @if (emailInput.invalid && emailInput.touched) {
+            <small class="error-message"><i class="pi pi-exclamation-circle"></i> Please enter a valid email</small>
+          }
+        </div>
+
+        <!-- Password Field -->
+        <div class="field">
+          <div class="label-row">
+            <label for="password">Password</label>
+            <span class="forgot-link disabled">Forgot password? (Coming Soon)</span>
+          </div>
+          <p-password
+            id="password"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="Enter your password"
+            [toggleMask]="true"
+            [feedback]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full input-enhanced"
+            inputId="login-password-input"
+            required
+            #passwordInput="ngModel"
+          />
+          @if (passwordInput.invalid && passwordInput.touched) {
+            <small class="error-message"><i class="pi pi-exclamation-circle"></i> Password is required</small>
+          }
+        </div>
+
+        <!-- Remember Me -->
+        <div class="remember-me">
+          <p-checkbox
+            [(ngModel)]="rememberMe"
+            name="rememberMe"
+            [binary]="true"
+            inputId="remember"
+          />
+          <label for="remember" class="remember-label">Remember me for 30 days</label>
+        </div>
+
+        <!-- Submit -->
+        <p-button
+          type="submit"
+          label="Sign In"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          styleClass="w-full btn-signin"
+          data-testid="login-submit"
+          [loading]="loading()"
+          [disabled]="!email || !password"
+        />
+      </form>
+
+      <div class="login-footer">
+        <span>Don't have an account?</span>
+        <a routerLink="/register">Create account</a>
+      </div>
+    </div>
+
+    <p class="form-panel-footer">© 2026 Benta · All rights reserved</p>
+  </div>
+
+</div>

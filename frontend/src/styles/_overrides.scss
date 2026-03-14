@@ -51,7 +51,7 @@
       font-size: 1.25rem;
       font-weight: 600;
       margin: 0;
-      color: #111827;
+      color: var(--text-primary);
     }
 
     p {
@@ -59,7 +59,7 @@
       margin: 0;
       font-size: 0.875rem;
       line-height: 1.5;
-      color: #6b7280;
+      color: var(--text-secondary);
     }
   }
 }
@@ -79,8 +79,8 @@
 // Dialogs
 .p-dialog {
   border-radius: var(--border-radius-lg);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.06), 0 20px 60px -10px rgba(99, 102, 241, 0.18), 0 8px 20px rgba(0, 0, 0, 0.08);
 
   .p-dialog-header {
     border-bottom: 1px solid var(--border-color);

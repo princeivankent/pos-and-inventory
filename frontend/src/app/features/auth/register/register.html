@@ -1,76 +1,171 @@
-<div class="register-page">
-      <div class="register-card">
-        <div class="register-header">
-          <h1>Create Account</h1>
-          <p>Set up your store in minutes</p>
+<div class="register-page" data-testid="register-page">
+
+  <!-- Left: Brand Panel -->
+  <div class="brand-panel">
+    <div class="deco-circle deco-circle-1"></div>
+    <div class="deco-circle deco-circle-2"></div>
+    <div class="deco-dots"></div>
+
+    <div class="brand-panel-content">
+      <div class="brand-logo-large">
+        <i class="pi pi-shopping-cart"></i>
+      </div>
+      <h1 class="brand-name">Benta</h1>
+      <p class="brand-tagline">Start your 30-day free trial — no credit card required.</p>
+
+      <div class="brand-features">
+        <div class="brand-feature">
+          <span class="feature-icon">🚀</span>
+          <div class="feature-text">
+            <strong>Up and running in minutes</strong>
+            <span>Add your products and start selling right away</span>
+          </div>
         </div>
-
-        <form (ngSubmit)="onRegister()" class="register-form">
-          <div class="field">
-            <label for="fullName">Full Name</label>
-            <input
-              pInputText
-              id="fullName"
-              [(ngModel)]="fullName"
-              name="fullName"
-              placeholder="Your full name"
-              class="w-full"
-              required
-            />
+        <div class="brand-feature">
+          <span class="feature-icon">🛒</span>
+          <div class="feature-text">
+            <strong>Full POS & Inventory</strong>
+            <span>FIFO tracking, batches, and stock alerts included</span>
           </div>
-
-          <div class="field">
-            <label for="storeName">Store Name</label>
-            <input
-              pInputText
-              id="storeName"
-              [(ngModel)]="storeName"
-              name="storeName"
-              placeholder="Your store name"
-              class="w-full"
-              required
-            />
+        </div>
+        <div class="brand-feature">
+          <span class="feature-icon">💰</span>
+          <div class="feature-text">
+            <strong>Utang & Credit Management</strong>
+            <span>Track customer balances and record payments</span>
           </div>
-
-          <div class="field">
-            <label for="email">Email</label>
-            <input
-              pInputText
-              id="email"
-              type="email"
-              [(ngModel)]="email"
-              name="email"
-              placeholder="your@email.com"
-              class="w-full"
-              required
-            />
+        </div>
+        <div class="brand-feature">
+          <span class="feature-icon">📊</span>
+          <div class="feature-text">
+            <strong>Sales Reports & Analytics</strong>
+            <span>Insights to help grow your business</span>
           </div>
-
-          <div class="field">
-            <label for="password">Password</label>
-            <p-password
-              id="password"
-              [(ngModel)]="password"
-              name="password"
-              placeholder="Minimum 6 characters"
-              [toggleMask]="true"
-              styleClass="w-full"
-              inputStyleClass="w-full"
-            />
-          </div>
-
-          <p-button
-            type="submit"
-            label="Create Account"
-            styleClass="w-full"
-            [loading]="loading()"
-            [disabled]="!fullName || !storeName || !email || !password"
-          />
-        </form>
-
-        <div class="register-footer">
-          <span>Already have an account?</span>
-          <a routerLink="/login">Sign in</a>
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Right: Form Panel -->
+  <div class="form-panel">
+    <div class="register-card">
+      <!-- Mobile-only brand mark -->
+      <div class="brand-logo-mobile">
+        <i class="pi pi-shopping-cart"></i>
+      </div>
+
+      <div class="register-header">
+        <h2>Create your account</h2>
+        <p>Set up your store and start your free trial</p>
+      </div>
+
+      <form (ngSubmit)="onRegister()" class="register-form">
+
+        <!-- Full Name -->
+        <div class="field">
+          <label for="fullName">Full Name</label>
+          <input
+            pInputText
+            id="fullName"
+            [(ngModel)]="fullName"
+            name="fullName"
+            placeholder="Your full name"
+            class="w-full input-enhanced"
+            data-testid="register-fullname"
+            required
+            #fullNameInput="ngModel"
+          />
+          @if (fullNameInput.invalid && fullNameInput.touched) {
+            <small class="error-message"><i class="pi pi-exclamation-circle"></i> Full name is required</small>
+          }
+        </div>
+
+        <!-- Store Name -->
+        <div class="field">
+          <label for="storeName">Store Name</label>
+          <input
+            pInputText
+            id="storeName"
+            [(ngModel)]="storeName"
+            name="storeName"
+            placeholder="Your store name"
+            class="w-full input-enhanced"
+            data-testid="register-storename"
+            required
+            #storeNameInput="ngModel"
+          />
+          @if (storeNameInput.invalid && storeNameInput.touched) {
+            <small class="error-message"><i class="pi pi-exclamation-circle"></i> Store name is required</small>
+          }
+        </div>
+
+        <!-- Email -->
+        <div class="field">
+          <label for="email">Email address</label>
+          <input
+            pInputText
+            id="email"
+            type="email"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="you@example.com"
+            class="w-full input-enhanced"
+            data-testid="register-email"
+            required
+            #emailInput="ngModel"
+          />
+          @if (emailInput.invalid && emailInput.touched) {
+            <small class="error-message"><i class="pi pi-exclamation-circle"></i> Please enter a valid email</small>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="field">
+          <label for="password">Password</label>
+          <p-password
+            id="password"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="Minimum 6 characters"
+            [toggleMask]="true"
+            [feedback]="false"
+            styleClass="w-full"
+            inputStyleClass="w-full input-enhanced"
+            inputId="register-password-input"
+            required
+            #passwordInput="ngModel"
+          />
+          @if (passwordInput.invalid && passwordInput.touched) {
+            <small class="error-message"><i class="pi pi-exclamation-circle"></i> Password is required</small>
+          }
+        </div>
+
+        <!-- Submit -->
+        <p-button
+          type="submit"
+          label="Create Account"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          styleClass="w-full btn-register"
+          data-testid="register-submit"
+          [loading]="loading()"
+          [disabled]="!fullName || !storeName || !email || !password"
+        />
+
+        <p class="terms-note">
+          By creating an account you agree to our
+          <span class="terms-link">Terms of Service</span> and
+          <span class="terms-link">Privacy Policy</span>.
+        </p>
+      </form>
+
+      <div class="register-footer">
+        <span>Already have an account?</span>
+        <a routerLink="/login">Sign in</a>
+      </div>
+    </div>
+
+    <p class="form-panel-footer">© 2026 Benta · All rights reserved</p>
+  </div>
+
+</div>
