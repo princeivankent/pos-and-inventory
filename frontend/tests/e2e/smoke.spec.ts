@@ -85,7 +85,7 @@ test.describe('Playwright smoke suite', () => {
     await page.locator('#customer-search-input').fill(customer.name);
     await page.getByText(customer.name, { exact: true }).click();
     await page.getByTestId('charge-button').click();
-    await page.getByRole('button', { name: 'Credit' }).click();
+    await page.getByTestId('payment-method-credit').click();
     await page.getByRole('button', { name: 'Complete Sale' }).click();
     await closeReceipt(page);
 
@@ -94,7 +94,7 @@ test.describe('Playwright smoke suite', () => {
     await page.locator('#customer-search-input').fill(customer.name);
     await page.getByText(customer.name, { exact: true }).click();
     await page.getByTestId('charge-button').click();
-    await page.getByRole('button', { name: 'Partial' }).click();
+    await page.getByTestId('payment-method-partial').click();
     await page.locator('#partial-cash-amount-input').fill('50');
     await page.getByRole('button', { name: 'Complete Sale' }).click();
     await closeReceipt(page);
@@ -130,7 +130,8 @@ test.describe('Playwright smoke suite', () => {
 
     const secondStoreName = `Branch ${uniqueSuffix('store')}`;
     await createStore(request, session, secondStoreName);
-    await page.locator('[data-testid="logout-button"] button').click();
+    await page.getByTestId('user-menu-btn').click();
+    await page.getByTestId('logout-button').click();
     await loginViaUi(page, session);
 
     await page.goto('/products');
