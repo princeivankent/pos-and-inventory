@@ -127,30 +127,33 @@ export class ReportsService {
     totalCost: number;
     fallbackRows: number;
   }> {
-    const result = await this.saleItemRepository
+    // Revenue query on the Sale table (one row per sale) to avoid JOIN multiplication.
+    // Using total_amount - tax_amount (pre-VAT): VAT collected belongs to BIR, not
+    // store income. Both Today's Sales card and Profit→Revenue use this same figure.
+    const revenueResult = await this.saleRepository
+      .createQueryBuilder('s')
+      .select('SUM(s.total_amount - s.tax_amount)', 'total_revenue')
+      .where('s.store_id = :storeId', { storeId })
+      .andWhere('s.sale_date BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .andWhere('s.status = :status', { status: SaleStatus.COMPLETED })
+      .getRawOne();
+
+    // Cost query on SaleItem to leverage FIFO snapshots and batch-level costing.
+    const costResult = await this.saleItemRepository
       .createQueryBuilder('si')
-      .select('SUM(si.subtotal)', 'total_revenue')
-      .addSelect(
-        `
-          SUM(
-            CASE
+      .select(
+        `SUM(CASE
               WHEN si.cogs_subtotal IS NOT NULL THEN si.cogs_subtotal
               WHEN b.unit_cost IS NOT NULL THEN si.quantity * b.unit_cost
               ELSE si.quantity * p.cost_price
-            END
-          )
-        `,
+            END)`,
         'total_cost',
       )
       .addSelect(
-        `
-          SUM(
-            CASE
-              WHEN si.cogs_subtotal IS NULL THEN 1
-              ELSE 0
-            END
-          )
-        `,
+        `SUM(CASE WHEN si.cogs_subtotal IS NULL THEN 1 ELSE 0 END)`,
         'fallback_rows',
       )
       .innerJoin('si.sale', 's')
@@ -165,9 +168,9 @@ export class ReportsService {
       .getRawOne();
 
     return {
-      totalRevenue: Number(result?.total_revenue || 0),
-      totalCost: Number(result?.total_cost || 0),
-      fallbackRows: Number(result?.fallback_rows || 0),
+      totalRevenue: Number(revenueResult?.total_revenue || 0),
+      totalCost: Number(costResult?.total_cost || 0),
+      fallbackRows: Number(costResult?.fallback_rows || 0),
     };
   }
 

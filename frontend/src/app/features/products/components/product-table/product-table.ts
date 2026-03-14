@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 import { Product } from '../../../../core/models/product.model';
 import { PhpCurrencyPipe } from '../../../../shared/pipes/php-currency.pipe';
 import { StatusBadge } from '../../../../shared/components/status-badge/status-badge';
@@ -9,7 +10,7 @@ import { StoreContextService } from '../../../../core/services/store-context.ser
 @Component({
   selector: 'app-product-table',
   standalone: true,
-  imports: [TableModule, ButtonModule, PhpCurrencyPipe, StatusBadge],
+  imports: [TableModule, ButtonModule, TooltipModule, PhpCurrencyPipe, StatusBadge],
   templateUrl: './product-table.html',
   styleUrls: ['./product-table.scss'],
 })
@@ -58,5 +59,19 @@ export class ProductTableComponent {
     if (margin < 10) return 'margin-low';
     if (margin < 30) return 'margin-medium';
     return 'margin-good';
+  }
+
+  hasFifoCostLoss(product: Product): boolean {
+    return (
+      product.next_fifo_unit_cost != null &&
+      product.next_fifo_unit_cost > product.retail_price
+    );
+  }
+
+  getFifoCostWarningTooltip(product: Product): string {
+    if (!this.hasFifoCostLoss(product)) return '';
+    const cost = product.next_fifo_unit_cost!;
+    const loss = cost - product.retail_price;
+    return `Next FIFO batch cost: ₱${cost.toFixed(2)} — selling at a loss of ₱${loss.toFixed(2)}/unit`;
   }
 }

@@ -72,6 +72,17 @@
   }
 }
 
+.fifo-loss-badge {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
+  cursor: default;
+  white-space: nowrap;
+}
+
 .font-medium {
   font-weight: 500;
 }
