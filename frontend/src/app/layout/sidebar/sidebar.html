@@ -1,23 +1,27 @@
-<aside class="sidebar" data-testid="sidebar">
-      <div class="sidebar-brand">
-        <span class="brand-icon">
-          <i class="pi pi-shopping-cart"></i>
-        </span>
-        <span class="brand-text">Benta</span>
-      </div>
+<aside class="sidebar" [class.open]="open" data-testid="sidebar">
+  <div class="sidebar-brand">
+    <span class="brand-icon">
+      <i class="pi pi-shopping-cart"></i>
+    </span>
+    <span class="brand-text">Benta</span>
+    <button class="sidebar-close-btn" (click)="closed.emit()" aria-label="Close menu">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
 
-      <nav class="sidebar-nav">
-        @for (item of visibleItems; track item.route) {
-          <a
-            [routerLink]="item.route"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
-            class="nav-item"
-            [attr.data-testid]="'nav-' + item.route.replace('/', '')"
-          >
-            <i [class]="'pi ' + item.icon"></i>
-            <span>{{ item.label }}</span>
-          </a>
-        }
-      </nav>
-    </aside>
+  <nav class="sidebar-nav">
+    @for (item of visibleItems; track item.route) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }"
+        class="nav-item"
+        [attr.data-testid]="'nav-' + item.route.replace('/', '')"
+        (click)="onNavClick()"
+      >
+        <i [class]="'pi ' + item.icon"></i>
+        <span>{{ item.label }}</span>
+      </a>
+    }
+  </nav>
+</aside>

@@ -103,3 +103,48 @@
     border-radius: var(--border-radius);
   }
 }
+
+// ── Mobile overrides ────────────────────────────────────────
+
+@media (max-width: 768px) {
+  // Dialogs go full-width on mobile
+  .p-dialog {
+    max-width: 95vw !important;
+    width: 95vw !important;
+    margin: 0.5rem !important;
+
+    .p-dialog-header {
+      padding: var(--space-4);
+    }
+
+    .p-dialog-content {
+      padding: var(--space-4);
+    }
+
+    .p-dialog-footer {
+      padding: var(--space-3) var(--space-4);
+    }
+  }
+
+  // Tables scroll horizontally on mobile
+  .p-datatable-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .p-datatable {
+    min-width: 500px;
+  }
+
+  // Toast position and width on mobile
+  .p-toast {
+    width: calc(100vw - 1.5rem) !important;
+    left: 0.75rem !important;
+    right: 0.75rem !important;
+  }
+
+  // Buttons: ensure minimum touch target
+  .p-button {
+    min-height: 44px;
+  }
+}

@@ -84,3 +84,19 @@
     max-height: 50vh;
   }
 }
+
+@media (max-width: 768px) {
+  .pos-toolbar {
+    flex-wrap: wrap;
+
+    app-product-search {
+      order: -1;
+      width: 100%;
+      flex: 1 1 100%;
+    }
+  }
+
+  .pos-grid-area {
+    max-height: 40vh;
+  }
+}
