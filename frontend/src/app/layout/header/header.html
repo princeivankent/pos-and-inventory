@@ -1,30 +1,58 @@
 <header class="app-header" data-testid="app-header">
-      <div class="header-left">
-        <p-select
-          [options]="stores()"
-          [(ngModel)]="selectedStoreId"
-          optionLabel="name"
-          optionValue="id"
-          placeholder="Select store"
-          (onChange)="onStoreChange($event.value)"
-          styleClass="store-select"
-          inputId="store-switcher-input"
-          data-testid="store-switcher"
-          appendTo="body"
-        />
-      </div>
+  <div class="header-left">
+    <p-select
+      [options]="stores()"
+      [(ngModel)]="selectedStoreId"
+      optionLabel="name"
+      optionValue="id"
+      placeholder="Select store"
+      (onChange)="onStoreChange($event.value)"
+      styleClass="store-select"
+      inputId="store-switcher-input"
+      data-testid="store-switcher"
+      appendTo="body"
+    />
+  </div>
 
-      <div class="header-right">
-        <a [routerLink]="'/profile'" class="user-name-link" pTooltip="My profile" tooltipPosition="bottom">
-          {{ auth.currentUser()?.full_name }}
-        </a>
-        <p-button
-          icon="pi pi-sign-out"
-          [text]="true"
-          severity="secondary"
-          data-testid="logout-button"
-          (onClick)="onLogout()"
-          pTooltip="Sign out"
-        />
-      </div>
-    </header>
+  <div class="header-right">
+    <div class="user-menu-wrapper" (click)="$event.stopPropagation()">
+      <button
+        class="user-menu-trigger"
+        (click)="toggleMenu($event)"
+        data-testid="user-menu-btn"
+        aria-haspopup="true"
+        [attr.aria-expanded]="menuOpen"
+      >
+        <span class="user-avatar">{{ userInitials }}</span>
+        <span class="user-display-name">{{ auth.currentUser()?.full_name }}</span>
+        <i class="pi pi-chevron-down user-chevron" [class.rotated]="menuOpen"></i>
+      </button>
+
+      @if (menuOpen) {
+        <div class="user-dropdown-panel" role="menu">
+          <a routerLink="/profile" class="dropdown-item" (click)="closeMenu()">
+            <i class="pi pi-user"></i>
+            <span>My Profile</span>
+          </a>
+          @if (isAdmin) {
+            <a routerLink="/billing" class="dropdown-item" (click)="closeMenu()">
+              <i class="pi pi-credit-card"></i>
+              <span>Billing</span>
+            </a>
+          }
+          @if (isPlatformAdmin) {
+            <a routerLink="/platform/subscriptions" class="dropdown-item" (click)="closeMenu()">
+              <i class="pi pi-building-columns"></i>
+              <span>Platform Billing</span>
+            </a>
+          }
+          <div class="dropdown-separator"></div>
+          <button class="dropdown-item danger" (click)="onLogout()" data-testid="logout-button">
+            <i class="pi pi-sign-out"></i>
+            <span>Sign Out</span>
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</header>
