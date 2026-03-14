@@ -130,10 +130,21 @@
   .p-datatable-wrapper {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    // Subtle shadow on right edge to hint at horizontal scroll
+    background:
+      linear-gradient(to right, white 30%, rgba(255,255,255,0)),
+      linear-gradient(to right, rgba(255,255,255,0), white 70%) 0 100%,
+      radial-gradient(farthest-side at 0% 50%, rgba(0,0,0,.08), transparent),
+      radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.08), transparent) 0 100%;
+    background-repeat: no-repeat;
+    background-color: white;
+    background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+    background-position: 0 0, 100%, 0 0, 100%;
+    background-attachment: local, local, scroll, scroll;
   }
 
   .p-datatable {
-    min-width: 500px;
+    min-width: 480px;
   }
 
   // Toast position and width on mobile
@@ -146,5 +157,31 @@
   // Buttons: ensure minimum touch target
   .p-button {
     min-height: 44px;
+  }
+
+  // Input fields: full height for easy tapping
+  .p-inputtext,
+  .p-select .p-select-label {
+    font-size: 16px; // Prevent iOS auto-zoom
+  }
+
+  // Dropdown panels: proper sizing on mobile
+  .p-select-overlay,
+  .p-autocomplete-overlay {
+    max-height: 50vh;
+  }
+}
+
+@media (max-width: 480px) {
+  .p-dialog {
+    max-width: 100vw !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0 !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    top: auto !important;
+    max-height: 90vh;
+    overflow-y: auto;
   }
 }
