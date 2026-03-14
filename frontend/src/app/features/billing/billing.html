@@ -9,27 +9,28 @@
       <p-skeleton height="1rem" width="10rem" />
     </div>
   } @else if (subscription()) {
-    <div class="card status-card" data-testid="billing-status-card">
-      <div class="status-left">
-        <div class="plan-name">{{ subscription()!.plan_name }}</div>
-        <span class="status-badge {{ getStatusBadgeClass(subscription()!.status) }}">
-          {{ getStatusLabel(subscription()!.status) }}
-        </span>
+    <div class="card status-card plan-hero {{ getPlanHeroClass() }}" data-testid="billing-status-card">
+      <div class="plan-hero-content">
+        <div class="plan-hero-icon-wrap">
+          <i class="pi {{ getPlanIcon() }}"></i>
+        </div>
+        <div class="plan-hero-info">
+          <div class="plan-hero-name">{{ subscription()!.plan_name }}</div>
+          <span class="plan-hero-status {{ getStatusBadgeClass(subscription()!.status) }}">
+            {{ getStatusLabel(subscription()!.status) }}
+          </span>
+        </div>
       </div>
-      <div class="status-right">
+      <div class="plan-hero-renewal">
         @if (isTrialing()) {
-          <div class="expiry-info">
-            <span class="expiry-label">Trial ends in</span>
-            <span class="expiry-value" [class.expiry-urgent]="getDaysRemaining() <= 3">
-              {{ getDaysRemaining() }} day{{ getDaysRemaining() !== 1 ? 's' : '' }}
-            </span>
-            <span class="expiry-date">{{ formatExpiryDate() }}</span>
-          </div>
+          <span class="plan-hero-renewal-label">Trial ends in</span>
+          <span class="plan-hero-renewal-date" [class.renewal-urgent]="getDaysRemaining() <= 3">
+            {{ getDaysRemaining() }} day{{ getDaysRemaining() !== 1 ? 's' : '' }}
+          </span>
+          <span class="plan-hero-renewal-sub">{{ formatExpiryDate() }}</span>
         } @else {
-          <div class="expiry-info">
-            <span class="expiry-label">Next renewal</span>
-            <span class="expiry-value">{{ formatExpiryDate() }}</span>
-          </div>
+          <span class="plan-hero-renewal-label">Next renewal</span>
+          <span class="plan-hero-renewal-date">{{ formatExpiryDate() }}</span>
         }
       </div>
     </div>

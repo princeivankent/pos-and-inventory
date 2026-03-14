@@ -158,6 +158,20 @@ export class BillingComponent implements OnInit, OnDestroy {
     return map[status] ?? 'status-secondary';
   }
 
+  getPlanHeroClass(): string {
+    const code = this.subscription()?.plan_code;
+    if (code === 'kadena') return 'plan-hero--kadena';
+    if (code === 'negosyo') return 'plan-hero--negosyo';
+    return 'plan-hero--tindahan';
+  }
+
+  getPlanIcon(): string {
+    const code = this.subscription()?.plan_code;
+    if (code === 'kadena') return 'pi-crown';
+    if (code === 'negosyo') return 'pi-briefcase';
+    return 'pi-shop';
+  }
+
   getStatusLabel(status: string): string {
     const map: Record<string, string> = {
       trial: 'Trial',
