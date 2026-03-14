@@ -15,7 +15,9 @@
       </div>
 
       <div class="header-right">
-        <span class="user-name">{{ auth.currentUser()?.full_name }}</span>
+        <a [routerLink]="'/profile'" class="user-name-link" pTooltip="My profile" tooltipPosition="bottom">
+          {{ auth.currentUser()?.full_name }}
+        </a>
         <p-button
           icon="pi pi-sign-out"
           [text]="true"

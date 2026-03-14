@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,6 +18,10 @@ import { SubscriptionPlan } from '../database/entities/subscription-plan.entity'
 import { Subscription, SubscriptionStatus } from '../database/entities/subscription.entity';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { ALL_PERMISSIONS } from '../common/permissions/permission.enum';
 
 @Injectable()
@@ -269,6 +274,114 @@ export class AuthService {
           ? ALL_PERMISSIONS
           : (us.permissions ?? []),
     }));
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.userRepository.findOne({ where: { email: dto.email } });
+
+    // Always return success to prevent email enumeration
+    if (!user) {
+      return { message: 'If that email exists, a reset link has been sent.' };
+    }
+
+    const token = crypto.randomUUID();
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    user.password_reset_token = token;
+    user.password_reset_expires_at = expiresAt;
+    await this.userRepository.save(user);
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
+    const resetLink = `${frontendUrl}/reset-password?token=${token}`;
+
+    return {
+      message: 'If that email exists, a reset link has been sent.',
+      // Returned so frontend can send email via EmailJS
+      reset_token: token,
+      reset_link: resetLink,
+      user_name: user.full_name,
+      user_email: user.email,
+    };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const userWithToken = await this.userRepository.findOne({
+      where: { password_reset_token: dto.token },
+    });
+
+    if (!userWithToken || !userWithToken.password_reset_expires_at) {
+      throw new BadRequestException('Invalid or expired reset link');
+    }
+
+    if (userWithToken.password_reset_expires_at < new Date()) {
+      throw new BadRequestException('Invalid or expired reset link');
+    }
+
+    // Update password in Supabase
+    const supabase = this.supabaseService.getAdminClient();
+    const { error } = await supabase.auth.admin.updateUserById(userWithToken.id, {
+      password: dto.new_password,
+    });
+
+    if (error) {
+      throw new BadRequestException('Failed to update password: ' + error.message);
+    }
+
+    // Clear reset token
+    userWithToken.password_reset_token = null;
+    userWithToken.password_reset_expires_at = null;
+    await this.userRepository.save(userWithToken);
+
+    return { message: 'Password updated successfully' };
+  }
+
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.full_name = dto.full_name;
+    await this.userRepository.save(user);
+
+    return {
+      id: user.id,
+      email: user.email,
+      full_name: user.full_name,
+      is_platform_admin: user.is_platform_admin,
+    };
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Verify current password via Supabase sign-in
+    const supabase = this.supabaseService.getClient();
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: dto.current_password,
+    });
+
+    if (verifyError) {
+      throw new BadRequestException('Current password is incorrect');
+    }
+
+    // Update password in Supabase
+    const adminClient = this.supabaseService.getAdminClient();
+    const { error: updateError } = await adminClient.auth.admin.updateUserById(userId, {
+      password: dto.new_password,
+    });
+
+    if (updateError) {
+      throw new BadRequestException('Failed to update password: ' + updateError.message);
+    }
+
+    return { message: 'Password changed successfully' };
   }
 
   private async createTrialForOrganization(organizationId: string) {

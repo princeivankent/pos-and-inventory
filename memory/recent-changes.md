@@ -1,5 +1,17 @@
 # Recent Changes
 
+## 2026-03-15 (user-profile-forgot-password)
+
+- **Forgot password flow** — `POST /auth/forgot-password` generates UUID token (1-hr expiry) stored on `users` table, returns reset link; frontend sends email via EmailJS (`@emailjs/browser`)
+- **Reset password page** (`/reset-password?token=xxx`) — validates token server-side, updates Supabase password via admin API, clears token after use
+- **Profile page** (`/profile`) — two-card layout: Personal Info (avatar initials, full_name edit, read-only email) + Change Password (current + new + confirm with Supabase verification)
+- **Header** — user name now a `[routerLink]="/profile"` clickable link
+- **Login page** — "Forgot password?" link activated (was "Coming Soon" disabled span)
+- **Migration**: `1709000000000-AddPasswordResetToken.ts` — adds `password_reset_token` and `password_reset_expires_at` to `users`
+- **EmailJS**: `service_u7kzvmf` / `template_k1oj5b1` configured in both environment files; template vars: `{{to_name}}`, `{{to_email}}`, `{{reset_link}}`
+- `AuthService` (frontend) — 4 new methods: `forgotPassword`, `resetPassword`, `updateProfile`, `changePassword`
+- `AuthService` (backend) — 4 new methods + `NotFoundException` import + 4 new DTOs
+
 ## 2026-03-14 (subscription-plan-refinement)
 
 - Refined subscription plans: pricing, feature allocation, trial strategy, annual billing, supplier gating

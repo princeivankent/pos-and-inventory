@@ -14,4 +14,10 @@ export class User extends BaseEntity {
 
   @Column({ type: 'boolean', default: false })
   is_platform_admin: boolean;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  password_reset_token: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  password_reset_expires_at: Date | null;
 }

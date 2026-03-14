@@ -14,6 +14,7 @@ A multi-tenant POS & Inventory Management System for Philippine retail stores wi
 - ✅ **Subscription System (Frontend) Complete**: Feature gating, adaptive UI, upgrade prompts (Feb 15, 2026)
 - ✅ **Supplier Management Complete**: Full CRUD, inventory batch linking, frontend pages (Feb 25, 2026)
 - ✅ **Production Hardening Complete**: Env validation, platform admin APIs, payment-intent flow, webhook idempotency (Mar 2, 2026)
+- ✅ **User Profile + Forgot Password Complete**: Profile page (name edit, change password), forgot/reset password flow with EmailJS delivery (Mar 15, 2026)
 - 🚧 Phase 10 In Progress: Testing & Deployment preparation
 
 ## Operational Memory
@@ -313,7 +314,8 @@ Reverse the sale transaction:
 
 **Frontend Source**: `frontend/src/`
 - **App**: `app/` (standalone components, Angular 21)
-- **Features**: `app/features/` (auth, pos, products, inventory, sales, customers, reports, dashboard, settings, suppliers)
+- **Features**: `app/features/` (auth, pos, products, inventory, sales, customers, reports, dashboard, settings, suppliers, profile)
+  - Auth sub-pages: `auth/forgot-password/`, `auth/reset-password/`
 - **Core**: `app/core/` (services, guards, interceptors)
 - **Shared**: `app/shared/` (components, directives, pipes)
 - **Assets**: `assets/` (images, styles, i18n)
@@ -412,6 +414,14 @@ feature-name/
 - ✅ Payment-intent upgrade flow (`POST /api/payments/intents` + `payment_id` verification in upgrade)
 - ✅ Webhook event idempotency guard (dedupe via processed event IDs)
 
+**Completed - User Profile + Forgot Password (Mar 15, 2026)**:
+- ✅ User entity: `password_reset_token` + `password_reset_expires_at` columns; migration `1709000000000-AddPasswordResetToken.ts`
+- ✅ Backend: `POST /auth/forgot-password` (public), `POST /auth/reset-password` (public), `PATCH /auth/profile` (JWT), `POST /auth/change-password` (JWT)
+- ✅ EmailJS (`@emailjs/browser`) for password reset emails; credentials in `environment.ts`; template vars: `{{to_name}}`, `{{to_email}}`, `{{reset_link}}`
+- ✅ Frontend pages: `/forgot-password`, `/reset-password?token=xxx`, `/profile`
+- ✅ Profile page: avatar initials, full_name edit, read-only email, change password with current-password verification
+- ✅ Header user name links to `/profile`; login "Forgot password?" link activated
+
 **Frontend Subscription Pattern**:
 ```typescript
 // 1. Component setup
@@ -447,7 +457,7 @@ if (this.subscriptionService.hasFeature('reports')) {
 - Low-stock alert cron job + dashboard notifications
 - Data seeding & onboarding flow (sample categories, first-run wizard)
 - Additional frontend feature tests where launch risk justifies them (billing, sales, or other uncovered critical paths)
-- Email notifications (trial ending, payment receipts, renewal confirmations)
+- Email notifications (trial ending, payment receipts, renewal confirmations) — **password reset email done via EmailJS**; billing lifecycle emails still pending
 - PayMongo live key configuration (`PAYMONGO_SECRET_KEY` + `BYPASS_PAYMENT=false`)
 
 **UI/UX Modernization Standards**:

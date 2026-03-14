@@ -1,6 +1,6 @@
 # Project Memory Index
 
-Last updated: 2026-03-14 (subscription plan refinement)
+Last updated: 2026-03-15 (user profile + forgot password)
 
 ## Overall State
 
@@ -29,7 +29,7 @@ Last updated: 2026-03-14 (subscription plan refinement)
 
 | Area | Status | Confidence | Last Updated | Next Action |
 |------|--------|------------|--------------|-------------|
-| [Auth](./features/auth.md) | `done` | `verified` | 2026-03-07 | Keep stable |
+| [Auth](./features/auth.md) | `done` | `verified` | 2026-03-15 | Keep stable |
 | [Frontend Shell](./features/frontend-shell.md) | `done` | `verified` | 2026-03-07 | Trim bundle size and keep guards/interceptors aligned |
 | [Products](./features/products.md) | `done` | `verified` | 2026-03-07 | Keep stable |
 | [Inventory](./features/inventory.md) | `done` | `verified` | 2026-03-07 | Add low-stock automation |
@@ -51,6 +51,7 @@ Last updated: 2026-03-14 (subscription plan refinement)
 
 ## Recently Completed Milestones
 
+- **User profile + forgot password** (Mar 15, 2026): Forgot password flow (EmailJS delivery, 1-hr token), reset password page, profile page (name edit + change password), header user-name links to `/profile`. Migration: `1709000000000-AddPasswordResetToken.ts` — **run `npm run migration:run` before deploying**
 - **Subscription plan refinement** (Mar 14, 2026): pricing corrected (₱599/₱1,499/₱2,999), 30-day Negosyo trial, annual billing, utang ungated to Tindahan, suppliers gated to Negosyo+. Migration: `1708000000000-UpdateSubscriptionPlans.ts` — **run `npm run migration:run` before deploying**
 - **Production deployment live** (Mar 13, 2026): Railway (backend) + Vercel (frontend) + CD via native GitHub integrations + branch protection on main + PayMongo test keys wired
 - Added production hardening for frontend environment replacement, auth token log removal, and raw-body webhook verification
