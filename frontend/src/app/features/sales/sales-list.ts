@@ -12,6 +12,8 @@ import { environment } from '../../../environments/environment';
 import { Sale } from '../../core/models/sale.model';
 import { ToastService } from '../../core/services/toast.service';
 import { StoreContextService } from '../../core/services/store-context.service';
+import { SubscriptionService } from '../../core/services/subscription.service';
+import { CsvExportService } from '../../core/services/csv-export.service';
 import { PageHeader } from '../../shared/components/page-header/page-header';
 import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
@@ -31,6 +33,10 @@ export class SalesListComponent implements OnInit {
   private toast = inject(ToastService);
   private confirmService = inject(ConfirmationService);
   storeCtx = inject(StoreContextService);
+  private subscriptionService = inject(SubscriptionService);
+  private csvExport = inject(CsvExportService);
+
+  canExport = this.subscriptionService.hasFeatureSignal('export_data');
 
   sales = signal<Sale[]>([]);
   selectedSale = signal<Sale | null>(null);
@@ -62,6 +68,19 @@ export class SalesListComponent implements OnInit {
         this.detailVisible = true;
       },
     });
+  }
+
+  exportCsv() {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    this.csvExport.export(this.sales(), [
+      { field: 'sale_number', header: 'Sale #' },
+      { field: 'sale_date', header: 'Date' },
+      { field: 'cashier.full_name', header: 'Cashier' },
+      { field: 'total_amount', header: 'Total (₱)' },
+      { field: 'payment_method', header: 'Payment Method' },
+      { field: 'status', header: 'Status' },
+    ], `sales-${dateStr}.csv`);
   }
 
   confirmVoid(sale: Sale) {

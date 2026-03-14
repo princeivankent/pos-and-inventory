@@ -15,6 +15,10 @@
     />
   </p-buttonGroup>
 
+  @if (canExport()) {
+    <p-button label="Export CSV" icon="pi pi-download" [outlined]="true" severity="secondary" (onClick)="exportCsv()" />
+  }
+
   @if (storeCtx.isAdmin()) {
     <p-button label="Add Product" icon="pi pi-plus" data-testid="add-product-button" (onClick)="openNew()" />
   }

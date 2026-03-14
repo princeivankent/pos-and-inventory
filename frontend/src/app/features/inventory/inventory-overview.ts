@@ -16,6 +16,8 @@ import { Supplier } from '../../core/models/supplier.model';
 import { SupplierService } from '../../core/services/supplier.service';
 import { ToastService } from '../../core/services/toast.service';
 import { StoreContextService } from '../../core/services/store-context.service';
+import { SubscriptionService } from '../../core/services/subscription.service';
+import { CsvExportService } from '../../core/services/csv-export.service';
 import { PageHeader } from '../../shared/components/page-header/page-header';
 import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
 import { StatusBadge } from '../../shared/components/status-badge/status-badge';
@@ -36,6 +38,10 @@ export class InventoryOverviewComponent implements OnInit {
   private supplierService = inject(SupplierService);
   private toast = inject(ToastService);
   storeCtx = inject(StoreContextService);
+  private subscriptionService = inject(SubscriptionService);
+  private csvExport = inject(CsvExportService);
+
+  canExport = this.subscriptionService.hasFeatureSignal('export_data');
 
   products = signal<Product[]>([]);
   searchQuery = signal('');
@@ -74,6 +80,19 @@ export class InventoryOverviewComponent implements OnInit {
       next: (p) => { this.products.set(p); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
+  }
+
+  exportCsv() {
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    this.csvExport.export(this.filteredProducts(), [
+      { field: 'name', header: 'Product' },
+      { field: 'sku', header: 'SKU' },
+      { field: 'current_stock', header: 'Stock' },
+      { field: 'unit', header: 'Unit' },
+      { field: 'cost_price', header: 'Cost Price' },
+      { field: 'retail_price', header: 'Retail Price' },
+    ], `inventory-overview-${dateStr}.csv`);
   }
 
   openStockIn(product?: Product) {

@@ -1,4 +1,7 @@
 <app-page-header title="Stock Movements" subtitle="Full history of inventory changes">
+  @if (canExport()) {
+    <p-button label="Export CSV" icon="pi pi-download" [outlined]="true" severity="secondary" (onClick)="exportCsv()" />
+  }
   <a routerLink="/inventory">
     <p-button label="Back to Inventory" icon="pi pi-arrow-left" severity="secondary" [outlined]="true" />
   </a>

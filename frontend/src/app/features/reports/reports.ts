@@ -14,6 +14,8 @@ import { environment } from '../../../environments/environment';
 import { SalesReport, InventoryReport, BestSellingItem, ProfitReport, DailySales, TrendMetadata } from '../../core/models/report.model';
 import { PageHeader } from '../../shared/components/page-header/page-header';
 import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
+import { SubscriptionService } from '../../core/services/subscription.service';
+import { CsvExportService } from '../../core/services/csv-export.service';
 
 @Component({
   selector: 'app-reports',
@@ -24,6 +26,10 @@ import { PhpCurrencyPipe } from '../../shared/pipes/php-currency.pipe';
 })
 export class ReportsComponent implements OnInit {
   private http = inject(HttpClient);
+  private subscriptionService = inject(SubscriptionService);
+  private csvExport = inject(CsvExportService);
+
+  canExport = this.subscriptionService.hasFeatureSignal('export_data');
 
   activeTab = 'sales';
   salesPeriod = 'daily';
@@ -373,5 +379,61 @@ export class ReportsComponent implements OnInit {
    */
   hasTrendData(trendData?: TrendMetadata): boolean {
     return !!trendData;
+  }
+
+  // --- CSV Export ---
+
+  exportSalesCsv() {
+    const breakdown = this.salesReport()?.daily_breakdown ?? [];
+    this.csvExport.export(breakdown, [
+      { field: 'date', header: 'Date' },
+      { field: 'total_sales', header: 'Total Sales' },
+      { field: 'transaction_count', header: 'Transactions' },
+    ], `sales-report-${this.salesPeriod}-${this.salesDate}.csv`);
+  }
+
+  exportInventoryCsv() {
+    const products = this.inventoryReport()?.products ?? [];
+    this.csvExport.export(products, [
+      { field: 'name', header: 'Product' },
+      { field: 'sku', header: 'SKU' },
+      { field: 'current_stock', header: 'Stock' },
+      { field: 'reorder_level', header: 'Reorder Level' },
+      { field: 'stock_value', header: 'Stock Value' },
+    ], `inventory-report-${this.todayStr()}.csv`);
+  }
+
+  exportBestSellingCsv() {
+    const items = this.bestSelling().map((item, i) => ({ rank: i + 1, ...item }));
+    this.csvExport.export(items, [
+      { field: 'rank', header: 'Rank' },
+      { field: 'name', header: 'Product' },
+      { field: 'sku', header: 'SKU' },
+      { field: 'total_quantity', header: 'Qty Sold' },
+      { field: 'total_revenue', header: 'Revenue' },
+    ], `best-selling-${this.bestSellingPeriod}-${this.bestSellingDate}.csv`);
+  }
+
+  exportProfitCsv() {
+    const r = this.profitReport();
+    if (!r) return;
+    const row = {
+      period: r.period,
+      start_date: r.start_date,
+      end_date: r.end_date,
+      revenue: r.total_revenue,
+      cost: r.total_cost,
+      gross_profit: r.gross_profit,
+      margin_pct: r.profit_margin,
+    };
+    this.csvExport.export([row], [
+      { field: 'period', header: 'Period' },
+      { field: 'start_date', header: 'Start Date' },
+      { field: 'end_date', header: 'End Date' },
+      { field: 'revenue', header: 'Revenue' },
+      { field: 'cost', header: 'Cost' },
+      { field: 'gross_profit', header: 'Gross Profit' },
+      { field: 'margin_pct', header: 'Margin %' },
+    ], `profit-report-${this.profitPeriod}-${this.profitDate}.csv`);
   }
 }

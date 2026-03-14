@@ -8,6 +8,8 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ProductListComponent } from './product-list';
 import { ToastService } from '../../core/services/toast.service';
 import { StoreContextService } from '../../core/services/store-context.service';
+import { SubscriptionService } from '../../core/services/subscription.service';
+import { CsvExportService } from '../../core/services/csv-export.service';
 import { ConfirmationService } from 'primeng/api';
 
 describe('ProductListComponent', () => {
@@ -15,6 +17,7 @@ describe('ProductListComponent', () => {
   let component: ProductListComponent;
   let controller: HttpTestingController;
   const toast = { success: vi.fn() };
+  const csvExport = { export: vi.fn() };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -28,6 +31,14 @@ describe('ProductListComponent', () => {
           useValue: {
             isAdmin: vi.fn(() => true),
           },
+        },
+        {
+          provide: SubscriptionService,
+          useValue: { hasFeatureSignal: vi.fn(() => () => true) },
+        },
+        {
+          provide: CsvExportService,
+          useValue: csvExport,
         },
         {
           provide: ConfirmationService,
@@ -55,6 +66,23 @@ describe('ProductListComponent', () => {
 
     expect(component.products().length).toBe(1);
     expect(component.categories().length).toBe(1);
+  });
+
+  it('exportCsv calls CsvExportService with filteredProducts and correct columns', () => {
+    fixture.detectChanges();
+    controller.expectOne('/api/products').flush([
+      { id: 'p1', name: 'Coffee', sku: 'COF-1', barcode: '', category: { name: 'Drinks' }, retail_price: 120, cost_price: 80, current_stock: 10, unit: 'pcs' },
+    ]);
+    controller.expectOne('/api/categories').flush([]);
+
+    component.exportCsv();
+
+    expect(csvExport.export).toHaveBeenCalledOnce();
+    const [data, columns, filename] = csvExport.export.mock.calls[0];
+    expect(data).toHaveLength(1);
+    expect(data[0].name).toBe('Coffee');
+    expect(columns.map((c: any) => c.header)).toEqual(['Name', 'SKU', 'Barcode', 'Category', 'Retail Price', 'Cost Price', 'Stock', 'Unit']);
+    expect(filename).toMatch(/^products-\d{4}-\d{2}-\d{2}\.csv$/);
   });
 
   it('creates a product and refreshes the list', () => {
