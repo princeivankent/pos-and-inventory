@@ -30,6 +30,7 @@ export class ReportsComponent implements OnInit {
   private csvExport = inject(CsvExportService);
 
   canExport = this.subscriptionService.hasFeatureSignal('export_data');
+  hasReports = this.subscriptionService.hasFeatureSignal('reports');
 
   activeTab = 'sales';
   salesPeriod = 'daily';
@@ -108,6 +109,7 @@ export class ReportsComponent implements OnInit {
   };
 
   ngOnInit() {
+    if (!this.subscriptionService.hasFeature('reports')) return;
     this.loadSalesReport();
     this.loadInventoryReport();
     this.loadBestSelling();

@@ -1,6 +1,6 @@
 # Project Memory Index
 
-Last updated: 2026-03-15 (user profile + forgot password)
+Last updated: 2026-03-15 (subscription-gating-audit)
 
 ## Overall State
 
@@ -51,6 +51,10 @@ Last updated: 2026-03-15 (user profile + forgot password)
 
 ## Recently Completed Milestones
 
+- **Subscription gating audit & fix** (Mar 15, 2026): Fixed `getMinimumPlanForFeature` bug (`export_data` was mapped to kadena, now negosyo); gated receipt customization fields in Settings; added full-page upgrade prompts to Reports + Suppliers pages (with `ngOnInit` short-circuits to skip API calls)
+- **UI/UX improvements — billing, header, sidebar** (Mar 14, 2026, PR #34): Visual/UX polish on billing page, header, and sidebar navigation
+- **Broad UI/UX pass + backend dashboard fix** (Mar 14, 2026, PR #32): Modernized login, register, dashboard, and all feature pages; fixed `reports.service.ts` dashboard totals returning wrong values
+- **CSV export** (Mar 14, 2026, PR #31): `CsvExportService` added; export buttons on Reports, Sales, Products, Inventory pages; gated to `export_data` feature (Negosyo+ plans); 38+ unit tests
 - **User profile + forgot password** (Mar 15, 2026): Forgot password flow (EmailJS delivery, 1-hr token), reset password page, profile page (name edit + change password), header user-name links to `/profile`. Migration: `1709000000000-AddPasswordResetToken.ts` — **run `npm run migration:run` before deploying**
 - **Subscription plan refinement** (Mar 14, 2026): pricing corrected (₱599/₱1,499/₱2,999), 30-day Negosyo trial, annual billing, utang ungated to Tindahan, suppliers gated to Negosyo+. Migration: `1708000000000-UpdateSubscriptionPlans.ts` — **run `npm run migration:run` before deploying**
 - **Production deployment live** (Mar 13, 2026): Railway (backend) + Vercel (frontend) + CD via native GitHub integrations + branch protection on main + PayMongo test keys wired

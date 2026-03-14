@@ -48,14 +48,22 @@
 
           <h3 style="margin-top: 1.5rem">Receipt Settings</h3>
           <div class="form-grid">
-            <div class="field">
-              <label>Receipt Header</label>
-              <textarea pTextarea [(ngModel)]="settings.receipt_header" class="w-full" rows="2" placeholder="Printed at top of receipt"></textarea>
-            </div>
-            <div class="field">
-              <label>Receipt Footer</label>
-              <textarea pTextarea [(ngModel)]="settings.receipt_footer" class="w-full" rows="2" placeholder="Printed at bottom of receipt"></textarea>
-            </div>
+            @if (hasReceiptCustomization()) {
+              <div class="field">
+                <label>Receipt Header</label>
+                <textarea pTextarea [(ngModel)]="settings.receipt_header" class="w-full" rows="2" placeholder="Printed at top of receipt"></textarea>
+              </div>
+              <div class="field">
+                <label>Receipt Footer</label>
+                <textarea pTextarea [(ngModel)]="settings.receipt_footer" class="w-full" rows="2" placeholder="Printed at bottom of receipt"></textarea>
+              </div>
+            } @else {
+              <div class="upgrade-prompt compact">
+                <i class="pi pi-receipt upgrade-icon"></i>
+                <p class="upgrade-title">Receipt Customization — Negosyo Plan &amp; Above</p>
+                <p class="upgrade-text">Add custom headers and footers to your receipts. Upgrade to unlock this feature.</p>
+              </div>
+            }
             <p-button label="Save Settings" icon="pi pi-check" (onClick)="saveSettings()" [loading]="savingSettings()" />
           </div>
         </div>

@@ -1,5 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -10,6 +11,7 @@ import { Supplier, CreateSupplierDto } from '../../core/models/supplier.model';
 import { SupplierService } from '../../core/services/supplier.service';
 import { ToastService } from '../../core/services/toast.service';
 import { StoreContextService } from '../../core/services/store-context.service';
+import { SubscriptionService } from '../../core/services/subscription.service';
 import { PageHeader } from '../../shared/components/page-header/page-header';
 import { SupplierTableComponent } from './components/supplier-table/supplier-table';
 import { SupplierFormDialogComponent } from './components/supplier-form-dialog/supplier-form-dialog';
@@ -19,6 +21,7 @@ import { SupplierFormDialogComponent } from './components/supplier-form-dialog/s
   standalone: true,
   imports: [
     FormsModule,
+    RouterLink,
     ButtonModule,
     InputTextModule,
     IconFieldModule,
@@ -35,7 +38,10 @@ export class SupplierListComponent implements OnInit {
   private supplierService = inject(SupplierService);
   private toast = inject(ToastService);
   private confirmService = inject(ConfirmationService);
+  private subscriptionService = inject(SubscriptionService);
   storeCtx = inject(StoreContextService);
+
+  hasSupplierMgmt = this.subscriptionService.hasFeatureSignal('supplier_management');
 
   suppliers = signal<Supplier[]>([]);
   loading = signal(false);
@@ -50,6 +56,7 @@ export class SupplierListComponent implements OnInit {
   private searchTimeout: any;
 
   ngOnInit() {
+    if (!this.subscriptionService.hasFeature('supplier_management')) return;
     this.loadSuppliers();
   }
 
