@@ -9,7 +9,8 @@ A multi-tenant POS & Inventory Management System for Philippine retail stores wi
 **Current Status**:
 - ✅ Phase 1-8 Complete: Backend foundation + all core modules (Categories, Products, Inventory, Sales, Receipts, Reports, Users, Customers)
 - ✅ Phase 9 Complete: Frontend (Angular 21 + PrimeNG) with all pages scaffolded
-- ✅ UI/UX Modernization Phase 1: Login & Reports pages enhanced with modern design
+- ✅ UI/UX Modernization: Full pass across all pages — login, register, dashboard, products, reports, customers, billing, sidebar, header, and more (Mar 14, 2026)
+- ✅ **CSV Export Complete**: `CsvExportService`, export buttons on Reports/Sales/Products/Inventory pages, gated to `export_data` feature (Negosyo+) (Mar 14, 2026)
 - ✅ **Subscription System (Backend) Complete**: 3-tier billing (Tindahan/Negosyo/Kadena), feature gates, usage limits, PayMongo integration
 - ✅ **Subscription System (Frontend) Complete**: Feature gating, adaptive UI, upgrade prompts (Feb 15, 2026)
 - ✅ **Supplier Management Complete**: Full CRUD, inventory batch linking, frontend pages (Feb 25, 2026)
@@ -413,6 +414,17 @@ feature-name/
 - ✅ Platform billing admin page (`/platform/subscriptions`)
 - ✅ Payment-intent upgrade flow (`POST /api/payments/intents` + `payment_id` verification in upgrade)
 - ✅ Webhook event idempotency guard (dedupe via processed event IDs)
+
+**Completed - CSV Export (Mar 14, 2026)**:
+- ✅ `core/services/csv-export.service.ts` — shared service with dot-notation field resolution and proper CSV quoting
+- ✅ Export buttons on Reports, Sales, Products, Inventory (overview + stock movements) pages
+- ✅ Feature-gated to `export_data` flag (Negosyo+ plans) — uses `hasFeatureSignal('export_data')`; Tindahan users see upgrade prompt
+- ✅ 38+ unit tests added across affected components
+
+**Completed - Full UI/UX Pass (Mar 14, 2026)**:
+- ✅ Modernized auth pages (login, register), dashboard, product table, reports, billing, sidebar, header, and all other feature pages
+- ✅ Backend `reports.service.ts` dashboard fix — corrected dashboard totals that were returning wrong values
+- ✅ Global styles updated: `_layout.scss`, `_overrides.scss`, `_variables.scss`
 
 **Completed - User Profile + Forgot Password (Mar 15, 2026)**:
 - ✅ User entity: `password_reset_token` + `password_reset_expires_at` columns; migration `1709000000000-AddPasswordResetToken.ts`
