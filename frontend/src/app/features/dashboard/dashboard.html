@@ -40,8 +40,8 @@
             <i class="pi pi-wallet"></i>
           </div>
           <div class="stat-content">
-            <span class="stat-label">Today's Sales <i class="pi pi-question-circle label-help" pTooltip="Total completed sales amount for today, including tax." tooltipPosition="top" appendTo="body"></i></span>
-            <span class="stat-value">{{ salesReport()?.total_sales ?? 0 | phpCurrency }}</span>
+            <span class="stat-label">Today's Sales <i class="pi pi-question-circle label-help" pTooltip="Net sales today, excluding VAT. Matches Revenue in Today's Profit." tooltipPosition="top" appendTo="body"></i></span>
+            <span class="stat-value">{{ ((salesReport()?.total_sales ?? 0) - (salesReport()?.total_tax ?? 0)) | phpCurrency }}</span>
           </div>
         }
       </a>
@@ -297,7 +297,7 @@
           } @else {
             <div class="profit-grid">
               <div class="profit-stat">
-                <span class="profit-label">Revenue <i class="pi pi-question-circle label-help" pTooltip="Sum of item subtotals sold today before tax." tooltipPosition="top" appendTo="body"></i></span>
+                <span class="profit-label">Revenue <i class="pi pi-question-circle label-help" pTooltip="Pre-VAT revenue from completed sales today (total collected minus VAT). Matches Today's Sales." tooltipPosition="top" appendTo="body"></i></span>
                 <span class="profit-value">{{ profitReport()?.total_revenue ?? 0 | phpCurrency }}</span>
               </div>
               <div class="profit-stat">
@@ -305,7 +305,7 @@
                 <span class="profit-value">{{ profitReport()?.total_cost ?? 0 | phpCurrency }}</span>
               </div>
               <div class="profit-stat">
-                <span class="profit-label">Gross Profit <i class="pi pi-question-circle label-help" pTooltip="Revenue minus FIFO-based cost." tooltipPosition="top" appendTo="body"></i></span>
+                <span class="profit-label">Gross Profit <i class="pi pi-question-circle label-help" pTooltip="Pre-VAT revenue minus FIFO-based cost of goods sold." tooltipPosition="top" appendTo="body"></i></span>
                 <span class="profit-value" [class.profit-positive]="(profitReport()?.gross_profit ?? 0) >= 0"
                   [class.profit-negative]="(profitReport()?.gross_profit ?? 0) < 0">
                   {{ profitReport()?.gross_profit ?? 0 | phpCurrency }}

@@ -51,6 +51,16 @@
               {{ getMarginPercent(product) }}%
             </small>
           }
+          @if (hasFifoCostLoss(product)) {
+            <small
+              class="fifo-loss-badge"
+              [pTooltip]="getFifoCostWarningTooltip(product)"
+              tooltipPosition="top"
+              appendTo="body"
+            >
+              ⚠ Old stock loss
+            </small>
+          }
         </div>
       </td>
       <td style="text-align:right">{{ product.cost_price | phpCurrency }}</td>

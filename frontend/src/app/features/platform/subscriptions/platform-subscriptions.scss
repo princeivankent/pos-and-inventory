@@ -20,17 +20,17 @@
   transition: background-color 0.15s;
 
   &:hover {
-    background: #f9fafb !important;
+    background: var(--bg-secondary) !important;
   }
 }
 
 .org-name {
   font-weight: 500;
-  color: #111827;
+  color: var(--text-primary);
 }
 
 .cell-secondary {
-  color: #6b7280;
+  color: var(--text-secondary);
   font-size: 0.8125rem;
 }
 
@@ -51,13 +51,13 @@
 
     h3 {
       margin: 0;
-      color: #374151;
+      color: var(--text-primary);
       font-size: 1.125rem;
     }
 
     .text-secondary {
       margin: 0;
-      color: #6b7280;
+      color: var(--text-secondary);
     }
   }
 }
