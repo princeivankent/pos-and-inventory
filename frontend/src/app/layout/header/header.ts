@@ -1,8 +1,10 @@
 import { Component, inject } from '@angular/core';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { MenuModule } from 'primeng/menu';
+import { TooltipModule } from 'primeng/tooltip';
 import { MenuItem } from 'primeng/api';
 import { AuthService } from '../../core/services/auth.service';
 import { StoreContextService } from '../../core/services/store-context.service';
@@ -12,7 +14,7 @@ import { StoreAccess } from '../../core/models/user.model';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [SelectModule, FormsModule, ButtonModule, MenuModule],
+  imports: [SelectModule, FormsModule, RouterLink, ButtonModule, MenuModule, TooltipModule],
   templateUrl: './header.html',
   styleUrls: ['./header.scss'],
 })

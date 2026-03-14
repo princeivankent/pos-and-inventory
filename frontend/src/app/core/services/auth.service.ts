@@ -78,6 +78,41 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
+  forgotPassword(email: string) {
+    return this.http.post<{ message: string; reset_token?: string; reset_link?: string; user_name?: string; user_email?: string }>(
+      `${environment.apiUrl}/auth/forgot-password`,
+      { email },
+    );
+  }
+
+  resetPassword(token: string, newPassword: string) {
+    return this.http.post<{ message: string }>(
+      `${environment.apiUrl}/auth/reset-password`,
+      { token, new_password: newPassword },
+    );
+  }
+
+  updateProfile(dto: { full_name: string }) {
+    return this.http
+      .patch<{ id: string; email: string; full_name: string; is_platform_admin: boolean }>(
+        `${environment.apiUrl}/auth/profile`,
+        dto,
+      )
+      .pipe(
+        tap((user) => {
+          this.currentUser.set(user);
+          localStorage.setItem(USER_KEY, JSON.stringify(user));
+        }),
+      );
+  }
+
+  changePassword(dto: { current_password: string; new_password: string }) {
+    return this.http.post<{ message: string }>(
+      `${environment.apiUrl}/auth/change-password`,
+      dto,
+    );
+  }
+
   addStore(store: StoreAccess) {
     const updated = [...this.stores(), store];
     localStorage.setItem(STORES_KEY, JSON.stringify(updated));

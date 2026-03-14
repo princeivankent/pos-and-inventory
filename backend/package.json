@@ -24,6 +24,8 @@
     "migration:run": "npm run typeorm -- migration:run -d src/config/database.config.ts",
     "migration:revert": "npm run typeorm -- migration:revert -d src/config/database.config.ts",
     "db:seed:e2e": "ts-node -r tsconfig-paths/register scripts/db/seed-e2e.ts",
+    "db:seed:demo": "ts-node -r tsconfig-paths/register scripts/db/seed-demo.ts",
+    "db:cleanup:playwright": "ts-node -r tsconfig-paths/register scripts/db/cleanup-playwright-users.ts",
     "purge:transactions": "ts-node -r tsconfig-paths/register src/scripts/purge-transactions.ts"
   },
   "dependencies": {

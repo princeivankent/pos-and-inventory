@@ -17,6 +17,20 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./features/auth/forgot-password/forgot-password').then(
+        (m) => m.ForgotPasswordComponent
+      ),
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./features/auth/reset-password/reset-password').then(
+        (m) => m.ResetPasswordComponent
+      ),
+  },
+  {
     path: '',
     loadComponent: () =>
       import('./layout/layout').then((m) => m.LayoutComponent),
@@ -129,6 +143,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/billing/billing').then((m) => m.BillingComponent),
         canActivate: [adminGuard],
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./features/profile/profile').then((m) => m.ProfileComponent),
       },
       {
         path: 'platform/subscriptions',
