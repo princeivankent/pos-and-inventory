@@ -139,7 +139,40 @@ These are **High Impact, Medium Effort** items needed before real users can adop
 
 ---
 
-#### 2.3 Data Seeding & Onboarding Flow
+#### 2.3 Email Notifications (Lifecycle Emails)
+
+**Recommendation:** Build Next (after backend email service is set up)
+
+| Attribute | Value |
+|-----------|-------|
+| Impact | Medium - Keeps users informed about billing, trial expiry, and stock — reduces churn and surprise suspensions. |
+| Effort | Medium - Needs a backend email service first; each event is independently implementable after. |
+| Category | Retention |
+| Current Status | Partial - Password reset email works via EmailJS (browser-side). Cron events have `// TODO: Send notification` comments but no delivery. |
+
+**Infrastructure note:**
+- Password reset uses `@emailjs/browser` on the **frontend** — browser-side only, cannot be used from NestJS cron jobs.
+- All lifecycle events below fire on the **backend** and need a server-side email service: **Resend**, **SendGrid**, or **Nodemailer + SMTP**.
+- Pick one backend email provider first. Each event below is independently implementable once the transport exists.
+
+**Events to implement (each is a standalone task):**
+
+- [ ] **Trial expiring — 10 days warning** (`sendTrialReminders()` — `// TODO` at line ~180) — send "10 days left on your trial" nudge
+- [ ] **Trial expiring — 3 days urgent** (`sendTrialReminders()` — `// TODO` at line ~175) — send urgent "3 days left, upgrade now" email
+- [ ] **Trial expired / account suspended** (`sendTrialReminders()` — after suspension logic) — notify user their account is suspended with upgrade CTA
+- [ ] **Payment failed (retry queued)** (`retryFailedPayments()`) — warn user that auto-charge failed, ask to update payment method
+- [ ] **Account suspended (max retries hit)** (`retryFailedPayments()`) — notify that auto-renewal gave up, account suspended
+- [ ] **Subscription renewed successfully** (`processRenewals()`) — confirmation email with renewal date and amount
+- [ ] **Low-stock threshold breached** (not yet implemented) — notify store owner when a product drops below threshold
+
+**What NOT to build yet:**
+- SMS/push notifications
+- Weekly digest emails
+- Marketing/promotional emails
+
+---
+
+#### 2.4 Data Seeding & Onboarding Flow
 
 **Recommendation:** Build Next
 
@@ -226,8 +259,9 @@ These are either **Low Impact**, **High Effort**, or solve problems that don't e
 | 2 | Thermal Printer Integration | High | Low | Core |
 | 3 | E2E Testing & Bug Fixes | High | Medium | Retention |
 | 4 | Low-Stock Alert Automation (finish) | Medium | Low | Retention |
-| 5 | Data Seeding & Onboarding | High | Low | Core |
-| 6 | Customer Credit ("Utang") - stabilization only | High | Low | Core |
+| 5 | Email Notifications (lifecycle) | Medium | Medium | Retention |
+| 6 | Data Seeding & Onboarding | High | Low | Core |
+| 7 | Customer Credit ("Utang") - stabilization only | High | Low | Core |
 | --- | **LAUNCH GATE** | --- | --- | --- |
 | 7 | Returns & Refunds | Medium | Medium | Core |
 | 8 | Expense Tracking | Medium | Medium | Monetization |

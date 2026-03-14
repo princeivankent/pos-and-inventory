@@ -26,8 +26,8 @@ test.describe('Playwright billing and permissions suite', () => {
     // New accounts start on Negosyo trial; upgrade to Kadena to test the upgrade flow
     await page.goto('/billing');
     await expect(page.getByTestId('billing-status-card')).toContainText('Negosyo');
-    await page.getByRole('button', { name: 'Upgrade' }).first().click();
-    await page.getByRole('button', { name: /Upgrade to Kadena/ }).click();
+    await page.locator('[data-testid="upgrade-plan-kadena"] button').click();
+    await page.locator('[data-testid="confirm-upgrade-button"] button').click();
     await expect(page.getByTestId('billing-status-card')).toContainText('Kadena');
     await expect(page.getByTestId('plan-card-kadena')).toContainText('Current Plan');
   });

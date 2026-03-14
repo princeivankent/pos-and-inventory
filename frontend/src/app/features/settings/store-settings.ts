@@ -50,6 +50,7 @@ export class StoreSettingsComponent implements OnInit {
   stores = this.authService.stores;
   activeStoreId = this.storeCtx.storeId;
   hasMultiStore = this.subscriptionService.hasFeatureSignal('multi_store');
+  hasReceiptCustomization = this.subscriptionService.hasFeatureSignal('receipt_customization');
   storeUsage = computed(() => this.usage()?.stores ?? null);
   isAtStoreLimit = computed(() => {
     const u = this.storeUsage();

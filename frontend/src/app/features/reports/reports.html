@@ -1,5 +1,16 @@
 <app-page-header title="Reports" subtitle="Business analytics and insights" />
 
+    @if (!hasReports()) {
+      <div class="upgrade-prompt">
+        <i class="pi pi-chart-bar upgrade-icon"></i>
+        <p class="upgrade-title">Reports &amp; Analytics — Negosyo Plan &amp; Above</p>
+        <p class="upgrade-text">Unlock detailed sales reports, inventory analytics, best-selling products, and profit tracking to grow your business.</p>
+        <a routerLink="/settings">
+          <p-button label="Upgrade Plan" icon="pi pi-arrow-up" />
+        </a>
+      </div>
+    } @else {
+
     <p-tabs [(value)]="activeTab">
       <p-tabpanel value="sales" header="Sales">
         <!-- Period selector + date navigation -->
@@ -417,3 +428,4 @@
         }
       </p-tabpanel>
     </p-tabs>
+    } <!-- end @else hasReports -->

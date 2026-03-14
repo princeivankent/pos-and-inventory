@@ -96,7 +96,7 @@ export class SubscriptionService {
 
   // Get minimum plan needed for a feature
   getMinimumPlanForFeature(feature: string): 'negosyo' | 'kadena' {
-    if (feature === 'export_data') return 'kadena';
+    if (['export_advanced', 'low_stock_alerts'].includes(feature)) return 'kadena';
     return 'negosyo';
   }
 }

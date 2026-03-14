@@ -371,7 +371,7 @@
     }
   }
 
-  <ng-template #footer>
+  <ng-template pTemplate="footer">
     @if (upgradePaymentStep()) {
       <p-button
         label="Back"
@@ -415,7 +415,7 @@
     }
     This may restrict features and limits immediately or at period end depending on your current status.
   </p>
-  <ng-template #footer>
+  <ng-template pTemplate="footer">
     <p-button
       label="Keep Current Plan"
       severity="secondary"
@@ -440,7 +440,7 @@
   <p class="cancel-dialog-text">
     Your subscription will be cancelled at the end of the current billing period. You'll keep access to all features until then.
   </p>
-  <ng-template #footer>
+  <ng-template pTemplate="footer">
     <p-button
       label="Keep Subscription"
       severity="secondary"

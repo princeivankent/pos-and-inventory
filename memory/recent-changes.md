@@ -1,5 +1,37 @@
 # Recent Changes
 
+## 2026-03-15 (subscription-gating-audit)
+
+- **`getMinimumPlanForFeature` bug fixed** (`subscription.service.ts`) — `export_data` now correctly returns `'negosyo'` (was wrongly returning `'kadena'`); Kadena-only features (`export_advanced`, `low_stock_alerts`) now correctly return `'kadena'`
+- **Receipt customization gated in Settings** (`store-settings.ts/html`) — added `hasReceiptCustomization` signal; Receipt Header/Footer fields hidden for Tindahan users; compact upgrade prompt shown in their place; Save Settings button (for tax config) remains always visible
+- **Reports page upgrade prompt** (`reports.ts/html`) — added `hasReports` signal + `ngOnInit` short-circuit (skips all 4 API calls if feature absent); direct navigation to `/reports` by Tindahan users now shows a full-page upgrade prompt instead of blank/broken page; also added `.upgrade-prompt` styles to `reports.scss`
+- **Suppliers page upgrade prompt** (`supplier-list.ts/html/scss`) — injected `SubscriptionService`, added `hasSupplierMgmt` signal + `ngOnInit` guard; direct navigation to `/suppliers` by Tindahan users shows clean upgrade prompt; "Add Supplier" header button also hidden when locked; `RouterLink` added to imports; `.upgrade-prompt` styles added to `supplier-list.scss`
+
+## 2026-03-15 (docs-only)
+
+- **Roadmap** (`docs/roadmap.md`) — added Phase 2.3 Email Notifications section tracking 7 lifecycle email events (trial warnings, payment failure, renewal confirmation, low-stock); infrastructure note explains EmailJS is browser-only and a backend email service (Resend/SendGrid/Nodemailer) is required before any cron event can send email; each event is a standalone checkbox item; build order table updated (items 5-7 renumbered)
+- **Billing memory** (`memory/features/billing-subscriptions.md`) — confirmed Tindahan price is ₱599/mo (corrected from ₱799 during Mar 14 migration `1708000000000-UpdateSubscriptionPlans.ts`); updated Last Updated date to 2026-03-15
+
+## 2026-03-14 (ui-ux-improvements — PR #34)
+
+- **Billing page** (`billing.html/ts/scss`) — layout and style refinements
+- **Header** (`header.html/ts/scss`) — visual/UX polish after profile link addition
+- **Sidebar** (`sidebar.ts`) — navigation adjustments
+
+## 2026-03-14 (ui-ux-improvements-broad — PR #32)
+
+- **UI/UX pass across nearly all pages** — login, register, dashboard, products, reports, sidebar, header, billing, categories, customers, inventory, platform, POS cart, sales, settings, suppliers, users, page-header
+- **Backend dashboard fix** (`reports.service.ts`) — corrected dashboard report data/values (totals were returning wrong figures)
+- Global styles updated: `_layout.scss`, `_overrides.scss`, `_variables.scss`
+- Auth pages (login, register) received additional polish on top of the earlier modernization
+
+## 2026-03-14 (csv-export — PR #31)
+
+- **CSV export service** — new `core/services/csv-export.service.ts` with dot-notation field resolution and proper CSV quoting; unit tests in `csv-export.service.spec.ts`
+- **Export buttons added** to Reports, Sales, Products, and Inventory (overview + stock movements) pages
+- Export is **feature-gated** to `export_data` flag (Negosyo+ plans) using `hasFeatureSignal('export_data')`
+- 38+ unit tests added across affected components
+
 ## 2026-03-15 (user-profile-forgot-password)
 
 - **Forgot password flow** — `POST /auth/forgot-password` generates UUID token (1-hr expiry) stored on `users` table, returns reset link; frontend sends email via EmailJS (`@emailjs/browser`)

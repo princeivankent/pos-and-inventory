@@ -1,6 +1,6 @@
 # Billing & Subscriptions
 
-Last updated: 2026-03-07
+Last updated: 2026-03-15 (subscription-gating-audit)
 
 ## Purpose
 
@@ -22,6 +22,7 @@ Control subscription state, plan features, usage limits, billing workflows, paym
 - Frontend production builds use `bypassPayment: false`
 - **Pending downgrade state surfaced in UI** (Mar 14, 2026)
 - **Subscription plan refinement** (Mar 14, 2026) — see recent-changes.md
+- **Tindahan price confirmed ₱599/mo** (Mar 15, 2026) — was ₱799 before the Mar 14 migration `1708000000000-UpdateSubscriptionPlans.ts` corrected it
 
 ## Plan Design (as of Mar 14, 2026)
 
@@ -35,15 +36,18 @@ Control subscription state, plan features, usage limits, billing workflows, paym
 
 ## Feature Gate Reference
 
-| Feature key | Min tier | Controller/Guard |
-|-------------|----------|-----------------|
-| `reports` | Negosyo | `reports.controller.ts` class-level |
-| `supplier_management` | Negosyo | `suppliers.controller.ts` class-level |
-| `utang_management` | Tindahan (all) | **No gate** — removed Mar 14, 2026 |
-| `receipt_customization` | Negosyo | frontend only (no backend endpoint gate) |
-| `multi_store` | Negosyo | checked in `UsageLimitGuard` for stores |
-| `export_advanced` | Kadena | not yet wired to endpoint — future |
-| `low_stock_alerts` | Kadena | not yet wired to endpoint — future |
+| Feature key | Min tier | Backend gate | Frontend gate |
+|-------------|----------|--------------|---------------|
+| `reports` | Negosyo | `reports.controller.ts` class-level `@RequireFeature` | `hasReports` signal on `reports.ts`; `ngOnInit` short-circuit; full-page upgrade prompt |
+| `supplier_management` | Negosyo | `suppliers.controller.ts` class-level `@RequireFeature` | `hasSupplierMgmt` signal on `supplier-list.ts`; `ngOnInit` guard; full-page upgrade prompt |
+| `utang_management` | Tindahan (all) | **No gate** — removed Mar 14, 2026 | `hasUtangFeature` signal gates statement/payment buttons in customers |
+| `receipt_customization` | Negosyo | none (backend stores value regardless) | `hasReceiptCustomization` signal on `store-settings.ts`; header/footer fields hidden + compact upgrade prompt shown |
+| `multi_store` | Negosyo | `UsageLimitGuard` for stores resource | `hasMultiStore` signal on `store-settings.ts`; compact upgrade prompt in Manage Stores card |
+| `export_data` | Negosyo | none (client-side only) | `canExport` signal gates export buttons on Reports, Sales, Products, Inventory pages |
+| `export_advanced` | Kadena | not yet wired | not yet wired — future |
+| `low_stock_alerts` | Kadena | not yet wired | not yet wired — future |
+
+**`getMinimumPlanForFeature` mapping** (fixed Mar 15, 2026): `export_advanced` + `low_stock_alerts` → `'kadena'`; all others → `'negosyo'`. Previously `export_data` was wrongly mapped to `'kadena'`.
 
 ## Known Gaps
 
@@ -83,4 +87,4 @@ Control subscription state, plan features, usage limits, billing workflows, paym
 
 ## Last Updated
 
-- 2026-03-14
+- 2026-03-15 (added export_data feature gate row)

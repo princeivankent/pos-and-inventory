@@ -231,7 +231,7 @@ export async function acceptConfirmDialog(page: Page) {
 
 export async function upgradeToNegosyoViaUi(page: Page) {
   await page.goto('/billing');
-  await page.getByRole('button', { name: 'Upgrade' }).first().click();
-  await page.getByRole('button', { name: /Upgrade to Negosyo/ }).click();
+  await page.locator('[data-testid="upgrade-plan-negosyo"] button').click();
+  await page.locator('[data-testid="confirm-upgrade-button"] button').click();
   await expect(page.getByTestId('billing-status-card')).toContainText('Negosyo');
 }

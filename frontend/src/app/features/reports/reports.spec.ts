@@ -56,7 +56,7 @@ describe('ReportsComponent', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: SubscriptionService, useValue: { hasFeatureSignal: vi.fn(() => () => true) } },
+        { provide: SubscriptionService, useValue: { hasFeatureSignal: vi.fn(() => () => true), hasFeature: vi.fn(() => true) } },
         { provide: CsvExportService, useValue: csvExport },
       ],
     })
