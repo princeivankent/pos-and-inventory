@@ -1,13 +1,13 @@
 # Project Memory Index
 
-Last updated: 2026-03-15 (subscription-gating-audit)
+Last updated: 2026-03-15 (low-stock-alerts)
 
 ## Overall State
 
 - Stage: pre-launch (deployed to production, not yet open to real customers)
 - Operational source of truth: this `memory/` folder
 - Overall status: core POS, inventory, credit, suppliers, billing, CI, Playwright E2E, and production deployment are all live
-- Main remaining launch blockers: thermal printer path, low-stock automation, PayMongo live keys (business verification), frontend bundle warning
+- Main remaining launch blockers: thermal printer path, PayMongo live keys (business verification), frontend bundle warning
 
 ## Production URLs
 
@@ -17,7 +17,7 @@ Last updated: 2026-03-15 (subscription-gating-audit)
 ## Launch Blockers
 
 - Thermal printing is not wired to real POS hardware flows (hardware not yet purchased)
-- Low-stock automation exists only as views/endpoints, not cron + notification flow (next up)
+- Low-stock automation: ✅ done (cron + Resend email, Mar 15, 2026)
 - Frontend production bundle is above the warning budget
 - Supabase: intentionally sharing dev DB for now, split before scaling to real customers
 
@@ -32,7 +32,8 @@ Last updated: 2026-03-15 (subscription-gating-audit)
 | [Auth](./features/auth.md) | `done` | `verified` | 2026-03-15 | Keep stable |
 | [Frontend Shell](./features/frontend-shell.md) | `done` | `verified` | 2026-03-07 | Trim bundle size and keep guards/interceptors aligned |
 | [Products](./features/products.md) | `done` | `verified` | 2026-03-07 | Keep stable |
-| [Inventory](./features/inventory.md) | `done` | `verified` | 2026-03-07 | Add low-stock automation |
+| [Inventory](./features/inventory.md) | `done` | `verified` | 2026-03-15 | Keep stable |
+| [Low-Stock Alerts](./features/low-stock-alerts.md) | `done` | `verified` | 2026-03-15 | Keep stable |
 | [Sales](./features/sales.md) | `done` | `verified` | 2026-03-07 | Keep stable and expand higher-value E2E coverage |
 | [Receipts & Printing](./features/receipts-printing.md) | `in_progress` | `verified` | 2026-03-07 | Define and wire the real thermal-print path |
 | [Customers](./features/customers.md) | `done` | `verified` | 2026-03-07 | Keep stable |
@@ -45,12 +46,12 @@ Last updated: 2026-03-15 (subscription-gating-audit)
 ## Current Top Priorities
 
 - Wire thermal printing for real POS environments
-- Automate low-stock detection and surface it in workflow-friendly ways
 - Complete live PayMongo rollout validation with production-safe config
 - Reduce the frontend initial bundle warning
 
 ## Recently Completed Milestones
 
+- **Low-stock alerts** (Mar 15, 2026): Cron job (`0 9 * * *`) checks all Kadena stores, creates `LowStockAlert` records, sends email via Resend to store + admin emails. One email per event; auto-resolves when stock > reorder level. Verified end-to-end.
 - **Subscription gating audit & fix** (Mar 15, 2026): Fixed `getMinimumPlanForFeature` bug (`export_data` was mapped to kadena, now negosyo); gated receipt customization fields in Settings; added full-page upgrade prompts to Reports + Suppliers pages (with `ngOnInit` short-circuits to skip API calls)
 - **UI/UX improvements — billing, header, sidebar** (Mar 14, 2026, PR #34): Visual/UX polish on billing page, header, and sidebar navigation
 - **Broad UI/UX pass + backend dashboard fix** (Mar 14, 2026, PR #32): Modernized login, register, dashboard, and all feature pages; fixed `reports.service.ts` dashboard totals returning wrong values

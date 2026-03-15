@@ -13,10 +13,12 @@ import { Store } from '../database/entities/store.entity';
 import { Organization } from '../database/entities/organization.entity';
 import { SubscriptionPlan } from '../database/entities/subscription-plan.entity';
 import { Subscription } from '../database/entities/subscription.entity';
+import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, UserStore, Store, Organization, SubscriptionPlan, Subscription]),
+    EmailModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

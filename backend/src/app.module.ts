@@ -17,6 +17,7 @@ import { SubscriptionPlansModule } from './subscription-plans/subscription-plans
 import { BillingModule } from './billing/billing.module';
 import { PaymentsModule } from './payments/payments.module';
 import { AdminSubscriptionsModule } from './admin-subscriptions/admin-subscriptions.module';
+import { AlertsModule } from './alerts/alerts.module';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { ValidationPipe } from './common/pipes/validation.pipe';
 
@@ -39,6 +40,7 @@ import { ValidationPipe } from './common/pipes/validation.pipe';
     BillingModule,
     PaymentsModule,
     AdminSubscriptionsModule,
+    AlertsModule,
   ],
   providers: [
     {

@@ -1,5 +1,14 @@
 # Recent Changes
 
+## 2026-03-15 (low-stock-alerts)
+
+- **Low-stock alert cron** (`backend/src/alerts/alerts.service.ts`) — daily `@Cron('0 9 * * *')` checks all stores on Kadena plan (or any plan with `low_stock_alerts: true`); creates `LowStockAlert` records for products where `current_stock <= reorder_level`; skips products with existing unresolved alerts (one email per event)
+- **Email sending** (`backend/src/email/email.service.ts`) — `sendLowStockAlertEmail()` via Resend sends to store email + all admin users; marks alerts `email_sent = true` after sending
+- **Auto-resolve** — on each cron run, alerts for products back above reorder level are auto-resolved (`is_resolved = true`); note: `current_stock = reorder_level` is still low (condition is `<=`)
+- **Migration**: `1710000000000-AddLowStockAlertEmailFields.ts` — adds `email_sent` + `email_sent_at` to `low_stock_alerts`
+- **Feature gate**: Kadena-only via `low_stock_alerts` JSONB feature flag on `subscription_plans`
+- Verified end-to-end: email received, DB state confirmed, auto-resolve behavior confirmed
+
 ## 2026-03-15 (subscription-gating-audit)
 
 - **`getMinimumPlanForFeature` bug fixed** (`subscription.service.ts`) — `export_data` now correctly returns `'negosyo'` (was wrongly returning `'kadena'`); Kadena-only features (`export_advanced`, `low_stock_alerts`) now correctly return `'kadena'`

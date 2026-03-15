@@ -23,12 +23,14 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { ALL_PERMISSIONS } from '../common/permissions/permission.enum';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private supabaseService: SupabaseService,
     private jwtService: JwtService,
+    private emailService: EmailService,
     @InjectRepository(User)
     private userRepository: Repository<User>,
     @InjectRepository(UserStore)
@@ -294,14 +296,13 @@ export class AuthService {
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:4200';
     const resetLink = `${frontendUrl}/reset-password?token=${token}`;
 
-    return {
-      message: 'If that email exists, a reset link has been sent.',
-      // Returned so frontend can send email via EmailJS
-      reset_token: token,
-      reset_link: resetLink,
-      user_name: user.full_name,
-      user_email: user.email,
-    };
+    try {
+      await this.emailService.sendPasswordResetEmail(user.email, user.full_name ?? 'User', resetLink);
+    } catch {
+      // Email failure is non-fatal — token is saved, user can still use the link if they have it
+    }
+
+    return { message: 'If that email exists, a reset link has been sent.' };
   }
 
   async resetPassword(dto: ResetPasswordDto) {
