@@ -403,7 +403,7 @@ feature-name/
 - ✅ Trial: 30 days on Negosyo plan; expiry suspends account (data preserved)
 - ✅ Annual billing: `billing_period` column on `subscriptions`; period = 365 days; charge = `price × 10`; PayMongo checkout amount reflects billing period
 - ✅ Product limits: 300 / 1,000 / 99,999 per store
-- ✅ New Kadena-only features: `export_advanced`, `low_stock_alerts` (gating in place; endpoints TBD)
+- ✅ New Kadena-only features: `export_advanced` (gating in place), `low_stock_alerts` (fully implemented Mar 15, 2026)
 - ✅ Migration: `1708000000000-UpdateSubscriptionPlans.ts` — **run `npm run migration:run` before deploying**
 
 **Completed - Production Hardening (Mar 2, 2026)**:
@@ -433,6 +433,16 @@ feature-name/
 - ✅ Frontend pages: `/forgot-password`, `/reset-password?token=xxx`, `/profile`
 - ✅ Profile page: avatar initials, full_name edit, read-only email, change password with current-password verification
 - ✅ Header user name links to `/profile`; login "Forgot password?" link activated
+
+**Completed - Low-Stock Alerts (Mar 15, 2026)**:
+- ✅ `LowStockAlert` entity: `store_id`, `product_id`, `alert_type` (LOW_STOCK / OUT_OF_STOCK), `alert_date`, `is_resolved`, `resolved_at`, `email_sent`, `email_sent_at`
+- ✅ `AlertsService`: daily cron `0 9 * * *` → `runDailyCheck()` → per-store `checkStoreStock()` → creates alerts + sends email via Resend
+- ✅ `EmailService`: `sendLowStockAlertEmail()` renders HTML email via Resend; recipients = store email + all admin user emails
+- ✅ One email per low-stock event (skips products with existing unresolved alerts)
+- ✅ Auto-resolve: alerts resolved when `current_stock > reorder_level` on next cron run
+- ✅ Feature-gated to Kadena via `low_stock_alerts: true` in `subscription_plans.features` JSONB
+- ✅ Migration: `1710000000000-AddLowStockAlertEmailFields.ts` — adds `email_sent` + `email_sent_at`
+- ✅ Verified end-to-end (Mar 15, 2026)
 
 **Frontend Subscription Pattern**:
 ```typescript
@@ -466,7 +476,6 @@ if (this.subscriptionService.hasFeature('reports')) {
 - Deployment: Backend (Railway), Frontend (Vercel), run migrations on production DB
 - CD pipeline (auto-deploy on main branch)
 - Thermal printer ESC/POS integration (wiring up installed `escpos`/`escpos-usb` deps)
-- Low-stock alert cron job + dashboard notifications
 - Data seeding & onboarding flow (sample categories, first-run wizard)
 - Additional frontend feature tests where launch risk justifies them (billing, sales, or other uncovered critical paths)
 - Email notifications (trial ending, payment receipts, renewal confirmations) — **password reset email done via EmailJS**; billing lifecycle emails still pending

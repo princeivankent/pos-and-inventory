@@ -10,7 +10,6 @@ Last updated: 2026-03-07
 
 ## Next
 
-- Add low-stock automation with cron-driven checks and visible operator notifications
 - Validate PayMongo live mode end to end with production-safe env settings
 - Reduce frontend initial bundle size below the warning threshold if feasible
 

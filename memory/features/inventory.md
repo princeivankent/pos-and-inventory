@@ -19,13 +19,13 @@ Track stock, batches, FIFO availability, movements, and low-stock visibility.
 
 ## Known Gaps
 
-- Low-stock automation is not implemented
 - No expiry-warning automation is implemented
 - No reorder workflow exists yet
 
 ## Recent Decisions
 
-- Inventory is functionally complete for manual operational use, but automation remains a launch-hardening item
+- Inventory is functionally complete for manual operational use
+- Low-stock automation is now live (Mar 15, 2026) — see [low-stock-alerts.md](./low-stock-alerts.md)
 
 ## Dependencies / Cross-Cutting Notes
 
@@ -34,7 +34,8 @@ Track stock, batches, FIFO availability, movements, and low-stock visibility.
 
 ## Next Actions
 
-- Add cron-driven low-stock automation and operator-facing notifications
+- Add expiry-warning automation if needed
+- Consider reorder workflow (purchase order generation)
 
 ## Validation / Evidence
 
@@ -45,4 +46,4 @@ Track stock, batches, FIFO availability, movements, and low-stock visibility.
 
 ## Last Updated
 
-- 2026-03-07
+- 2026-03-15

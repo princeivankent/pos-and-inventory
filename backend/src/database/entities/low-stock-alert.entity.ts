@@ -2,6 +2,7 @@ import { Entity, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { TenantBaseEntity } from './base.entity';
 import { Product } from './product.entity';
 import { User } from './user.entity';
+import { Store } from './store.entity';
 
 export enum AlertType {
   LOW_STOCK = 'low_stock',
@@ -39,7 +40,17 @@ export class LowStockAlert extends TenantBaseEntity {
   @JoinColumn({ name: 'product_id' })
   product: Product;
 
+  @Column({ type: 'boolean', default: false })
+  email_sent: boolean;
+
+  @Column({ type: 'timestamp', nullable: true })
+  email_sent_at: Date | null;
+
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'resolved_by' })
   resolver: User;
+
+  @ManyToOne(() => Store, { nullable: true })
+  @JoinColumn({ name: 'store_id' })
+  store: Store;
 }

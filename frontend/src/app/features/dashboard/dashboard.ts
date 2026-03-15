@@ -64,8 +64,9 @@ export class DashboardComponent implements OnInit {
   profitLoading = signal(true);
   inventoryLoading = signal(true);
 
-  // Subscription feature check
+  // Subscription feature checks
   hasReportsFeature = this.subscriptionService.hasFeatureSignal('reports');
+  hasLowStockAlerts = this.subscriptionService.hasFeatureSignal('low_stock_alerts');
 
   // Chart data
   salesChartData: any = { labels: [], datasets: [] };
