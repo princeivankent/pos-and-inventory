@@ -4,7 +4,9 @@ import { Resend } from 'resend';
 @Injectable()
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
-  private resend = new Resend(process.env.RESEND_API_KEY);
+  private resend: Resend | null = process.env.RESEND_API_KEY
+    ? new Resend(process.env.RESEND_API_KEY)
+    : null;
   private from = process.env.EMAIL_FROM ?? 'POS System <noreply@resend.dev>';
 
   async sendPasswordResetEmail(toEmail: string, toName: string, resetLink: string): Promise<void> {
@@ -65,6 +67,10 @@ export class EmailService {
       </html>
     `;
 
+    if (!this.resend) {
+      this.logger.warn(`RESEND_API_KEY not configured — skipping password reset email to ${toEmail}`);
+      return;
+    }
     try {
       await this.resend.emails.send({
         from: this.from,
@@ -172,6 +178,10 @@ export class EmailService {
       </html>
     `;
 
+    if (!this.resend) {
+      this.logger.warn(`RESEND_API_KEY not configured — skipping low-stock alert email to ${toEmail}`);
+      return;
+    }
     try {
       await this.resend.emails.send({
         from: this.from,
