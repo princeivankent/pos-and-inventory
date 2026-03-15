@@ -40,3 +40,49 @@ html, body {
 .text-sm { font-size: 0.875rem; }
 .text-xs { font-size: 0.75rem; }
 .text-secondary { color: var(--text-secondary); }
+
+// Responsive grid utilities
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+// Prevent text overflow on mobile
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Show/hide utilities for responsive
+.hide-mobile { }
+.show-mobile { display: none; }
+
+@media (max-width: 768px) {
+  .card {
+    padding: var(--space-4);
+  }
+
+  .page-content {
+    padding: var(--space-3);
+  }
+
+  .hide-mobile {
+    display: none !important;
+  }
+
+  .show-mobile {
+    display: block !important;
+  }
+
+  // Stacked flex on mobile
+  .flex-mobile-col {
+    flex-direction: column !important;
+  }
+
+  // Full-width on mobile
+  .full-mobile {
+    width: 100% !important;
+  }
+}

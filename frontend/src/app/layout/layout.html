@@ -1,7 +1,12 @@
-<app-sidebar />
-    <div class="main-area">
-      <app-header />
-      <main class="main-content">
-        <router-outlet />
-      </main>
-    </div>
+<app-sidebar [open]="sidebarOpen()" (closed)="closeSidebar()" />
+<div
+  class="sidebar-overlay"
+  [class.visible]="sidebarOpen()"
+  (click)="closeSidebar()"
+></div>
+<div class="main-area">
+  <app-header (menuToggle)="toggleSidebar()" />
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>

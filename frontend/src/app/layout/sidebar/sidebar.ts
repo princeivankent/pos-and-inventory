@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, Input, Output, EventEmitter } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { StoreContextService } from '../../core/services/store-context.service';
 import { SubscriptionService } from '../../core/services/subscription.service';
@@ -21,6 +21,9 @@ interface NavItem {
   styleUrls: ['./sidebar.scss'],
 })
 export class SidebarComponent {
+  @Input() open = false;
+  @Output() closed = new EventEmitter<void>();
+
   private storeContext = inject(StoreContextService);
   private subscriptionService = inject(SubscriptionService);
 
@@ -49,16 +52,18 @@ export class SidebarComponent {
     const isPlatformAdmin = this.storeContext.isPlatformAdmin();
 
     return this.navItems.filter((item) => {
-      // Check role requirement
       if (item.adminOnly && !isAdmin) return false;
       if (item.platformOnly && !isPlatformAdmin) return false;
 
-      // Check feature requirement
       if (item.requiresFeature) {
         return this.subscriptionService.hasFeature(item.requiresFeature);
       }
 
       return true;
     });
+  }
+
+  onNavClick(): void {
+    this.closed.emit();
   }
 }

@@ -1,5 +1,12 @@
 <header class="app-header" data-testid="app-header">
   <div class="header-left">
+    <button
+      class="hamburger-btn"
+      (click)="menuToggle.emit()"
+      aria-label="Toggle navigation menu"
+    >
+      <i class="pi pi-bars"></i>
+    </button>
     <p-select
       [options]="stores()"
       [(ngModel)]="selectedStoreId"

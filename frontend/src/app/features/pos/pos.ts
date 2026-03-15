@@ -1,4 +1,5 @@
-import { Component, inject, signal, OnInit, ViewChild, HostListener } from '@angular/core';
+import { Component, inject, signal, OnInit, ViewChild, HostListener, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Product } from '../../core/models/product.model';
@@ -46,11 +47,14 @@ export class PosComponent implements OnInit {
   @ViewChild('customerDialog') customerDialog!: CustomerSearchDialogComponent;
   @ViewChild('discountDialog') discountDialog!: DiscountDialogComponent;
 
+  private platformId = inject(PLATFORM_ID);
+
   products = signal<Product[]>([]);
   selectedCategory = signal<string | null>(null);
   lastSale = signal<Sale | null>(null);
   currentStore = signal<Store | null>(null);
   loading = signal(false);
+  mobileView = signal<'products' | 'cart'>('products');
 
   filteredProducts = signal<Product[]>([]);
 
@@ -95,6 +99,9 @@ export class PosComponent implements OnInit {
 
   addToCart(product: Product) {
     this.cart.addItem(product);
+    if (isPlatformBrowser(this.platformId) && window.innerWidth <= 1024) {
+      this.mobileView.set('cart');
+    }
   }
 
   onCategoryChange(categoryId: string | null) {

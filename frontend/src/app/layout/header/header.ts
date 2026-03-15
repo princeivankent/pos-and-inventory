@@ -1,4 +1,4 @@
-import { Component, inject, HostListener } from '@angular/core';
+import { Component, inject, HostListener, Output, EventEmitter } from '@angular/core';
 import { SelectModule } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -14,6 +14,8 @@ import { ToastService } from '../../core/services/toast.service';
   styleUrls: ['./header.scss'],
 })
 export class HeaderComponent {
+  @Output() menuToggle = new EventEmitter<void>();
+
   auth = inject(AuthService);
   private storeContext = inject(StoreContextService);
   private toast = inject(ToastService);

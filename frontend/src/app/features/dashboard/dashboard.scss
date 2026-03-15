@@ -139,6 +139,30 @@
     align-items: flex-start;
     gap: var(--space-4);
   }
+
+  .welcome-text h1 {
+    font-size: 1.375rem;
+  }
+
+  .quick-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+  }
+
   .content-grid,
   .insights-grid {
     grid-template-columns: 1fr;

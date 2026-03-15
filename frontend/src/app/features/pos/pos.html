@@ -1,4 +1,4 @@
-<div class="pos-layout">
+<div class="pos-layout" [class.mobile-show-cart]="mobileView() === 'cart'">
   <div class="pos-products">
     <div class="pos-toolbar">
       <app-product-search (productSelected)="addToCart($event)" />
@@ -40,6 +40,21 @@
       (addDiscount)="openDiscountDialog()"
     />
   </div>
+</div>
+
+<!-- Mobile tab switcher (visible only on small screens) -->
+<div class="pos-mobile-tabs">
+  <button class="pos-tab-btn" [class.active]="mobileView() === 'products'" (click)="mobileView.set('products')">
+    <i class="pi pi-th-large"></i>
+    <span>Products</span>
+  </button>
+  <button class="pos-tab-btn" [class.active]="mobileView() === 'cart'" (click)="mobileView.set('cart')">
+    <i class="pi pi-shopping-cart"></i>
+    <span>Cart</span>
+    @if (cart.items().length > 0) {
+      <span class="pos-tab-badge">{{ cart.items().length }}</span>
+    }
+  </button>
 </div>
 
 <app-payment-dialog

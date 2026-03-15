@@ -244,6 +244,39 @@
       }
     }
 
+    @media (max-width: 768px) {
+      .report-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+
+      .date-nav {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .date-label {
+        min-width: 0;
+        flex: 1;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+      }
+
+      .stat-value {
+        font-size: 1.25rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
     // Enhanced skeleton loading
     :host ::ng-deep {
       .p-skeleton {

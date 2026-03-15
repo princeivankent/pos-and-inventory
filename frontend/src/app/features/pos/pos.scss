@@ -64,23 +64,126 @@
     line-height: 1;
   }
 }
+// ── Mobile tab switcher ──────────────────────────────────────
+
+.pos-mobile-tabs {
+  display: none;
+}
+
 @media (max-width: 1024px) {
+  // Host: fixed height = viewport minus header minus tab bar
   :host {
-    height: auto;
-    overflow: auto;
+    height: calc(100vh - var(--header-height, 56px) - 56px);
+    overflow: hidden;
   }
+
+  // Layout fills the host height
   .pos-layout {
-    flex-direction: column;
-    height: auto;
-    overflow: visible;
+    height: 100%;
+    overflow: hidden;
   }
+
+  // Cart: full width when visible
   .pos-cart {
     max-width: none;
     min-width: 0;
     width: 100%;
-    min-height: 300px;
+    height: 100%;
+    overflow-y: auto;
   }
+
+  // Products panel fills height
+  .pos-products {
+    height: 100%;
+  }
+
+  // Product grid fills remaining space
   .pos-grid-area {
-    max-height: 50vh;
+    max-height: none;
+    flex: 1;
+  }
+
+  // Tab bar: fixed to bottom
+  .pos-mobile-tabs {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .pos-tab-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0.625rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    position: relative;
+    transition: color var(--transition-fast), background var(--transition-fast);
+    min-height: 56px;
+
+    i {
+      font-size: 1.25rem;
+    }
+
+    &.active {
+      color: var(--color-primary);
+      background: var(--color-primary-light);
+    }
+
+    &:hover:not(.active) {
+      background: var(--bg-secondary);
+    }
+  }
+
+  .pos-tab-badge {
+    position: absolute;
+    top: 8px;
+    right: calc(50% - 20px);
+    min-width: 18px;
+    height: 18px;
+    border-radius: 9999px;
+    background: var(--color-primary);
+    color: white;
+    font-size: 0.625rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    line-height: 1;
+  }
+
+  // Show only the active panel
+  .pos-layout:not(.mobile-show-cart) .pos-cart {
+    display: none;
+  }
+
+  .pos-layout.mobile-show-cart .pos-products {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .pos-toolbar {
+    flex-wrap: wrap;
+
+    app-product-search {
+      order: -1;
+      width: 100%;
+      flex: 1 1 100%;
+    }
   }
 }
